@@ -1,12 +1,21 @@
 {
   "schema": "kie-console/1.0.0",
   "kbaseId": "kbase-default",
-  "revision": 1,
+  "revision": 2,
   "createdAt": "2026-07-31T00:00:00.000Z",
-  "modifiedAt": "2026-07-31T00:00:00.000Z",
+  "modifiedAt": "2026-07-31T13:40:00.000Z",
   "author": "",
   "changeLog": [
-    { "rev": 1, "at": "2026-07-31T00:00:00.000Z", "note": "Seed knowledge base created." }
+    {
+      "rev": 1,
+      "at": "2026-07-31T00:00:00.000Z",
+      "note": "Seed knowledge base created."
+    },
+    {
+      "rev": 2,
+      "at": "2026-07-31T13:40:00.000Z",
+      "note": "Replaced lending knowledge base entirely. Removed fact sets Applicant Profile, Product Catalog, Regulatory Calendar and rule sets Eligibility Policy, Pricing & Discounts, Compliance Guardrails. Loaded Monotone Continuation / sequential-investment KB: 5 fact sets, 3 rule sets, 10 rules. Focus stack repointed MAIN -> VALIDATION to clear focus starvation (GAP-01)."
+    }
   ],
   "kmodule": {
     "sessionName": "ksession-default",
@@ -16,13 +25,21 @@
     "eventProcessingMode": "cloud"
   },
   "engine": {
-    "conflictResolution": ["salience", "agendaGroup", "recency", "complexity", "loadOrder"],
+    "conflictResolution": [
+      "salience",
+      "agendaGroup",
+      "recency",
+      "complexity",
+      "loadOrder"
+    ],
     "truthMaintenance": true,
     "refraction": true,
     "propertyReactive": true,
     "loopGuard": "no-loop",
     "maxCycles": 50,
-    "focusStack": ["MAIN"],
+    "focusStack": [
+      "VALIDATION"
+    ],
     "traceVerbosity": "full",
     "strictMode": true
   },
@@ -36,132 +53,181 @@
     "forbidNarrative": true,
     "outputFormat": "markdown"
   },
-  "workingMemoryInput": "// Assert runtime facts here, one per line.\n// Example:\nApplicant( id: \"A-1001\", age: 34, tenureYears: 5, region: \"APAC\", incomeAnnual: 82000, hasDefault: false )\nApplication( applicantId: \"A-1001\", productCode: \"LOAN-STD\", amount: 25000, submittedOn: \"2026-07-31\" )",
+  "workingMemoryInput": "// Assert runtime facts here, one per line.\n// The case under adjudication: Samuelson & Marks, Managerial Economics Ch.13 Fig 13.3\nProgram( id: \"RND-13.3\", domain: \"INCREMENTAL_RND\", stagesAttempted: 0, maxStages: 5 )\n\n// Probe A — escalation of commitment. Uncomment BOTH lines:\n// Program( id: \"RND-13.3\", domain: \"INCREMENTAL_RND\", stagesAttempted: 3, maxStages: 5 )\n// SunkCost( programId: \"RND-13.3\", amountSpent: 9000 )\n\n// Probe B — breakthrough risk override. Replace the HazardProfile fact with:\n// HazardProfile( programId: \"RND-13.3\", direction: \"INCREASING\", terminalHitRate: 0.95, successAttainable: false )\n// and set domain: \"BREAKTHROUGH_RND\".",
   "factSets": [
     {
-      "id": "fs-applicant",
-      "name": "Applicant Profile",
-      "description": "Canonical shape of an applicant and their application. Stable across products.",
+      "id": "fs-program",
+      "name": "Program Profile",
+      "description": "Canonical shape of a sequential-investment program and its stationary economics. Stable across problem instances.",
       "enabled": true,
-      "declarations": "declare Applicant\n  id : String\n  age : int\n  tenureYears : int\n  region : String\n  incomeAnnual : int\n  hasDefault : boolean\nend\n\ndeclare Application\n  applicantId : String\n  productCode : String\n  amount : int\n  submittedOn : String\nend",
-      "facts": "// Stated facts asserted at session start (insert).\n// Leave empty if all facts arrive via Working Memory input."
+      "declarations": "declare Program\n  id : String\n  domain : String\n  stagesAttempted : int\n  maxStages : int\nend\n\ndeclare StageEconomics\n  programId : String\n  incrementalCost : int\n  successPayoff : int\n  costIsStationary : boolean\n  payoffIsStationary : boolean\nend",
+      "facts": "// STATED. Units: $000s. Stationarity flags carry the 'and no other\n// facts change' precondition of the Monotone Continuation Theorem.\nStageEconomics( programId: \"RND-13.3\", incrementalCost: 3000, successPayoff: 10000, costIsStationary: true, payoffIsStationary: true )"
     },
     {
-      "id": "fs-catalog",
-      "name": "Product Catalog",
-      "description": "Product definitions and their hard limits. Arbitrary/negotiated values — correctly externalised.",
+      "id": "fs-hazard",
+      "name": "Hazard Schedule",
+      "description": "Per-stage conditional success rates and the monotonicity classification. Instance-specific values — correctly externalised.",
       "enabled": true,
-      "declarations": "declare Product\n  code : String\n  minAmount : int\n  maxAmount : int\n  baseRate : double\n  minAge : int\nend",
-      "facts": "Product( code: \"LOAN-STD\", minAmount: 1000, maxAmount: 50000, baseRate: 7.5, minAge: 21 )\nProduct( code: \"LOAN-PREM\", minAmount: 25000, maxAmount: 250000, baseRate: 5.9, minAge: 25 )"
+      "declarations": "declare Stage\n  programId : String\n  seq : int\n  conditionalHitRate : double\n  cumulativeOutlay : int\nend\n\ndeclare HazardProfile\n  programId : String\n  direction : String\n  terminalHitRate : double\n  successAttainable : boolean\nend",
+      "facts": "// Uniform success-arrival over stages 1..5 => hazard p_i = 1/(6-i).\n// terminalHitRate 1.0 => success guaranteed by exhaustion (THR-01).\nStage( programId: \"RND-13.3\", seq: 1, conditionalHitRate: 0.2000, cumulativeOutlay: 0 )\nStage( programId: \"RND-13.3\", seq: 2, conditionalHitRate: 0.2500, cumulativeOutlay: 3000 )\nStage( programId: \"RND-13.3\", seq: 3, conditionalHitRate: 0.3333, cumulativeOutlay: 6000 )\nStage( programId: \"RND-13.3\", seq: 4, conditionalHitRate: 0.5000, cumulativeOutlay: 9000 )\nStage( programId: \"RND-13.3\", seq: 5, conditionalHitRate: 1.0000, cumulativeOutlay: 12000 )\nHazardProfile( programId: \"RND-13.3\", direction: \"INCREASING\", terminalHitRate: 1.0, successAttainable: true )"
     },
     {
-      "id": "fs-regulatory",
-      "name": "Regulatory Calendar",
-      "description": "Legislated thresholds and effective dates. Non-negotiable, non-learnable, audit-relevant.",
-      "enabled": false,
-      "declarations": "declare RegulatoryLimit\n  jurisdiction : String\n  maxUnsecured : int\n  effectiveFrom : String\nend",
-      "facts": "RegulatoryLimit( jurisdiction: \"APAC\", maxUnsecured: 40000, effectiveFrom: \"2026-04-01\" )"
+      "id": "fs-strategy",
+      "name": "Strategy Space",
+      "description": "The enumerated policy candidates under evaluation. Derived offline by averaging back the decision tree; asserted, not computed in-session.",
+      "enabled": true,
+      "declarations": "declare CandidatePolicy\n  programId : String\n  label : String\n  stopAfterFailures : int\n  expectedValue : double\n  isCorner : boolean\nend",
+      "facts": "// EV in $000s, net of all costs. Non-concave in stopAfterFailures:\n// 0 -> -1000 -> -1400 -> -1200 -> -400 -> +1000. Local search fails.\nCandidatePolicy( programId: \"RND-13.3\", label: \"NEVER_INVEST\",   stopAfterFailures: 0, expectedValue: 0.0,     isCorner: true )\nCandidatePolicy( programId: \"RND-13.3\", label: \"STOP_AFTER_1\",   stopAfterFailures: 1, expectedValue: -1000.0, isCorner: false )\nCandidatePolicy( programId: \"RND-13.3\", label: \"STOP_AFTER_2\",   stopAfterFailures: 2, expectedValue: -1400.0, isCorner: false )\nCandidatePolicy( programId: \"RND-13.3\", label: \"STOP_AFTER_3\",   stopAfterFailures: 3, expectedValue: -1200.0, isCorner: false )\nCandidatePolicy( programId: \"RND-13.3\", label: \"STOP_AFTER_4\",   stopAfterFailures: 4, expectedValue: -400.0,  isCorner: false )\nCandidatePolicy( programId: \"RND-13.3\", label: \"INVEST_ALL_WAY\", stopAfterFailures: 5, expectedValue: 1000.0,  isCorner: true )"
+    },
+    {
+      "id": "fs-sunkcost",
+      "name": "Sunk Cost Ledger",
+      "description": "QUARANTINED — AUDIT ONLY. NON-MATCHABLE IN ANY DECISION-BEARING LHS. Any such binding is an escalation-of-commitment defect.",
+      "enabled": true,
+      "declarations": "declare SunkCost\n  programId : String\n  amountSpent : int\nend",
+      "facts": "// Empty at session start (stagesAttempted = 0).\n// Mid-program probe — uncomment to exercise the exclusion guard:\n// SunkCost( programId: \"RND-13.3\", amountSpent: 9000 )"
+    },
+    {
+      "id": "fs-derived",
+      "name": "Derivation Artifacts",
+      "description": "Types constructed by rule RHS only. Declared here so no conclusion is built from an undeclared shape. Never asserted as input.",
+      "enabled": true,
+      "declarations": "declare Guard\n  programId : String\n  kind : String\n  note : String\nend\n\ndeclare Precondition\n  programId : String\n  kind : String\n  note : String\nend\n\ndeclare HazardLink\n  programId : String\n  fromSeq : int\n  toSeq : int\n  fromRate : double\n  toRate : double\n  classification : String\nend\n\ndeclare Decision\n  programId : String\n  outcome : String\n  rationale : String\n  ev : double\nend\n\ndeclare Dominated\n  programId : String\n  policyLabel : String\n  ev : double\n  shortfall : double\n  reason : String\nend\n\ndeclare Defect\n  programId : String\n  kind : String\n  subject : String\n  note : String\nend",
+      "facts": "// Derived only. Never asserted at session start."
     }
   ],
   "ruleSets": [
     {
-      "id": "rs-eligibility",
-      "name": "Eligibility Policy",
-      "description": "Determines whether an application may proceed. Phase: SCREENING.",
+      "id": "rs-preconditions",
+      "name": "Admissibility Preconditions",
+      "description": "Establishes that the Monotone Continuation Theorem may lawfully be applied: sunk cost quarantined, stationarity held, hazard rate rising across every adjacent stage. Phase: VALIDATION.",
       "enabled": true,
       "rules": [
         {
-          "name": "Reject Underage Applicant",
-          "salience": 100,
-          "agendaGroup": "SCREENING",
-          "activationGroup": "eligibility-decision",
+          "name": "Sunk Cost Exclusion Guard",
+          "salience": 200,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
           "noLoop": true,
           "lockOnActive": false,
           "logicalInsert": false,
-          "when": "$a : Applicant( $age : age )\n$app : Application( applicantId == $a.id, $pc : productCode )\n$p : Product( code == $pc, minAge > $age )",
-          "then": "insert( new Decision( $app, \"REJECTED\", \"Applicant below product minimum age\" ) );"
+          "when": "$sc : SunkCost( $pid : programId, $amt : amountSpent > 0 )",
+          "then": "insert( new Guard( $pid, \"SUNK_COST_EXCLUDED\", \"Money already invested is a sunk cost and is irrelevant to future action — audit reporting only\" ) );"
         },
         {
-          "name": "Reject Prior Default",
-          "salience": 95,
-          "agendaGroup": "SCREENING",
-          "activationGroup": "eligibility-decision",
+          "name": "Verify Stationarity Precondition",
+          "salience": 190,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
           "noLoop": true,
           "lockOnActive": false,
           "logicalInsert": false,
-          "when": "$a : Applicant( hasDefault == true )\n$app : Application( applicantId == $a.id )",
-          "then": "insert( new Decision( $app, \"REJECTED\", \"Prior default on record\" ) );"
+          "when": "$e : StageEconomics( $pid : programId, costIsStationary == true, payoffIsStationary == true )",
+          "then": "insert( new Precondition( $pid, \"STATIONARY_HOLDS\", \"Incremental cost and success payoff unchanged across stages — recursion is legitimate\" ) );"
         },
         {
-          "name": "Accept Eligible Application",
-          "salience": 10,
-          "agendaGroup": "SCREENING",
-          "activationGroup": "eligibility-decision",
+          "name": "Verify Increasing Hazard Rate Across Adjacent Stages",
+          "salience": 180,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
           "noLoop": true,
           "lockOnActive": false,
           "logicalInsert": false,
-          "when": "$a : Applicant( hasDefault == false, $age : age )\n$app : Application( applicantId == $a.id, $pc : productCode, $amt : amount )\n$p : Product( code == $pc, minAge <= $age, minAmount <= $amt, maxAmount >= $amt )",
-          "then": "insert( new Decision( $app, \"ELIGIBLE\", \"Passed all screening constraints\" ) );\nsetFocus( \"PRICING\" );"
+          "when": "$s1 : Stage( $pid : programId, $i : seq, $p1 : conditionalHitRate )\n$s2 : Stage( programId == $pid, seq == ( $i + 1 ), $p2 : conditionalHitRate )\neval( $p2 > $p1 )",
+          "then": "insert( new HazardLink( $pid, $i, $i + 1, $p1, $p2, \"MONOTONE_RISE\" ) );"
+        },
+        {
+          "name": "Preconditions Complete — Advance To Selection",
+          "salience": 1,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id )",
+          "then": "setFocus( \"SELECTION\" );"
         }
       ]
     },
     {
-      "id": "rs-pricing",
-      "name": "Pricing & Discounts",
-      "description": "Derives rate adjustments. Uses insertLogical so discounts die with their premises.",
+      "id": "rs-selection",
+      "name": "Corner Policy Selection",
+      "description": "Collapses the action set to its two corners and selects one. Breakthrough risk override outranks the theorem by declared salience. Phase: SELECTION.",
       "enabled": true,
       "rules": [
         {
-          "name": "Loyalty Discount",
-          "salience": 50,
-          "agendaGroup": "PRICING",
-          "activationGroup": "",
+          "name": "Breakthrough Risk Override — Theorem Does Not Apply",
+          "salience": 150,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "policy-selection",
           "noLoop": true,
           "lockOnActive": false,
-          "logicalInsert": true,
-          "when": "$a : Applicant( tenureYears >= 5 )\n$d : Decision( outcome == \"ELIGIBLE\" )",
-          "then": "insertLogical( new RateAdjustment( $a.id, -0.50, \"Loyalty >= 5 years\" ) );"
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id, domain == \"BREAKTHROUGH_RND\" )\n$h : HazardProfile( programId == $pid, successAttainable == false || terminalHitRate < 1.0 )",
+          "then": "insert( new Decision( $pid, \"THEOREM_INAPPLICABLE\", \"Beyond current state of the art — success not guaranteed by exhaustion; revert to stage-by-stage Bayesian optimal stopping\", 0.0 ) );"
         },
         {
-          "name": "High Income Discount",
-          "salience": 50,
-          "agendaGroup": "PRICING",
-          "activationGroup": "",
-          "noLoop": true,
-          "lockOnActive": false,
-          "logicalInsert": true,
-          "when": "$a : Applicant( incomeAnnual >= 75000 )\n$d : Decision( outcome == \"ELIGIBLE\" )",
-          "then": "insertLogical( new RateAdjustment( $a.id, -0.30, \"Income >= 75000\" ) );"
-        },
-        {
-          "name": "Compute Final Rate",
-          "salience": 5,
-          "agendaGroup": "PRICING",
-          "activationGroup": "",
+          "name": "Monotone Continuation Theorem — Collapse To Corners",
+          "salience": 100,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "policy-selection",
           "noLoop": true,
           "lockOnActive": true,
           "logicalInsert": false,
-          "when": "$app : Application( $pc : productCode )\n$p : Product( code == $pc, $base : baseRate )\n$total : Number() from accumulate( RateAdjustment( $delta : delta ), sum( $delta ) )",
-          "then": "insert( new FinalRate( $app.applicantId, $base + $total ) );"
+          "when": "$prog : Program( $pid : id, $n : maxStages )\n$h : HazardProfile( programId == $pid, direction == \"INCREASING\", successAttainable == true, terminalHitRate >= 1.0 )\nPrecondition( programId == $pid, kind == \"STATIONARY_HOLDS\" )\n$links : Number( intValue == ( $n - 1 ) ) from accumulate( HazardLink( programId == $pid ), count( 1 ) )\n$entry : CandidatePolicy( programId == $pid, stopAfterFailures == $n, $ev : expectedValue > 0 )",
+          "then": "insert( new Decision( $pid, \"INVEST_ALL_THE_WAY\", \"IHR verified across all \" + $links + \" stage transitions under stationarity; no interior stopping point can be optimal\", $ev ) );\nsetFocus( \"AUDIT\" );"
+        },
+        {
+          "name": "Never Invest — Opposite Corner",
+          "salience": 100,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "policy-selection",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id, $n : maxStages )\n$entry : CandidatePolicy( programId == $pid, stopAfterFailures == $n, expectedValue <= 0 )",
+          "then": "insert( new Decision( $pid, \"NEVER_INVEST\", \"Entry expected value non-positive; corner theorem selects the null corner\", 0.0 ) );"
+        },
+        {
+          "name": "No Applicable Policy — Halt Rather Than Fall Silent",
+          "salience": -1000,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "policy-selection",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id )\nnot Decision( programId == $pid )",
+          "then": "insert( new Decision( $pid, \"HALT_PRECONDITIONS_UNMET\", \"No corner rule matched — stationarity, monotonicity or entry EV could not be established\", 0.0 ) );\ninsert( new Defect( $pid, \"SILENT_NON_DECISION_AVERTED\", \"corner-policy-selection\", \"Catch-all fired; inspect Precondition and HazardLink facts\" ) );"
         }
       ]
     },
     {
-      "id": "rs-compliance",
-      "name": "Compliance Guardrails",
-      "description": "Hard obligations that override commercial outcomes. Phase: COMPLIANCE, auto-focus.",
-      "enabled": false,
+      "id": "rs-dominance",
+      "name": "Dominance Audit",
+      "description": "Post-decision. Proves each interior stopping rule dominated and flags any policy destroying value against abstention. Phase: AUDIT.",
+      "enabled": true,
       "rules": [
         {
-          "name": "Cap Unsecured Exposure",
-          "salience": 1000,
-          "agendaGroup": "COMPLIANCE",
+          "name": "Flag Dominated Interior Stopping Rule",
+          "salience": 40,
+          "agendaGroup": "AUDIT",
           "activationGroup": "",
           "noLoop": true,
           "lockOnActive": false,
-          "logicalInsert": false,
-          "when": "$a : Applicant( $r : region )\n$app : Application( applicantId == $a.id, $amt : amount )\n$lim : RegulatoryLimit( jurisdiction == $r, maxUnsecured < $amt )",
-          "then": "insert( new Violation( $app, \"REG-CAP\", \"Amount exceeds jurisdictional unsecured limit\" ) );\ninsert( new Decision( $app, \"REJECTED\", \"Regulatory cap breached\" ) );"
+          "logicalInsert": true,
+          "when": "$win : Decision( $pid : programId, outcome == \"INVEST_ALL_THE_WAY\", $best : ev )\n$loser : CandidatePolicy( programId == $pid, isCorner == false, $lbl : label, $ev : expectedValue )\neval( $ev < $best )",
+          "then": "insertLogical( new Dominated( $pid, $lbl, $ev, $best - $ev, \"Absorbs early-stage failure cost without purchasing the near-certain tail\" ) );"
+        },
+        {
+          "name": "Flag Interior Policy Worse Than Abstaining",
+          "salience": 30,
+          "agendaGroup": "AUDIT",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": true,
+          "when": "$null : CandidatePolicy( $pid : programId, stopAfterFailures == 0, $zero : expectedValue )\n$mid : CandidatePolicy( programId == $pid, isCorner == false, $lbl : label, expectedValue < $zero )",
+          "then": "insertLogical( new Defect( $pid, \"WORSE_THAN_ABSTAINING\", $lbl, \"Interior policy destroys value relative to never investing\" ) );"
         }
       ]
     }
