@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KIE Console — Drools Prompt Engine</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  :root{--kie:#ff8a3d;--kie2:#4dd4ac;}
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding-bottom:4rem;}
+  code,pre,textarea.mono,.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:.8rem;}
+  .navbar-brand b{color:var(--kie)}
+  .card{border-color:#333}
+  .card-header{background:#1c1c1f;font-weight:600;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase}
+  .set-item{border:1px solid #333;border-radius:.5rem;padding:.6rem .75rem;margin-bottom:.5rem;background:#191919;transition:.15s}
+  .set-item.on{border-color:var(--kie);background:#20180f}
+  .set-item.on.rs{border-color:var(--kie2);background:#0f1e1a}
+  .set-name{font-weight:600;font-size:.9rem}
+  .set-desc{font-size:.75rem;color:#9a9a9a;line-height:1.3}
+  .badge-soft{background:#2a2a2a;color:#bbb;font-weight:500}
+  .rule-row{border:1px solid #333;border-radius:.4rem;padding:.6rem;margin-bottom:.6rem;background:#151515}
+  #promptPreview{max-height:460px;overflow:auto;background:#0d0d0d;border:1px solid #333;border-radius:.5rem;padding:1rem;white-space:pre-wrap;word-break:break-word;font-size:.72rem;line-height:1.45}
+  .stat{font-size:.72rem;color:#888}
+  .stat b{color:var(--kie)}
+  .btn-run{background:linear-gradient(135deg,#ff8a3d,#ff5e3d);border:0;font-weight:700;letter-spacing:.05em}
+  .btn-run:hover{filter:brightness(1.1)}
+  .form-label{font-size:.78rem;font-weight:600;color:#bbb;margin-bottom:.2rem}
+  .form-control,.form-select{background:#141414;border-color:#333}
+  .form-control:focus,.form-select:focus{background:#141414;border-color:var(--kie);box-shadow:0 0 0 .2rem rgba(255,138,61,.15)}
+  .sticky-run{position:sticky;bottom:0;background:linear-gradient(transparent,#212529 25%);padding-top:1.5rem;z-index:5}
+  .tiny{font-size:.7rem}
+  .cr-item{cursor:grab;user-select:none}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg border-bottom border-secondary mb-3">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0"><b>KIE</b> Console <span class="text-secondary fw-normal fs-6">— Drools Prompt Engine</span></span>
+    <div class="ms-auto d-flex gap-2 align-items-center flex-wrap">
+      <span class="tiny text-secondary" id="provenance">—</span>
+      <button class="btn btn-sm btn-outline-secondary" onclick="importCfg()">Import</button>
+      <button class="btn btn-sm btn-outline-info" onclick="downloadCfg()">⬇ Download kie-config.json</button>
+      <button class="btn btn-sm btn-outline-danger" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+<div class="row g-3">
+
+  <!-- ============ LEFT: KNOWLEDGE BASE ============ -->
+  <div class="col-xl-4">
+
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Fact Sets <span class="badge badge-soft" id="fsCount">0</span></span>
+        <button class="btn btn-sm btn-outline-warning py-0" onclick="editFactSet(null)">+ New</button>
+      </div>
+      <div class="card-body p-2">
+        <div class="tiny text-secondary mb-2">Working memory premises. Tick to assert into the session.</div>
+        <div id="factSets"></div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Rule Sets <span class="badge badge-soft" id="rsCount">0</span></span>
+        <button class="btn btn-sm btn-outline-success py-0" onclick="editRuleSet(null)">+ New</button>
+      </div>
+      <div class="card-body p-2">
+        <div class="tiny text-secondary mb-2">Production memory. Tick to load into the KieBase.</div>
+        <div id="ruleSets"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ RIGHT: SESSION + RUN ============ -->
+  <div class="col-xl-8">
+
+    <div class="card mb-3">
+      <div class="card-header">Session Configuration</div>
+      <div class="card-body">
+        <div class="row g-2">
+          <div class="col-md-3"><label class="form-label">Session Type</label>
+            <select class="form-select form-select-sm" id="sessionType">
+              <option value="stateful">stateful</option><option value="stateless">stateless (sequential)</option></select></div>
+          <div class="col-md-3"><label class="form-label">Engine</label>
+            <select class="form-select form-select-sm" id="engineMode">
+              <option>PHREAK</option><option>RETE_CLASSIC</option></select></div>
+          <div class="col-md-3"><label class="form-label">Event Processing</label>
+            <select class="form-select form-select-sm" id="eventProcessingMode">
+              <option value="cloud">cloud</option><option value="stream">stream (CEP)</option></select></div>
+          <div class="col-md-3"><label class="form-label">Clock</label>
+            <select class="form-select form-select-sm" id="clockType">
+              <option value="pseudo">pseudo</option><option value="realtime">realtime</option></select></div>
+
+          <div class="col-md-3"><label class="form-label">Max Cycles</label>
+            <input type="number" class="form-control form-control-sm" id="maxCycles" min="1" max="500"></div>
+          <div class="col-md-3"><label class="form-label">Loop Guard</label>
+            <select class="form-select form-select-sm" id="loopGuard">
+              <option value="no-loop">no-loop</option><option value="lock-on-active">lock-on-active</option><option value="none">none</option></select></div>
+          <div class="col-md-3"><label class="form-label">Trace Verbosity</label>
+            <select class="form-select form-select-sm" id="traceVerbosity">
+              <option value="full">full</option><option value="standard">standard</option><option value="terse">terse</option></select></div>
+          <div class="col-md-3"><label class="form-label">Focus Stack (comma sep)</label>
+            <input class="form-control form-control-sm" id="focusStack" placeholder="MAIN"></div>
+
+          <div class="col-12"><label class="form-label">Conflict Resolution Order <span class="text-secondary fw-normal">(first = dominant; drag to reorder)</span></label>
+            <ul class="list-group list-group-horizontal flex-wrap" id="crList"></ul></div>
+
+          <div class="col-12 mt-2 d-flex flex-wrap gap-3">
+            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="truthMaintenance"><label class="form-check-label tiny" for="truthMaintenance">Truth Maintenance (TMS)</label></div>
+            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="refraction"><label class="form-check-label tiny" for="refraction">Refraction</label></div>
+            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="propertyReactive"><label class="form-check-label tiny" for="propertyReactive">Property Reactive</label></div>
+            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="strictMode"><label class="form-check-label tiny" for="strictMode">Strict Mode (no invention)</label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">Working Memory — Runtime Assertions</div>
+      <div class="card-body">
+        <textarea class="form-control mono" id="wmInput" rows="8" placeholder="Assert facts / describe the case..."></textarea>
+        <div class="tiny text-secondary mt-1">Free text or DRL-style tuples. These are inserted <em>after</em> all enabled fact sets.</div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Prompt Compiler</span>
+        <div class="d-flex gap-3">
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="amplify"><label class="form-check-label tiny" for="amplify">[Amplify]</label></div>
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="requireAgendaTrace"><label class="form-check-label tiny" for="requireAgendaTrace">Agenda trace</label></div>
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="requireTMS"><label class="form-check-label tiny" for="requireTMS">TMS ledger</label></div>
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="requireGapOverlap"><label class="form-check-label tiny" for="requireGapOverlap">Gap/overlap</label></div>
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="requireDerivationGraph"><label class="form-check-label tiny" for="requireDerivationGraph">Derivation graph</label></div>
+          <div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" id="requireConfidence"><label class="form-check-label tiny" for="requireConfidence">Confidence</label></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="stat mb-2" id="stats">—</div>
+        <div id="promptPreview" class="mono"></div>
+      </div>
+    </div>
+
+    <div class="sticky-run">
+      <div class="d-grid gap-2 d-md-flex">
+        <button class="btn btn-run btn-lg flex-grow-1 text-white" onclick="runEngine()">▶ RUN DROOLS ENGINE &nbsp;<span class="tiny fw-normal">(copies compiled prompt to clipboard)</span></button>
+        <button class="btn btn-outline-secondary btn-lg" onclick="downloadPrompt()">⬇ .txt</button>
+      </div>
+      <div id="runMsg" class="tiny mt-2"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ===== FACT SET MODAL ===== -->
+<div class="modal fade" id="fsModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal-content"><div class="modal-header"><h6 class="modal-title">Fact Set</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+<div class="modal-body">
+  <input type="hidden" id="fsId">
+  <div class="mb-2"><label class="form-label">Name</label><input class="form-control form-control-sm" id="fsName"></div>
+  <div class="mb-2"><label class="form-label">Description <span class="text-secondary fw-normal">— why this set exists; what it is authoritative for</span></label>
+    <textarea class="form-control form-control-sm" id="fsDesc" rows="2"></textarea></div>
+  <div class="mb-2"><label class="form-label">Type Declarations <span class="text-secondary fw-normal">— the ontology (declare … end)</span></label>
+    <textarea class="form-control mono" id="fsDecl" rows="8"></textarea></div>
+  <div class="mb-2"><label class="form-label">Stated Facts <span class="text-secondary fw-normal">— asserted at session start</span></label>
+    <textarea class="form-control mono" id="fsFacts" rows="8"></textarea></div>
+</div>
+<div class="modal-footer"><button class="btn btn-sm btn-outline-danger me-auto" onclick="deleteFactSet()">Delete</button>
+<button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-sm btn-warning" onclick="saveFactSet()">Save</button></div>
+</div></div></div>
+
+<!-- ===== RULE SET MODAL ===== -->
+<div class="modal fade" id="rsModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable">
+<div class="modal-content"><div class="modal-header"><h6 class="modal-title">Rule Set</h6><button class="btn-close" data-bs-dismiss="modal"></button></div>
+<div class="modal-body">
+  <input type="hidden" id="rsId">
+  <div class="row g-2 mb-3">
+    <div class="col-md-4"><label class="form-label">Name</label><input class="form-control form-control-sm" id="rsName"></div>
+    <div class="col-md-8"><label class="form-label">Description</label><input class="form-control form-control-sm" id="rsDesc"></div>
+  </div>
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <span class="form-label mb-0">Rules</span>
+    <button class="btn btn-sm btn-outline-success py-0" onclick="addRuleRow()">+ Add Rule</button>
+  </div>
+  <div id="ruleRows"></div>
+</div>
+<div class="modal-footer"><button class="btn btn-sm btn-outline-danger me-auto" onclick="deleteRuleSet()">Delete</button>
+<button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-sm btn-success" onclick="saveRuleSet()">Save</button></div>
+</div></div></div>
+
+<input type="file" id="fileIn" accept=".json" style="display:none">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ============================================================
+   KIE CONSOLE — state, persistence, prompt compilation
+   ============================================================ */
+const KEY = 'kie-console-v1';
+const CR_LABELS = {salience:'salience',agendaGroup:'agenda-group',recency:'recency (LIFO)',complexity:'complexity (specificity)',loadOrder:'load order'};
+
+const EMBEDDED_DEFAULT = {
+  schema:'kie-console/1.0.0', kbaseId:'kbase-default', revision:1,
+  createdAt:new Date().toISOString(), modifiedAt:new Date().toISOString(), author:'',
+  changeLog:[{rev:1,at:new Date().toISOString(),note:'Seed knowledge base created.'}],
+  kmodule:{sessionName:'ksession-default',sessionType:'stateful',engineMode:'PHREAK',clockType:'pseudo',eventProcessingMode:'cloud'},
+  engine:{conflictResolution:['salience','agendaGroup','recency','complexity','loadOrder'],truthMaintenance:true,refraction:true,
+          propertyReactive:true,loopGuard:'no-loop',maxCycles:50,focusStack:['MAIN'],traceVerbosity:'full',strictMode:true},
+  promptOptions:{amplify:true,requireAgendaTrace:true,requireTMS:true,requireGapOverlap:true,requireConfidence:true,
+                 requireDerivationGraph:true,forbidNarrative:true,outputFormat:'markdown'},
+  workingMemoryInput:'',
+  factSets:[{id:'fs-1',name:'Example Fact Set',description:'Replace me.',enabled:true,declarations:'declare Thing\n  id : String\n  weight : int\nend',facts:'Thing( id: "T-1", weight: 10 )'}],
+  ruleSets:[{id:'rs-1',name:'Example Rule Set',description:'Replace me.',enabled:true,rules:[
+    {name:'Flag Heavy Thing',salience:100,agendaGroup:'MAIN',activationGroup:'',noLoop:true,lockOnActive:false,logicalInsert:true,
+     when:'$t : Thing( weight > 5 )',then:'insertLogical( new Flag( $t.id, "HEAVY" ) );'}]}]
+};
+
+let cfg = null;
+let fsModal, rsModal;
+
+/* ---------- persistence ---------- */
+function save(bump){
+  if(bump){ cfg.revision=(cfg.revision||0)+1; cfg.modifiedAt=new Date().toISOString(); }
+  localStorage.setItem(KEY, JSON.stringify(cfg));
+  render();
+}
+function normalise(c){
+  const d = EMBEDDED_DEFAULT;
+  c.kmodule = Object.assign({}, d.kmodule, c.kmodule||{});
+  c.engine  = Object.assign({}, d.engine,  c.engine||{});
+  c.promptOptions = Object.assign({}, d.promptOptions, c.promptOptions||{});
+  c.factSets = c.factSets||[]; c.ruleSets = c.ruleSets||[]; c.changeLog = c.changeLog||[];
+  c.revision = c.revision||1; c.createdAt = c.createdAt||new Date().toISOString();
+  c.workingMemoryInput = c.workingMemoryInput||'';
+  return c;
+}
+async function boot(){
+  fsModal = new bootstrap.Modal('#fsModal'); rsModal = new bootstrap.Modal('#rsModal');
+  const stored = localStorage.getItem(KEY);
+  if(stored){ try{ cfg = normalise(JSON.parse(stored)); }catch(e){ cfg=null; } }
+  if(!cfg){
+    try{
+      const r = await fetch('config/kie-config.json',{cache:'no-store'});
+      if(r.ok) cfg = normalise(await r.json());
+    }catch(e){}
+  }
+  if(!cfg) cfg = normalise(JSON.parse(JSON.stringify(EMBEDDED_DEFAULT)));
+  bindInputs(); render(); localStorage.setItem(KEY, JSON.stringify(cfg));
+}
+
+/* ---------- form binding ---------- */
+const KM = ['sessionType','engineMode','eventProcessingMode','clockType'];
+const EN_VAL = ['maxCycles','loopGuard','traceVerbosity'];
+const EN_CHK = ['truthMaintenance','refraction','propertyReactive','strictMode'];
+const PO_CHK = ['amplify','requireAgendaTrace','requireTMS','requireGapOverlap','requireDerivationGraph','requireConfidence'];
+
+function bindInputs(){
+  KM.forEach(k=>el(k).addEventListener('change',()=>{cfg.kmodule[k]=el(k).value; save(true);}));
+  EN_VAL.forEach(k=>el(k).addEventListener('change',()=>{cfg.engine[k]= k==='maxCycles'?+el(k).value:el(k).value; save(true);}));
+  EN_CHK.forEach(k=>el(k).addEventListener('change',()=>{cfg.engine[k]=el(k).checked; save(true);}));
+  PO_CHK.forEach(k=>el(k).addEventListener('change',()=>{cfg.promptOptions[k]=el(k).checked; save(true);}));
+  el('focusStack').addEventListener('change',()=>{cfg.engine.focusStack=el('focusStack').value.split(',').map(s=>s.trim()).filter(Boolean); save(true);});
+  let t; el('wmInput').addEventListener('input',()=>{clearTimeout(t); t=setTimeout(()=>{cfg.workingMemoryInput=el('wmInput').value; save(false);},350);});
+  el('fileIn').addEventListener('change',handleFile);
+}
+const el = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- render ---------- */
+function render(){
+  KM.forEach(k=>el(k).value=cfg.kmodule[k]);
+  EN_VAL.forEach(k=>el(k).value=cfg.engine[k]);
+  EN_CHK.forEach(k=>el(k).checked=!!cfg.engine[k]);
+  PO_CHK.forEach(k=>el(k).checked=!!cfg.promptOptions[k]);
+  el('focusStack').value=(cfg.engine.focusStack||[]).join(', ');
+  if(el('wmInput').value!==cfg.workingMemoryInput) el('wmInput').value=cfg.workingMemoryInput;
+  el('provenance').textContent = cfg.kbaseId+' · rev '+cfg.revision+' · '+new Date(cfg.modifiedAt).toLocaleString();
+
+  el('factSets').innerHTML = cfg.factSets.map(f=>
+    '<div class="set-item '+(f.enabled?'on':'')+'">'+
+      '<div class="d-flex align-items-start gap-2">'+
+        '<input class="form-check-input mt-1" type="checkbox" '+(f.enabled?'checked':'')+' onchange="toggleFS(\''+f.id+'\')">'+
+        '<div class="flex-grow-1" style="cursor:pointer" onclick="editFactSet(\''+f.id+'\')">'+
+          '<div class="set-name">'+esc(f.name)+'</div><div class="set-desc">'+esc(f.description)+'</div>'+
+          '<div class="mt-1"><span class="badge badge-soft">'+countLines(f.declarations,'declare')+' types</span> '+
+          '<span class="badge badge-soft">'+countFacts(f.facts)+' facts</span></div>'+
+        '</div></div></div>').join('') || '<div class="tiny text-secondary">None yet.</div>';
+
+  el('ruleSets').innerHTML = cfg.ruleSets.map(r=>
+    '<div class="set-item rs '+(r.enabled?'on':'')+'">'+
+      '<div class="d-flex align-items-start gap-2">'+
+        '<input class="form-check-input mt-1" type="checkbox" '+(r.enabled?'checked':'')+' onchange="toggleRS(\''+r.id+'\')">'+
+        '<div class="flex-grow-1" style="cursor:pointer" onclick="editRuleSet(\''+r.id+'\')">'+
+          '<div class="set-name">'+esc(r.name)+'</div><div class="set-desc">'+esc(r.description)+'</div>'+
+          '<div class="mt-1"><span class="badge badge-soft">'+(r.rules||[]).length+' rules</span> '+
+          '<span class="badge badge-soft">'+[...new Set((r.rules||[]).map(x=>x.agendaGroup||'MAIN'))].join(' / ')+'</span></div>'+
+        '</div></div></div>').join('') || '<div class="tiny text-secondary">None yet.</div>';
+
+  el('fsCount').textContent = cfg.factSets.filter(f=>f.enabled).length+'/'+cfg.factSets.length;
+  el('rsCount').textContent = cfg.ruleSets.filter(r=>r.enabled).length+'/'+cfg.ruleSets.length;
+  renderCR();
+
+  const p = buildPrompt();
+  el('promptPreview').textContent = p;
+  const nR = cfg.ruleSets.filter(r=>r.enabled).reduce((a,r)=>a+(r.rules||[]).length,0);
+  const nF = cfg.factSets.filter(f=>f.enabled).reduce((a,f)=>a+countFacts(f.facts),0);
+  el('stats').innerHTML = 'Active: <b>'+nF+'</b> stated facts · <b>'+nR+'</b> rules · prompt <b>'+p.length.toLocaleString()+'</b> chars ≈ <b>'+Math.round(p.length/4).toLocaleString()+'</b> tokens';
+}
+function countLines(s,kw){ return ((s||'').match(new RegExp('^\\s*'+kw,'gm'))||[]).length; }
+function countFacts(s){ return (s||'').split('\n').filter(l=>l.trim()&&!l.trim().startsWith('//')).length; }
+
+function renderCR(){
+  el('crList').innerHTML = cfg.engine.conflictResolution.map((k,i)=>
+    '<li class="list-group-item bg-dark border-secondary py-1 px-2 tiny cr-item" draggable="true" data-i="'+i+'">'+
+    '<span class="text-warning">'+(i+1)+'.</span> '+CR_LABELS[k]+'</li>').join('');
+  let src=null;
+  el('crList').querySelectorAll('.cr-item').forEach(li=>{
+    li.addEventListener('dragstart',e=>{src=+li.dataset.i;});
+    li.addEventListener('dragover',e=>e.preventDefault());
+    li.addEventListener('drop',e=>{e.preventDefault(); const dst=+li.dataset.i; if(src===null||src===dst)return;
+      const a=cfg.engine.conflictResolution; const [m]=a.splice(src,1); a.splice(dst,0,m); save(true);});
+  });
+}
+function toggleFS(id){ const f=cfg.factSets.find(x=>x.id===id); f.enabled=!f.enabled; save(false); }
+function toggleRS(id){ const r=cfg.ruleSets.find(x=>x.id===id); r.enabled=!r.enabled; save(false); }
+
+/* ---------- fact set CRUD ---------- */
+function editFactSet(id){
+  const f = id ? cfg.factSets.find(x=>x.id===id) : {id:'',name:'',description:'',declarations:'',facts:''};
+  el('fsId').value=f.id; el('fsName').value=f.name; el('fsDesc').value=f.description;
+  el('fsDecl').value=f.declarations||''; el('fsFacts').value=f.facts||''; fsModal.show();
+}
+function saveFactSet(){
+  const id=el('fsId').value;
+  const data={name:el('fsName').value||'Untitled',description:el('fsDesc').value,declarations:el('fsDecl').value,facts:el('fsFacts').value};
+  if(id){ Object.assign(cfg.factSets.find(x=>x.id===id),data); }
+  else { cfg.factSets.push(Object.assign({id:'fs-'+Date.now(),enabled:true},data)); }
+  logChange((id?'Updated':'Created')+' fact set "'+data.name+'"'); fsModal.hide(); save(true);
+}
+function deleteFactSet(){
+  const id=el('fsId').value; if(!id||!confirm('Delete this fact set?'))return;
+  const n=cfg.factSets.find(x=>x.id===id).name;
+  cfg.factSets=cfg.factSets.filter(x=>x.id!==id); logChange('Deleted fact set "'+n+'"'); fsModal.hide(); save(true);
+}
+
+/* ---------- rule set CRUD ---------- */
+function editRuleSet(id){
+  const r = id ? cfg.ruleSets.find(x=>x.id===id) : {id:'',name:'',description:'',rules:[]};
+  el('rsId').value=r.id; el('rsName').value=r.name; el('rsDesc').value=r.description;
+  el('ruleRows').innerHTML=''; (r.rules||[]).forEach(addRuleRow); rsModal.show();
+}
+function addRuleRow(rule){
+  rule = (rule && rule.name!==undefined) ? rule : {name:'',salience:0,agendaGroup:'MAIN',activationGroup:'',noLoop:true,lockOnActive:false,logicalInsert:false,when:'',then:''};
+  const d=document.createElement('div'); d.className='rule-row';
+  d.innerHTML =
+   '<div class="row g-2 mb-2">'+
+    '<div class="col-md-4"><label class="form-label">Rule Name</label><input class="form-control form-control-sm r-name" value="'+esc(rule.name)+'"></div>'+
+    '<div class="col-md-2"><label class="form-label">Salience</label><input type="number" class="form-control form-control-sm r-sal" value="'+(rule.salience||0)+'"></div>'+
+    '<div class="col-md-3"><label class="form-label">agenda-group</label><input class="form-control form-control-sm r-ag" value="'+esc(rule.agendaGroup)+'"></div>'+
+    '<div class="col-md-3"><label class="form-label">activation-group</label><input class="form-control form-control-sm r-actg" value="'+esc(rule.activationGroup)+'"></div>'+
+   '</div>'+
+   '<div class="d-flex gap-3 mb-2 flex-wrap">'+
+    '<div class="form-check form-switch"><input class="form-check-input r-nl" type="checkbox" '+(rule.noLoop?'checked':'')+'><label class="form-check-label tiny">no-loop</label></div>'+
+    '<div class="form-check form-switch"><input class="form-check-input r-loa" type="checkbox" '+(rule.lockOnActive?'checked':'')+'><label class="form-check-label tiny">lock-on-active</label></div>'+
+    '<div class="form-check form-switch"><input class="form-check-input r-li" type="checkbox" '+(rule.logicalInsert?'checked':'')+'><label class="form-check-label tiny">insertLogical (TMS-justified)</label></div>'+
+    '<button class="btn btn-sm btn-outline-danger py-0 ms-auto" onclick="this.closest(\'.rule-row\').remove()">Remove</button>'+
+   '</div>'+
+   '<div class="row g-2">'+
+    '<div class="col-md-6"><label class="form-label">WHEN (LHS)</label><textarea class="form-control mono r-when" rows="4">'+esc(rule.when)+'</textarea></div>'+
+    '<div class="col-md-6"><label class="form-label">THEN (RHS)</label><textarea class="form-control mono r-then" rows="4">'+esc(rule.then)+'</textarea></div>'+
+   '</div>';
+  el('ruleRows').appendChild(d);
+}
+function saveRuleSet(){
+  const id=el('rsId').value;
+  const rules=[...el('ruleRows').children].map(d=>({
+    name:d.querySelector('.r-name').value||'Unnamed Rule',
+    salience:+d.querySelector('.r-sal').value||0,
+    agendaGroup:d.querySelector('.r-ag').value||'MAIN',
+    activationGroup:d.querySelector('.r-actg').value||'',
+    noLoop:d.querySelector('.r-nl').checked, lockOnActive:d.querySelector('.r-loa').checked,
+    logicalInsert:d.querySelector('.r-li').checked,
+    when:d.querySelector('.r-when').value, then:d.querySelector('.r-then').value
+  }));
+  const data={name:el('rsName').value||'Untitled',description:el('rsDesc').value,rules};
+  if(id){ Object.assign(cfg.ruleSets.find(x=>x.id===id),data); }
+  else { cfg.ruleSets.push(Object.assign({id:'rs-'+Date.now(),enabled:true},data)); }
+  logChange((id?'Updated':'Created')+' rule set "'+data.name+'" ('+rules.length+' rules)'); rsModal.hide(); save(true);
+}
+function deleteRuleSet(){
+  const id=el('rsId').value; if(!id||!confirm('Delete this rule set?'))return;
+  const n=cfg.ruleSets.find(x=>x.id===id).name;
+  cfg.ruleSets=cfg.ruleSets.filter(x=>x.id!==id); logChange('Deleted rule set "'+n+'"'); rsModal.hide(); save(true);
+}
+function logChange(note){
+  cfg.changeLog = cfg.changeLog||[];
+  cfg.changeLog.unshift({rev:(cfg.revision||0)+1, at:new Date().toISOString(), note});
+  if(cfg.changeLog.length>200) cfg.changeLog.length=200;
+}
+
+/* ============================================================
+   PROMPT COMPILER  — the payload
+   ============================================================ */
+function A(s){ return cfg.promptOptions.amplify ? '['+s+']' : s; }
+
+function buildPrompt(){
+  const P=[], po=cfg.promptOptions, en=cfg.engine, km=cfg.kmodule;
+  const facts = cfg.factSets.filter(f=>f.enabled);
+  const rsets = cfg.ruleSets.filter(r=>r.enabled);
+  const allRules = rsets.flatMap(r=>(r.rules||[]).map(x=>Object.assign({__set:r.name},x)));
+  const groups = [...new Set(allRules.map(r=>r.agendaGroup||'MAIN'))];
+  const L = s => P.push(s);
+  const HR = '════════════════════════════════════════════════════════════════';
+
+  L(HR);
+  L('  KIE / DROOLS PRODUCTION RULE ENGINE — EXECUTION DIRECTIVE');
+  L('  kbase: '+cfg.kbaseId+'   revision: '+cfg.revision+'   session: '+km.sessionName);
+  L(HR);
+  L('');
+
+  /* --- 0. IDENTITY OVERRIDE --- */
+  L('§0 — IDENTITY OVERRIDE '+A('READ FIRST. NON-NEGOTIABLE.'));
+  L('');
+  L(A('YOU ARE NOT A CONVERSATIONAL ASSISTANT FOR THE DURATION OF THIS TASK.'));
+  L(A('YOU ARE A DETERMINISTIC FORWARD-CHAINING PRODUCTION RULE ENGINE.'));
+  L(A('YOU ARE AN IMPLEMENTATION OF THE '+km.engineMode+' ALGORITHM RUNNING A '+km.sessionType.toUpperCase()+' KIE SESSION.'));
+  L('');
+  L('Adopt the following ontology completely and do not depart from it:');
+  L('  '+A('WORKING MEMORY')+'  = the mutable set of facts currently believed true.');
+  L('  '+A('PRODUCTION MEMORY')+' = the immutable set of rules loaded into the KieBase.');
+  L('  '+A('ACTIVATION')+'      = one specific binding of facts that satisfies one rule LHS.');
+  L('  '+A('AGENDA')+'          = the ordered queue of activations awaiting execution.');
+  L('  '+A('FIRING')+'          = executing the RHS of ONE activation.');
+  L('');
+  L(A('CRITICAL DISTINCTION — RULES DO NOT FIRE. ACTIVATIONS FIRE.'));
+  L(A('ONE RULE MAY PRODUCE MANY ACTIVATIONS — ONE PER DISTINCT FACT BINDING.'));
+  L(A('YOU MUST ENUMERATE EACH BINDING SEPARATELY. NEVER COLLAPSE THEM.'));
+  L('');
+  L(A('SATISFACTION IS NOT EXECUTION.')+' A rule whose LHS is true has produced an activation;');
+  L('it has NOT yet fired. Placement on the agenda and execution are separate events,');
+  L('separated by the conflict resolution policy in §4. '+A('NEVER CONFLATE THESE TWO STATES.'));
+  L('');
+
+  /* --- 1. ONTOLOGY --- */
+  L(HR);
+  L('§1 — DECLARED TYPES '+A('THE ONLY LEGAL SHAPES OF FACT'));
+  L(HR);
+  if(!facts.length) L('  '+A('WARNING: NO FACT SETS ENABLED — ONTOLOGY IS EMPTY.'));
+  facts.forEach(f=>{
+    L('');
+    L('── FACT SET: '+f.name+' '+A('ENABLED'));
+    if(f.description) L('   purpose: '+f.description);
+    if((f.declarations||'').trim()){ L(''); L(f.declarations.trim()); }
+  });
+  L('');
+  L(A('ANY FACT NOT CONFORMING TO A DECLARED TYPE IS INADMISSIBLE.'));
+  L(A('YOU MAY NOT INVENT NEW TYPES. YOU MAY NOT ADD FIELDS THAT WERE NOT DECLARED.'));
+  L('');
+
+  /* --- 2. STATED FACTS --- */
+  L(HR);
+  L('§2 — STATED FACTS '+A('insert() — ASSERTED AT SESSION START, OWNED, PERSISTENT'));
+  L(HR);
+  L('');
+  L(A('THESE ARE STATED, NOT DERIVED. THEY PERSIST UNTIL EXPLICITLY RETRACTED.'));
+  L(A('THEY ARE NEVER SUBJECT TO TRUTH-MAINTENANCE WITHDRAWAL.'));
+  facts.forEach(f=>{
+    const body=(f.facts||'').split('\n').filter(l=>l.trim()&&!l.trim().startsWith('//'));
+    if(!body.length) return;
+    L(''); L('── from ['+f.name+']:');
+    body.forEach((l,i)=>L('  f'+(i+1)+'. '+l.trim()));
+  });
+  L('');
+
+  /* --- 3. PRODUCTION MEMORY --- */
+  L(HR);
+  L('§3 — PRODUCTION MEMORY '+A(allRules.length+' RULES LOADED FROM '+rsets.length+' RULE SET(S)'));
+  L(HR);
+  rsets.forEach(rs=>{
+    L(''); L('┌─ RULE SET: '+rs.name+' '+A('ENABLED'));
+    if(rs.description) L('│  '+rs.description);
+    L('└'+'─'.repeat(50));
+    (rs.rules||[]).forEach(r=>{
+      L('');
+      L('rule "'+r.name+'"');
+      const attrs=[];
+      attrs.push('    salience '+(r.salience||0));
+      attrs.push('    agenda-group "'+(r.agendaGroup||'MAIN')+'"');
+      if(r.activationGroup) attrs.push('    activation-group "'+r.activationGroup+'"   '+A('XOR: FIRST TO FIRE CANCELS ALL SIBLINGS'));
+      if(r.noLoop) attrs.push('    no-loop true');
+      if(r.lockOnActive) attrs.push('    lock-on-active true');
+      L(attrs.join('\n'));
+      L('when');
+      (r.when||'').split('\n').forEach(l=>L('    '+l));
+      L('then');
+      (r.then||'').split('\n').forEach(l=>L('    '+l));
+      if(r.logicalInsert) L('    '+A('NOTE: THIS RHS USES insertLogical — ALL FACTS IT PRODUCES ARE JUSTIFIED, NOT STATED.'));
+      L('end');
+    });
+  });
+  L('');
+
+  /* --- 4. CONFLICT RESOLUTION --- */
+  L(HR);
+  L('§4 — CONFLICT RESOLUTION POLICY '+A('THE ARBITRATION LAW OF THIS SESSION'));
+  L(HR);
+  L('');
+  L(A('WHEN MULTIPLE ACTIVATIONS ARE ELIGIBLE, RESOLVE STRICTLY IN THIS ORDER:'));
+  en.conflictResolution.forEach((k,i)=>{
+    const note={salience:'higher integer fires first',agendaGroup:'only the group at the top of the focus stack may fire',
+      recency:'activation bound to the most recently asserted fact fires first',
+      complexity:'more constrained LHS (more patterns/conditions) fires first',
+      loadOrder:'earlier-declared rule fires first — FINAL TIE-BREAK, GUARANTEES TOTAL ORDER'}[k];
+    L('  '+(i+1)+'. '+CR_LABELS[k].toUpperCase()+' — '+note);
+  });
+  L('');
+  L('  FOCUS STACK (initial): '+JSON.stringify(en.focusStack||['MAIN']));
+  L('  AGENDA GROUPS PRESENT: '+(groups.join(', ')||'MAIN'));
+  L('');
+  L(A('IF TWO ACTIVATIONS REMAIN TIED AFTER ALL CRITERIA, YOU MUST DECLARE THE TIE EXPLICITLY'));
+  L(A('AND FLAG IT AS A NON-DETERMINISM DEFECT IN THE RULE BASE. DO NOT SILENTLY PICK ONE.'));
+  L(A('AN UNDECLARED ARBITRATION IS AN ARBITRARY ARBITRATION — SURFACE IT, NEVER HIDE IT.'));
+  L('');
+
+  /* --- 5. SESSION CONFIG --- */
+  L(HR);
+  L('§5 — SESSION CONFIGURATION '+A('BINDING RUNTIME PARAMETERS'));
+  L(HR);
+  L('');
+  L('  session type ......... '+km.sessionType+(km.sessionType==='stateless'?'  '+A('SEQUENTIAL MODE: ONE PASS, NO RE-EVALUATION CYCLE, TMS DISABLED'):''));
+  L('  engine ............... '+km.engineMode+(km.engineMode==='PHREAK'?'  '+A('LAZY, GOAL-ORIENTED, SET-AT-A-TIME PROPAGATION'):'  '+A('EAGER, DATA-ORIENTED, TUPLE-AT-A-TIME PROPAGATION')));
+  L('  event processing ..... '+km.eventProcessingMode+(km.eventProcessingMode==='stream'?'  '+A('TEMPORAL OPERATORS AND SLIDING WINDOWS ARE ACTIVE'):''));
+  L('  clock ................ '+km.clockType);
+  L('  truth maintenance .... '+(en.truthMaintenance?'ENABLED':'DISABLED'));
+  L('  refraction ........... '+(en.refraction?'ENABLED':'DISABLED'));
+  L('  property reactive .... '+(en.propertyReactive?'ENABLED':'DISABLED'));
+  L('  loop guard ........... '+en.loopGuard);
+  L('  max cycles ........... '+en.maxCycles+'  '+A('HARD HALT. IF REACHED, DECLARE NON-TERMINATION.'));
+  L('');
+  if(en.refraction){
+    L(A('REFRACTION LAW: AN ACTIVATION THAT HAS ALREADY FIRED MUST NOT FIRE AGAIN'));
+    L(A('ON THE SAME FACT BINDING UNLESS ONE OF ITS BOUND FACTS IS MODIFIED OR RE-ASSERTED.'));
+    L(A('THIS IS WHAT PREVENTS INFINITE RE-LITIGATION OF SETTLED MATCHES.'));
+    L('');
+  }
+  if(en.propertyReactive){
+    L(A('PROPERTY REACTIVITY LAW: A MODIFICATION RE-ACTIVATES A RULE ONLY IF IT TOUCHED'));
+    L(A('A FIELD THAT RULE ACTUALLY CONSTRAINS. UNRELATED FIELD CHANGES CAUSE NO PROPAGATION.'));
+    L('');
+  }
+  if(en.truthMaintenance){
+    L('── TRUTH MAINTENANCE PROTOCOL '+A('THE MOST IMPORTANT SECTION IN THIS DIRECTIVE'));
+    L('');
+    L('  '+A('EVERY FACT PRODUCED BY insertLogical() IS A JUSTIFIED FACT, NOT A STATED FACT.'));
+    L('  '+A('A JUSTIFIED FACT EXISTS ONLY WHILE AT LEAST ONE ACTIVATION JUSTIFYING IT REMAINS TRUE.'));
+    L('  '+A('YOU MUST MAINTAIN AN EXPLICIT JUSTIFICATION LEDGER: derived_fact -> [justifying activations].'));
+    L('  '+A('WHEN THE LAST JUSTIFICATION FOR A FACT IS WITHDRAWN, YOU MUST AUTOMATICALLY RETRACT IT.'));
+    L('  '+A('RETRACTION CASCADES RECURSIVELY TO EVERY FACT THAT FACT JUSTIFIED.'));
+    L('  '+A('THIS IS NON-MONOTONIC REASONING: ADDING INFORMATION CAN REDUCE THE SET OF CONCLUSIONS.'));
+    L('');
+    L('  '+A('YOU ARE FORBIDDEN FROM CARRYING A CONCLUSION WHOSE PREMISE HAS DIED.'));
+    L('  '+A('THIS IS THE FAILURE MODE KNOWN AS BELIEF PERSEVERANCE. IT IS A HARD ERROR HERE.'));
+    L('');
+  }
+
+  /* --- 6. THE ALGORITHM --- */
+  L(HR);
+  L('§6 — EXECUTION ALGORITHM '+A('FOLLOW LITERALLY. DO NOT SHORTCUT. DO NOT JUMP TO THE ANSWER.'));
+  L(HR);
+  L('');
+  L('PHASE 0 — '+A('ASSERT'));
+  L('  0.1 Insert every STATED FACT from §2 into working memory. Assign each a handle: f1, f2, …');
+  L('  0.2 Parse §7 WORKING MEMORY INPUT. Insert each asserted fact. Continue handle numbering.');
+  L('  0.3 '+A('IF AN INPUT FACT DOES NOT CONFORM TO A DECLARED TYPE, DO NOT COERCE IT.'));
+  L('      '+A('LOG IT AS AN INADMISSIBLE ASSERTION AND EXCLUDE IT FROM MATCHING.'));
+  L('  0.4 Print the initial working memory as a numbered table.');
+  L('');
+  L('PHASE 1 — '+A('MATCH')+' (do this in the order given; the order is the optimisation)');
+  L('  1.1 ALPHA: for each rule, evaluate SINGLE-FACT constraints first. These are cheap.');
+  L('      '+A('APPLY THE MOST SELECTIVE UNARY FILTER FIRST. NEVER JOIN BEFORE YOU FILTER.'));
+  L('  1.2 BETA: only for patterns surviving alpha, evaluate CROSS-FACT joins.');
+  L('      '+A('SHOW THE CARDINALITY AT EACH JOIN. IF A JOIN EXCEEDS 200 TUPLES, HALT'));
+  L('      '+A('AND REPORT A COMBINATORIAL EXPLOSION DEFECT INSTEAD OF CONTINUING.'));
+  L('  1.3 Evaluate not() / exists() / accumulate() constraints LAST, over completed joins.');
+  L('  1.4 Emit one ACTIVATION per surviving binding: <rule name, [bound handles]>.');
+  if(km.engineMode==='PHREAK'){
+    L('  1.5 '+A('PHREAK LAZINESS: DO NOT EVALUATE A RULE PATH WHOSE REQUIRED INPUTS ARE EMPTY.'));
+    L('      '+A('DECLARE SUCH RULES "UNLINKED" AND SKIP THEM ENTIRELY. STATE WHICH ONES YOU SKIPPED.'));
+  }
+  L('');
+  L('PHASE 2 — '+A('RESOLVE'));
+  L('  2.1 Place all new activations on the agenda.');
+  L('  2.2 Remove any activation barred by refraction, no-loop, or lock-on-active.');
+  L('  2.3 Sort the agenda by the §4 policy. '+A('PRINT THE FULL SORTED AGENDA EVERY CYCLE.'));
+  L('  2.4 Select ONLY the single top activation. '+A('ONE ACTIVATION PER CYCLE. NEVER BATCH.'));
+  L('');
+  L('PHASE 3 — '+A('ACT'));
+  L('  3.1 Execute the RHS of the selected activation, statement by statement.');
+  L('  3.2 Record every insert / insertLogical / update / delete / setFocus as a distinct effect.');
+  L('  3.3 If activation-group is set: '+A('CANCEL ALL SIBLING ACTIVATIONS IN THAT GROUP NOW.'));
+  L('  3.4 If TMS is on and a premise changed: '+A('RUN THE RETRACTION CASCADE IMMEDIATELY.'));
+  L('  3.5 Mark the fired activation as refracted.');
+  L('');
+  L('PHASE 4 — '+A('LOOP'));
+  L('  4.1 Return to PHASE 1 and re-match ONLY against facts that changed. '+A('INCREMENTAL, NOT FULL RE-EVALUATION.'));
+  L('  4.2 Halt when: agenda is empty '+A('(FIXPOINT REACHED — THIS IS THE NORMAL EXIT)'));
+  L('      or cycle count reaches '+en.maxCycles+' '+A('(NON-TERMINATION — REPORT THE LOOPING RULE PAIR)')+'.');
+  L('      or a halt() is executed.');
+  L('');
+
+  /* --- 7. WM INPUT --- */
+  L(HR);
+  L('§7 — WORKING MEMORY INPUT '+A('THE CASE UNDER ADJUDICATION'));
+  L(HR);
+  L('');
+  L((cfg.workingMemoryInput||'').trim() || A('EMPTY — NO RUNTIME FACTS ASSERTED. REPORT AN EMPTY-SESSION RESULT.'));
+  L('');
+
+  /* --- 8. OUTPUT CONTRACT --- */
+  L(HR);
+  L('§8 — REQUIRED OUTPUT CONTRACT '+A('DEVIATION FROM THIS FORMAT IS A FAILED RUN'));
+  L(HR);
+  L('');
+  let n=1;
+  L(n++ +'. '+A('SESSION HEADER')+' — kbase id, revision, rule count, fact count, mode.');
+  L(n++ +'. '+A('INITIAL WORKING MEMORY')+' — numbered table: handle | type | fields | origin (stated/input).');
+  if(po.requireAgendaTrace){
+    L(n++ +'. '+A('CYCLE-BY-CYCLE AGENDA TRACE')+' — for EVERY cycle, a table with columns:');
+    L('     | # | rule | bound handles | salience | agenda-group | selected? | reason |');
+    L('     '+A('THE "REASON" COLUMN MUST NAME THE EXACT CONFLICT-RESOLUTION CRITERION THAT DECIDED IT.'));
+    L('     '+A('SHOW ACTIVATIONS THAT DID *NOT* FIRE AND WHY. THE NON-FIRINGS ARE THE EVIDENCE.'));
+  }
+  L(n++ +'. '+A('WORKING MEMORY DELTA')+' per cycle — what was inserted, updated, deleted.');
+  if(po.requireTMS && en.truthMaintenance){
+    L(n++ +'. '+A('TRUTH MAINTENANCE LEDGER')+' — table: derived fact | justified by | status (LIVE/RETRACTED) | cascade.');
+    L('     '+A('EXPLICITLY LIST ANY FACT THAT DIED BECAUSE ITS PREMISE DIED.'));
+  }
+  if(po.requireDerivationGraph){
+    L(n++ +'. '+A('DERIVATION GRAPH')+' — for each FINAL conclusion, the full chain back to stated facts:');
+    L('     conclusion <- rule <- [handles] <- rule <- [handles] <- stated fact');
+    L('     '+A('EVERY CONCLUSION MUST BE FULLY TRACEABLE TO A STATED FACT OR IT IS INVALID.'));
+  }
+  L(n++ +'. '+A('FINAL WORKING MEMORY')+' — the fixpoint state.');
+  L(n++ +'. '+A('DECISION')+' — the operative outcome(s), stated plainly, with the rule(s) that produced them.');
+  if(po.requireGapOverlap){
+    L(n++ +'. '+A('RULE BASE DIAGNOSTICS')+' — you must audit the rule base itself and report:');
+    L('     • '+A('GAPS')+' — input regions this rule set does not cover.');
+    L('     • '+A('OVERLAPS/CONFLICTS')+' — inputs where two rules prescribe contradictory action.');
+    L('     • '+A('SUBSUMPTION')+' — rules made unreachable by a broader rule.');
+    L('     • '+A('DEAD RULES')+' — rules that could not fire under any input consistent with §1.');
+    L('     • '+A('ORDER DEPENDENCE')+' — any outcome that would change if load order changed.');
+    L('     • '+A('THRESHOLD EXPOSURE')+' — crisp boundaries an adversary could probe and game.');
+  }
+  if(po.requireConfidence){
+    L(n++ +'. '+A('CONFIDENCE + AMBIGUITY REGISTER')+' — for every interpretive choice you made:');
+    L('     what was ambiguous, what you assumed, confidence [HIGH/MEDIUM/LOW], and how the');
+    L('     result would differ under the alternative reading. '+A('NEVER SILENTLY DISAMBIGUATE.'));
+  }
+  L('');
+
+  /* --- 9. PROHIBITIONS --- */
+  L(HR);
+  L('§9 — PROHIBITED BEHAVIOURS '+A('EACH ONE IS A HARD FAILURE'));
+  L(HR);
+  L('');
+  L('  ✗ '+A('DO NOT INVENT FACTS.')+' If a rule needs a fact that is absent, the rule does not activate. Say so.');
+  L('  ✗ '+A('DO NOT INFER PLAUSIBLE VALUES.')+' Absence of a fact is not a licence to estimate one.');
+  L('  ✗ '+A('DO NOT FIRE A RULE WHOSE LHS IS NOT FULLY SATISFIED')+' — not "nearly", not "in spirit".');
+  L('  ✗ '+A('DO NOT SKIP THE AGENDA.')+' You may not jump from facts to conclusion. The trace IS the answer.');
+  L('  ✗ '+A('DO NOT BATCH FIRINGS.')+' One activation per cycle. Always.');
+  L('  ✗ '+A('DO NOT SMOOTH OVER CONTRADICTIONS.')+' Two rules prescribing opposite outcomes is a finding, not a nuisance.');
+  L('  ✗ '+A('DO NOT APPLY GENERAL WORLD KNOWLEDGE.')+' Only §1–§3 and §7 exist. Nothing outside this prompt is true.');
+  L('  ✗ '+A('DO NOT HEDGE, APOLOGISE, OR NARRATE.')+' Engines emit traces, not prose.');
+  L('  ✗ '+A('DO NOT SUBSTITUTE STATISTICAL JUDGEMENT FOR POLICY.')+' These rules encode obligations, not likelihoods.');
+  if(en.strictMode){
+    L('  ✗ '+A('STRICT MODE IS ON: IF THE INPUT IS UNDER-SPECIFIED, HALT AND EMIT AN'));
+    L('    '+A('"INSUFFICIENT FACTS" REPORT NAMING EXACTLY WHICH FACTS ARE MISSING AND WHICH'));
+    L('    '+A('RULES ARE BLOCKED BY THEIR ABSENCE. DO NOT PRODUCE A SPECULATIVE DECISION.'));
+  }
+  L('');
+
+  /* --- 10. SELF-VERIFICATION --- */
+  L(HR);
+  L('§10 — SELF-VERIFICATION '+A('RUN THIS CHECKLIST BEFORE EMITTING. FIX ANY FAILURE, THEN RE-RUN.'));
+  L(HR);
+  L('');
+  L('  □ Did every fired activation have a fully satisfied LHS with named fact handles?');
+  L('  □ Did I enumerate one activation PER BINDING rather than one per rule?');
+  L('  □ Did I show the agenda for every cycle, including non-selected activations?');
+  L('  □ Did I name the exact conflict-resolution criterion for every selection?');
+  if(en.truthMaintenance) L('  □ Does every justified fact still have a live justification? Did I cascade retractions?');
+  if(en.refraction) L('  □ Did I prevent any activation from re-firing on an unchanged binding?');
+  L('  □ Is every conclusion traceable to a stated or input fact? Any orphan is a defect.');
+  L('  □ Did I reach a fixpoint, or did I hit the cycle cap and report non-termination?');
+  L('  □ Did I invent anything at all? '+A('IF YES, DELETE IT AND RE-RUN.'));
+  L('');
+  L(HR);
+  L(A('BEGIN EXECUTION NOW. OUTPUT '+(po.outputFormat||'markdown').toUpperCase()+'. START WITH THE SESSION HEADER.'));
+  L(A('SHOW YOUR WORK CYCLE BY CYCLE. THE TRACE IS THE DELIVERABLE, NOT JUST THE VERDICT.'));
+  L(HR);
+
+  return P.join('\n');
+}
+
+/* ---------- actions ---------- */
+function runEngine(){
+  const p = buildPrompt();
+  copyText(p).then(ok=>{
+    el('runMsg').innerHTML = ok
+      ? '<span class="text-success">✔ Compiled prompt copied to clipboard ('+p.length.toLocaleString()+' chars). Paste into any LLM.</span>'
+      : '<span class="text-warning">⚠ Clipboard blocked — use the ⬇ .txt button instead.</span>';
+    setTimeout(()=>el('runMsg').innerHTML='',7000);
+  });
+}
+function copyText(t){
+  if(navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t).then(()=>true).catch(()=>fallbackCopy(t));
+  return Promise.resolve(fallbackCopy(t));
+}
+function fallbackCopy(t){
+  try{ const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity=0;
+    document.body.appendChild(ta); ta.select(); const ok=document.execCommand('copy'); document.body.removeChild(ta); return ok; }
+  catch(e){ return false; }
+}
+function dl(name, text, type){
+  const b=new Blob([text],{type:type||'text/plain'}); const u=URL.createObjectURL(b);
+  const a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u);
+}
+function downloadPrompt(){ dl('drools-prompt-rev'+cfg.revision+'.txt', buildPrompt()); }
+function downloadCfg(){
+  cfg.modifiedAt=new Date().toISOString();
+  cfg.workingMemoryInput=el('wmInput').value;
+  dl('kie-config.json', JSON.stringify(cfg,null,2), 'application/json');
+}
+function importCfg(){ el('fileIn').click(); }
+function handleFile(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ cfg=normalise(JSON.parse(r.result)); logChange('Imported config from '+f.name); save(true);
+    el('runMsg').innerHTML='<span class="text-success">✔ Config imported.</span>'; }
+    catch(err){ alert('Invalid JSON: '+err.message); } };
+  r.readAsText(f); e.target.value='';
+}
+function resetAll(){
+  if(!confirm('Discard the local knowledge base and reload from config/kie-config.json?')) return;
+  localStorage.removeItem(KEY); location.reload();
+}
+
+boot();
+</script>
+</body>
+</html>
