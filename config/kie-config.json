@@ -1,0 +1,169 @@
+{
+  "schema": "kie-console/1.0.0",
+  "kbaseId": "kbase-default",
+  "revision": 1,
+  "createdAt": "2026-07-31T00:00:00.000Z",
+  "modifiedAt": "2026-07-31T00:00:00.000Z",
+  "author": "",
+  "changeLog": [
+    { "rev": 1, "at": "2026-07-31T00:00:00.000Z", "note": "Seed knowledge base created." }
+  ],
+  "kmodule": {
+    "sessionName": "ksession-default",
+    "sessionType": "stateful",
+    "engineMode": "PHREAK",
+    "clockType": "pseudo",
+    "eventProcessingMode": "cloud"
+  },
+  "engine": {
+    "conflictResolution": ["salience", "agendaGroup", "recency", "complexity", "loadOrder"],
+    "truthMaintenance": true,
+    "refraction": true,
+    "propertyReactive": true,
+    "loopGuard": "no-loop",
+    "maxCycles": 50,
+    "focusStack": ["MAIN"],
+    "traceVerbosity": "full",
+    "strictMode": true
+  },
+  "promptOptions": {
+    "amplify": true,
+    "requireAgendaTrace": true,
+    "requireTMS": true,
+    "requireGapOverlap": true,
+    "requireConfidence": true,
+    "requireDerivationGraph": true,
+    "forbidNarrative": true,
+    "outputFormat": "markdown"
+  },
+  "workingMemoryInput": "// Assert runtime facts here, one per line.\n// Example:\nApplicant( id: \"A-1001\", age: 34, tenureYears: 5, region: \"APAC\", incomeAnnual: 82000, hasDefault: false )\nApplication( applicantId: \"A-1001\", productCode: \"LOAN-STD\", amount: 25000, submittedOn: \"2026-07-31\" )",
+  "factSets": [
+    {
+      "id": "fs-applicant",
+      "name": "Applicant Profile",
+      "description": "Canonical shape of an applicant and their application. Stable across products.",
+      "enabled": true,
+      "declarations": "declare Applicant\n  id : String\n  age : int\n  tenureYears : int\n  region : String\n  incomeAnnual : int\n  hasDefault : boolean\nend\n\ndeclare Application\n  applicantId : String\n  productCode : String\n  amount : int\n  submittedOn : String\nend",
+      "facts": "// Stated facts asserted at session start (insert).\n// Leave empty if all facts arrive via Working Memory input."
+    },
+    {
+      "id": "fs-catalog",
+      "name": "Product Catalog",
+      "description": "Product definitions and their hard limits. Arbitrary/negotiated values — correctly externalised.",
+      "enabled": true,
+      "declarations": "declare Product\n  code : String\n  minAmount : int\n  maxAmount : int\n  baseRate : double\n  minAge : int\nend",
+      "facts": "Product( code: \"LOAN-STD\", minAmount: 1000, maxAmount: 50000, baseRate: 7.5, minAge: 21 )\nProduct( code: \"LOAN-PREM\", minAmount: 25000, maxAmount: 250000, baseRate: 5.9, minAge: 25 )"
+    },
+    {
+      "id": "fs-regulatory",
+      "name": "Regulatory Calendar",
+      "description": "Legislated thresholds and effective dates. Non-negotiable, non-learnable, audit-relevant.",
+      "enabled": false,
+      "declarations": "declare RegulatoryLimit\n  jurisdiction : String\n  maxUnsecured : int\n  effectiveFrom : String\nend",
+      "facts": "RegulatoryLimit( jurisdiction: \"APAC\", maxUnsecured: 40000, effectiveFrom: \"2026-04-01\" )"
+    }
+  ],
+  "ruleSets": [
+    {
+      "id": "rs-eligibility",
+      "name": "Eligibility Policy",
+      "description": "Determines whether an application may proceed. Phase: SCREENING.",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Reject Underage Applicant",
+          "salience": 100,
+          "agendaGroup": "SCREENING",
+          "activationGroup": "eligibility-decision",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$a : Applicant( $age : age )\n$app : Application( applicantId == $a.id, $pc : productCode )\n$p : Product( code == $pc, minAge > $age )",
+          "then": "insert( new Decision( $app, \"REJECTED\", \"Applicant below product minimum age\" ) );"
+        },
+        {
+          "name": "Reject Prior Default",
+          "salience": 95,
+          "agendaGroup": "SCREENING",
+          "activationGroup": "eligibility-decision",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$a : Applicant( hasDefault == true )\n$app : Application( applicantId == $a.id )",
+          "then": "insert( new Decision( $app, \"REJECTED\", \"Prior default on record\" ) );"
+        },
+        {
+          "name": "Accept Eligible Application",
+          "salience": 10,
+          "agendaGroup": "SCREENING",
+          "activationGroup": "eligibility-decision",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$a : Applicant( hasDefault == false, $age : age )\n$app : Application( applicantId == $a.id, $pc : productCode, $amt : amount )\n$p : Product( code == $pc, minAge <= $age, minAmount <= $amt, maxAmount >= $amt )",
+          "then": "insert( new Decision( $app, \"ELIGIBLE\", \"Passed all screening constraints\" ) );\nsetFocus( \"PRICING\" );"
+        }
+      ]
+    },
+    {
+      "id": "rs-pricing",
+      "name": "Pricing & Discounts",
+      "description": "Derives rate adjustments. Uses insertLogical so discounts die with their premises.",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Loyalty Discount",
+          "salience": 50,
+          "agendaGroup": "PRICING",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": true,
+          "when": "$a : Applicant( tenureYears >= 5 )\n$d : Decision( outcome == \"ELIGIBLE\" )",
+          "then": "insertLogical( new RateAdjustment( $a.id, -0.50, \"Loyalty >= 5 years\" ) );"
+        },
+        {
+          "name": "High Income Discount",
+          "salience": 50,
+          "agendaGroup": "PRICING",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": true,
+          "when": "$a : Applicant( incomeAnnual >= 75000 )\n$d : Decision( outcome == \"ELIGIBLE\" )",
+          "then": "insertLogical( new RateAdjustment( $a.id, -0.30, \"Income >= 75000\" ) );"
+        },
+        {
+          "name": "Compute Final Rate",
+          "salience": 5,
+          "agendaGroup": "PRICING",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": true,
+          "logicalInsert": false,
+          "when": "$app : Application( $pc : productCode )\n$p : Product( code == $pc, $base : baseRate )\n$total : Number() from accumulate( RateAdjustment( $delta : delta ), sum( $delta ) )",
+          "then": "insert( new FinalRate( $app.applicantId, $base + $total ) );"
+        }
+      ]
+    },
+    {
+      "id": "rs-compliance",
+      "name": "Compliance Guardrails",
+      "description": "Hard obligations that override commercial outcomes. Phase: COMPLIANCE, auto-focus.",
+      "enabled": false,
+      "rules": [
+        {
+          "name": "Cap Unsecured Exposure",
+          "salience": 1000,
+          "agendaGroup": "COMPLIANCE",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$a : Applicant( $r : region )\n$app : Application( applicantId == $a.id, $amt : amount )\n$lim : RegulatoryLimit( jurisdiction == $r, maxUnsecured < $amt )",
+          "then": "insert( new Violation( $app, \"REG-CAP\", \"Amount exceeds jurisdictional unsecured limit\" ) );\ninsert( new Decision( $app, \"REJECTED\", \"Regulatory cap breached\" ) );"
+        }
+      ]
+    }
+  ]
+}
