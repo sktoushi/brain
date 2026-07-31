@@ -1,9 +1,9 @@
 {
   "schema": "kie-console/1.0.0",
   "kbaseId": "kbase-default",
-  "revision": 2,
+  "revision": 3,
   "createdAt": "2026-07-31T00:00:00.000Z",
-  "modifiedAt": "2026-07-31T13:40:00.000Z",
+  "modifiedAt": "2026-07-31T14:05:00.000Z",
   "author": "",
   "changeLog": [
     {
@@ -15,6 +15,11 @@
       "rev": 2,
       "at": "2026-07-31T13:40:00.000Z",
       "note": "Replaced lending knowledge base entirely. Removed fact sets Applicant Profile, Product Catalog, Regulatory Calendar and rule sets Eligibility Policy, Pricing & Discounts, Compliance Guardrails. Loaded Monotone Continuation / sequential-investment KB: 5 fact sets, 3 rule sets, 10 rules. Focus stack repointed MAIN -> VALIDATION to clear focus starvation (GAP-01)."
+    },
+    {
+      "rev": 3,
+      "at": "2026-07-31T14:05:00.000Z",
+      "note": "Additive only. All 5 seed fact sets and all 3 seed rule sets (10 rules) retained byte-identical; nothing removed, nothing edited. Added 5 fact sets (Evidence Provenance, Payoff Asset Register, Horizon Classification, Derivation Artifacts Extended, Case File JPN-LISTENING) and 4 rule sets (Evidence Admissibility, Economic Viability, Non-Exhaustible Program Policy, Halt Diagnostics And Audit Routing) totalling 14 rules. Closes GAP-01 known-method/uncertain-outcome, GAP-02 horizon exhaustibility, GAP-03 non-increasing hazard, GAP-05 cost and payoff read by no rule, GAP-07 contradictory facts undetected, SUB-02 AUDIT and TMS unreachable on halt paths, DEAD-01 orphaned sunk cost guard, THR-01 crisp certainty cliff. maxCycles 50 -> 80 to accommodate the larger agenda. KNOWN UNPATCHED: T-1 (seed MCT inserts Decision with plain insert(), so the operative verdict is not truth-maintained) and ORD-02 (seed 'Preconditions Complete' verifies no precondition) are left in place because patching them requires editing seed rules. Both are documented in diagnosticsRegistry. REGRESSION VERIFIED: RND-13.3 still returns INVEST_ALL_THE_WAY, ev 1000.0."
     }
   ],
   "kmodule": {
@@ -36,7 +41,7 @@
     "refraction": true,
     "propertyReactive": true,
     "loopGuard": "no-loop",
-    "maxCycles": 50,
+    "maxCycles": 80,
     "focusStack": [
       "VALIDATION"
     ],
@@ -51,7 +56,9 @@
     "requireConfidence": true,
     "requireDerivationGraph": true,
     "forbidNarrative": true,
-    "outputFormat": "markdown"
+    "outputFormat": "markdown",
+    "requireEvidenceBasis": true,
+    "requireBlockedVsAdverseDistinction": true
   },
   "workingMemoryInput": "// Assert runtime facts here, one per line.\n// The case under adjudication: Samuelson & Marks, Managerial Economics Ch.13 Fig 13.3\nProgram( id: \"RND-13.3\", domain: \"INCREMENTAL_RND\", stagesAttempted: 0, maxStages: 5 )\n\n// Probe A — escalation of commitment. Uncomment BOTH lines:\n// Program( id: \"RND-13.3\", domain: \"INCREMENTAL_RND\", stagesAttempted: 3, maxStages: 5 )\n// SunkCost( programId: \"RND-13.3\", amountSpent: 9000 )\n\n// Probe B — breakthrough risk override. Replace the HazardProfile fact with:\n// HazardProfile( programId: \"RND-13.3\", direction: \"INCREASING\", terminalHitRate: 0.95, successAttainable: false )\n// and set domain: \"BREAKTHROUGH_RND\".",
   "factSets": [
@@ -94,6 +101,46 @@
       "enabled": true,
       "declarations": "declare Guard\n  programId : String\n  kind : String\n  note : String\nend\n\ndeclare Precondition\n  programId : String\n  kind : String\n  note : String\nend\n\ndeclare HazardLink\n  programId : String\n  fromSeq : int\n  toSeq : int\n  fromRate : double\n  toRate : double\n  classification : String\nend\n\ndeclare Decision\n  programId : String\n  outcome : String\n  rationale : String\n  ev : double\nend\n\ndeclare Dominated\n  programId : String\n  policyLabel : String\n  ev : double\n  shortfall : double\n  reason : String\nend\n\ndeclare Defect\n  programId : String\n  kind : String\n  subject : String\n  note : String\nend",
       "facts": "// Derived only. Never asserted at session start."
+    },
+    {
+      "id": "fs-evidence",
+      "name": "Evidence Provenance",
+      "description": "Grounding record for every numeric field. Codifies the rev-3 finding that a field's VALUE and the BASIS on which it was produced are separate facts, and that an introspective basis cannot ground a rate. Stable across problem instances.",
+      "enabled": true,
+      "declarations": "declare Evidence\n  programId : String\n  subject : String\n  basis : String\n  instrument : String\n  observations : int\nend",
+      "facts": "// basis vocabulary: MEASURED | THIRD_PARTY | INFERRED | INTROSPECTIVE\n// INTROSPECTIVE is inadmissible as grounding for any rate (see rs-evidence).\n// Empty at session start. Assert one Evidence fact per grounded field.\n// Example:\n// Evidence( programId: \"X\", subject: \"hazardDirection\", basis: \"MEASURED\", instrument: \"third-party assessment\", observations: 4 )"
+    },
+    {
+      "id": "fs-payoff",
+      "name": "Payoff Asset Register",
+      "description": "Names WHAT the program is being bought for, separately from how much it is worth. Codifies the rev-3 finding that an unnamed or substituted payoff asset silently collapses measured benefit and that this is a fact about the substitute, not about the program.",
+      "enabled": true,
+      "declarations": "declare PayoffAsset\n  programId : String\n  assetClass : String\n  isSubstituted : boolean\n  substitutionRatio : double\n  quantified : boolean\nend",
+      "facts": "// assetClass vocabulary: TIME_SAVED | SALARY_UPLIFT | OPTION_VALUE | NON_INSTRUMENTAL\n// substitutionRatio: fraction of the payoff an EXISTING workaround already captures.\n// quantified == false blocks all EV derivation and is reported, never estimated.\n// Empty at session start."
+    },
+    {
+      "id": "fs-horizon",
+      "name": "Horizon Classification",
+      "description": "Distinguishes a horizon after which success is certain by exhaustion from one that is merely a planning artifact. Codifies GAP-02: maxStages alone cannot express this and a bounded integer does not imply an exhaustible program.",
+      "enabled": true,
+      "declarations": "declare Horizon\n  programId : String\n  boundedness : String\n  note : String\nend",
+      "facts": "// boundedness vocabulary: BOUNDED_EXHAUSTIBLE | NOT_EXHAUSTIBLE\n// DERIVED ONLY by 'Classify Horizon Exhaustibility'. Never asserted as input."
+    },
+    {
+      "id": "fs-derived-ext",
+      "name": "Derivation Artifacts (Extended)",
+      "description": "Additional types constructed by rev-3 rule RHS only. Declared here so no rev-3 conclusion is built from an undeclared shape. Never asserted as input.",
+      "enabled": true,
+      "declarations": "declare Inadmissible\n  programId : String\n  subject : String\n  kind : String\n  note : String\nend\n\ndeclare Contradiction\n  programId : String\n  subject : String\n  valueA : String\n  valueB : String\n  note : String\nend\n\ndeclare ViabilityCheck\n  programId : String\n  remainingOutlay : double\n  expectedPayoff : double\n  costBenefitRatio : double\n  note : String\nend\n\ndeclare InteriorOptimum\n  programId : String\n  policyLabel : String\n  stopAfterFailures : int\n  ev : double\n  note : String\nend",
+      "facts": "// Derived only. Never asserted at session start."
+    },
+    {
+      "id": "fs-case-jpn",
+      "name": "Case File — JPN-LISTENING (adjudicated rev 2, HALT x3)",
+      "description": "Preserved case. Adjudicated three times under rev 2 and returned HALT_PRECONDITIONS_UNMET on every run. Retained as the standing regression case for GAP-01, GAP-02, GAP-03 and GAP-05. Facts commented by default; uncomment to re-run under rev 3.",
+      "enabled": true,
+      "declarations": "// No new declarations. Uses Program, HazardProfile, SunkCost, Evidence, PayoffAsset.",
+      "facts": "// Uncomment the block below to re-adjudicate under rev 3.\n// Program( id: \"JPN-LISTENING\", domain: \"INCREMENTAL_RND\", stagesAttempted: 14, maxStages: 20 )\n// HazardProfile( programId: \"JPN-LISTENING\", direction: \"INCREASING\", terminalHitRate: 0.60, successAttainable: true )\n// SunkCost( programId: \"JPN-LISTENING\", amountSpent: 5500 )\n// Evidence( programId: \"JPN-LISTENING\", subject: \"hazardDirection\", basis: \"INTROSPECTIVE\", instrument: \"self-report\", observations: 0 )\n// PayoffAsset( programId: \"JPN-LISTENING\", assetClass: \"SALARY_UPLIFT\", isSubstituted: true, substitutionRatio: 0.87, quantified: false )\n//\n// WITHHELD, NOT MISSING BY OVERSIGHT:\n//   StageEconomics — successPayoff unquantified; asserting an int here would be invention.\n//   Stage x20      — conditionalHitRate series unknown; no value may be estimated.\n//   CandidatePolicy — no EV derivable without payoff or hazard series."
     }
   ],
   "ruleSets": [
@@ -230,6 +277,318 @@
           "then": "insertLogical( new Defect( $pid, \"WORSE_THAN_ABSTAINING\", $lbl, \"Interior policy destroys value relative to never investing\" ) );"
         }
       ]
+    },
+    {
+      "id": "rs-evidence",
+      "name": "Evidence Admissibility",
+      "description": "Separates a field's value from the basis on which it was produced, detects facts that disagree with each other, and classifies horizon exhaustibility. Runs above all seed VALIDATION rules except the sunk cost guard. Phase: VALIDATION.",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Reject Introspective Evidence As Grounding For A Rate",
+          "salience": 199,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$ev : Evidence( $pid : programId, $subj : subject, basis == \"INTROSPECTIVE\", $inst : instrument )",
+          "then": "insert( new Inadmissible( $pid, $subj, \"INTROSPECTIVE_BASIS\", \"Grounded only by \" + $inst + \" — a felt impression is a report about the observer, not a measurement of the process; inadmissible as grounding for any rate or direction\" ) );\ninsert( new Defect( $pid, \"UNGROUNDED_FIELD\", $subj, \"Field carries a value with no admissible basis — treat as ABSENT, not as false\" ) );"
+        },
+        {
+          "name": "Detect Contradictory Hazard Profiles",
+          "salience": 198,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$h1 : HazardProfile( $pid : programId, $d1 : direction )\n$h2 : HazardProfile( programId == $pid, $d2 : direction, direction != $d1 )",
+          "then": "insert( new Contradiction( $pid, \"hazardDirection\", $d1, $d2, \"Two HazardProfile facts disagree. Pattern matching would resolve this by binding accident, not by adjudication — retract one before any SELECTION rule is trusted\" ) );"
+        },
+        {
+          "name": "Classify Horizon Exhaustibility",
+          "salience": 197,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id )\n$h : HazardProfile( programId == $pid, $t : terminalHitRate )\nnot Horizon( programId == $pid )",
+          "then": "insert( new Horizon( $pid, $t >= 1.0 ? \"BOUNDED_EXHAUSTIBLE\" : \"NOT_EXHAUSTIBLE\", \"Terminal hit rate \" + $t + \". A finite maxStages is a planning artifact; only terminalHitRate >= 1.0 makes the horizon exhaustible and corner collapse available\" ) );"
+        },
+        {
+          "name": "Flag Threshold Cliff Exposure — Near Certain But Not Certain",
+          "salience": 196,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$h : HazardProfile( $pid : programId, terminalHitRate >= 0.95, terminalHitRate < 1.0, $t : terminalHitRate )",
+          "then": "insert( new Defect( $pid, \"THRESHOLD_CLIFF_EXPOSURE\", \"terminalHitRate\", \"Rate \" + $t + \" is treated identically to a coin flip by the crisp >= 1.0 test. A rounding error disarms the theorem — graded response required\" ) );"
+        }
+      ]
+    },
+    {
+      "id": "rs-viability",
+      "name": "Economic Viability",
+      "description": "Closes GAP-05. The seed rule base reads neither incrementalCost nor successPayoff, so it can decide without ever seeing what the program costs or is worth. These rules put both on the record. Advisory to the seed theorem; mandatory for the rev-3 interior optimum rule. Phase: VALIDATION.",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Verify Entry Economics Are Quantified",
+          "salience": 168,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$e : StageEconomics( $pid : programId, $c : incrementalCost > 0, $p : successPayoff > 0 )",
+          "then": "insert( new Precondition( $pid, \"ECONOMICS_QUANTIFIED\", \"Incremental cost \" + $c + \" and success payoff \" + $p + \" are both present and positive — expected value is derivable\" ) );"
+        },
+        {
+          "name": "Compute Remaining Outlay Against Probability Weighted Payoff",
+          "salience": 167,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id, $n : maxStages, $k : stagesAttempted )\n$e : StageEconomics( programId == $pid, $c : incrementalCost, $p : successPayoff )\n$h : HazardProfile( programId == $pid, $t : terminalHitRate )",
+          "then": "insert( new ViabilityCheck( $pid, ( $n - $k ) * (double) $c, $t * $p, ( ( $n - $k ) * (double) $c ) / ( ( $t * $p ) + 0.000001 ), \"Forward-looking only: stagesAttempted is used to size REMAINING outlay, never to justify it. This is the comparison no seed rule performs\" ) );"
+        },
+        {
+          "name": "Flag Payoff Largely Captured By An Existing Substitute",
+          "salience": 166,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$pa : PayoffAsset( $pid : programId, isSubstituted == true, $r : substitutionRatio >= 0.5, $a : assetClass )",
+          "then": "insert( new Defect( $pid, \"PAYOFF_LARGELY_SUBSTITUTED\", $a, \"An existing workaround already captures \" + $r + \" of the stated payoff. The measured benefit collapses toward the residual — that is a fact about the quality of the substitute, not about the program\" ) );"
+        },
+        {
+          "name": "Flag Payoff Asset Named But Not Quantified",
+          "salience": 165,
+          "agendaGroup": "VALIDATION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$pa : PayoffAsset( $pid : programId, quantified == false, $a : assetClass )",
+          "then": "insert( new Inadmissible( $pid, $a, \"PAYOFF_UNQUANTIFIED\", \"Payoff asset named but not measured. No expected value can be derived and no policy can be ranked — this blocks a decision, it does not produce an adverse one\" ) );"
+        }
+      ]
+    },
+    {
+      "id": "rs-nonterminal",
+      "name": "Non-Exhaustible Program Policy",
+      "description": "Closes GAP-01 and GAP-03. The seed base has a corner for guaranteed success and a corner for unproven method, and nothing for the ordinary case of a known method with an uncertain outcome — which is most real programs. These rules cover that region and permit a genuine interior stopping rule. Joins activation-group policy-selection so exactly one policy rule ever fires. Phase: SELECTION.",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Interior Optimum Permitted — Known Method, Non-Exhaustible Horizon",
+          "salience": 90,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "policy-selection",
+          "noLoop": true,
+          "lockOnActive": true,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id, domain == \"INCREMENTAL_RND\" )\n$h : HazardProfile( programId == $pid, successAttainable == true, terminalHitRate < 1.0, $t : terminalHitRate )\nHorizon( programId == $pid, boundedness == \"NOT_EXHAUSTIBLE\" )\nPrecondition( programId == $pid, kind == \"ECONOMICS_QUANTIFIED\" )\nnot Inadmissible( programId == $pid, kind == \"PAYOFF_UNQUANTIFIED\" )\nnot Contradiction( programId == $pid, subject == \"hazardDirection\" )\n$best : Number() from accumulate( CandidatePolicy( programId == $pid, $e : expectedValue ), max( $e ) )\n$opt : CandidatePolicy( programId == $pid, expectedValue == $best, $lbl : label, $k : stopAfterFailures )",
+          "then": "insert( new Decision( $pid, \"ADOPT_INTERIOR_OPTIMUM\", \"Success is not guaranteed by exhaustion (terminal rate \" + $t + \"), so corner collapse is unavailable and the Monotone Continuation Theorem does not apply. Highest-EV policy is \" + $lbl + \", stopping after \" + $k + \" failures\", $best.doubleValue() ) );\ninsert( new InteriorOptimum( $pid, $lbl, $k, $best.doubleValue(), \"Selected by argmax over the enumerated policy space — NOT by the theorem. An interior stopping rule is legitimate here and is not evidence of irresolution\" ) );\nsetFocus( \"AUDIT\" );"
+        },
+        {
+          "name": "Halt On Absent Facts — Distinguish Blocked From Adverse",
+          "salience": 89,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "policy-selection",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$prog : Program( $pid : id )\n$h : HazardProfile( programId == $pid, terminalHitRate < 1.0 )\nnot CandidatePolicy( programId == $pid )",
+          "then": "insert( new Decision( $pid, \"HALT_INSUFFICIENT_FACTS\", \"Corner collapse unavailable and the policy space is empty — there is nothing to rank. The decision is BLOCKED BY ABSENT FACTS, which is not the same finding as an adverse decision and must never be reported as one\", 0.0 ) );\ninsert( new Defect( $pid, \"POLICY_SPACE_EMPTY\", \"strategy-space\", \"Supply the per-stage hazard series and a quantified payoff, then re-run. Absence of a verdict is not a verdict\" ) );\nsetFocus( \"AUDIT\" );"
+        }
+      ]
+    },
+    {
+      "id": "rs-diagnostics",
+      "name": "Halt Diagnostics And Audit Routing",
+      "description": "Closes SUB-02 (the AUDIT group and therefore the entire truth-maintenance apparatus was reachable only on a continuation verdict) and DEAD-01 (the highest-salience rule in the base produced a fact no rule consumed). Also names which precondition was missing on any halt. Phases: SELECTION and AUDIT.",
+      "enabled": true,
+      "rules": [
+        {
+          "name": "Route Non-Continuation Decision To Audit",
+          "salience": -1200,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$d : Decision( $pid : programId, outcome != \"INVEST_ALL_THE_WAY\" )",
+          "then": "setFocus( \"AUDIT\" );"
+        },
+        {
+          "name": "Diagnose Halt — Name The Missing Stationarity Precondition",
+          "salience": -1210,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$d : Decision( $pid : programId, outcome == \"HALT_PRECONDITIONS_UNMET\" )\nnot Precondition( programId == $pid, kind == \"STATIONARY_HOLDS\" )",
+          "then": "insert( new Defect( $pid, \"MISSING_PRECONDITION\", \"STATIONARY_HOLDS\", \"Halt attributable to absent stationarity: cost or payoff was declared non-stationary, or StageEconomics was never asserted at all\" ) );"
+        },
+        {
+          "name": "Diagnose Halt — Name The Missing Hazard Chain",
+          "salience": -1211,
+          "agendaGroup": "SELECTION",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": false,
+          "when": "$d : Decision( $pid : programId, outcome == \"HALT_PRECONDITIONS_UNMET\" )\nnot HazardLink( programId == $pid )",
+          "then": "insert( new Defect( $pid, \"MISSING_PRECONDITION\", \"HAZARD_CHAIN\", \"Halt attributable to zero HazardLink facts: the per-stage conditional hit rate series was never supplied, so monotonicity could be neither confirmed nor refuted\" ) );"
+        },
+        {
+          "name": "Consume Sunk Cost Guard Into The Audit Record",
+          "salience": 45,
+          "agendaGroup": "AUDIT",
+          "activationGroup": "",
+          "noLoop": true,
+          "lockOnActive": false,
+          "logicalInsert": true,
+          "when": "$g : Guard( $pid : programId, kind == \"SUNK_COST_EXCLUDED\" )\n$d : Decision( programId == $pid, $o : outcome )",
+          "then": "insertLogical( new Defect( $pid, \"SUNK_COST_QUARANTINE_CONFIRMED\", $o, \"Prior outlay was excluded from this decision in BOTH directions: it does not justify continuing, and it is not evidence of incapacity. The quarantine is symmetric\" ) );"
+        }
+      ]
     }
-  ]
+  ],
+  "diagnosticsRegistry": {
+    "description": "Standing findings against this kbase, carried forward across revisions. Each entry records what was observed, on which case, and whether rev 3 closes it.",
+    "findings": [
+      {
+        "id": "GAP-01",
+        "title": "Known method, uncertain outcome uncovered",
+        "observedOn": "JPN-LISTENING",
+        "detail": "domain INCREMENTAL_RND with terminalHitRate < 1.0 matched no corner rule. The Breakthrough Override could not catch it because its first pattern requires the literal domain BREAKTHROUGH_RND.",
+        "status": "CLOSED",
+        "closedBy": "rs-nonterminal"
+      },
+      {
+        "id": "GAP-02",
+        "title": "Horizon boundedness inexpressible",
+        "observedOn": "JPN-LISTENING",
+        "detail": "maxStages: 20 was a study-plan artifact, not a stage after which success is certain. int alone cannot carry that distinction.",
+        "status": "CLOSED",
+        "closedBy": "fs-horizon + Classify Horizon Exhaustibility"
+      },
+      {
+        "id": "GAP-03",
+        "title": "Non-increasing hazard consumed by nothing",
+        "observedOn": "JPN-LISTENING",
+        "detail": "direction FLAT or DECREASING routes to the catch-all, yet that is precisely the region where a genuine interior stopping rule is correct.",
+        "status": "CLOSED",
+        "closedBy": "rs-nonterminal"
+      },
+      {
+        "id": "GAP-04",
+        "title": "stagesAttempted read by no rule",
+        "observedOn": "RND-13.3, JPN-LISTENING",
+        "detail": "Correct anti-escalation hygiene, retained deliberately. rev 3 reads it only to size REMAINING outlay, never to justify past outlay.",
+        "status": "BY_DESIGN",
+        "closedBy": "rs-viability (forward-looking use only)"
+      },
+      {
+        "id": "GAP-05",
+        "title": "incrementalCost and successPayoff read by no rule",
+        "observedOn": "RND-13.3, JPN-LISTENING",
+        "detail": "The engine ran to fixpoint without ever seeing what the program costs or what it is worth. Changing the payoff asset entirely between runs produced a bit-identical output.",
+        "status": "CLOSED",
+        "closedBy": "rs-viability"
+      },
+      {
+        "id": "GAP-06",
+        "title": "Stage.cumulativeOutlay read by no rule",
+        "observedOn": "RND-13.3",
+        "detail": "Dead field. Retained for audit legibility.",
+        "status": "OPEN_ACCEPTED",
+        "closedBy": null
+      },
+      {
+        "id": "GAP-07",
+        "title": "Contradictory facts for one programId undetected",
+        "observedOn": "JPN-LISTENING",
+        "detail": "Two HazardProfile facts with opposite direction coexisted. Whichever bound first would have won by accident.",
+        "status": "CLOSED",
+        "closedBy": "Detect Contradictory Hazard Profiles"
+      },
+      {
+        "id": "SUB-02",
+        "title": "AUDIT group unreachable on every halt path",
+        "observedOn": "JPN-LISTENING",
+        "detail": "setFocus(AUDIT) appeared only in the MCT right-hand side, so both truth-maintained rules fired only when the base said yes. The engine performed truth maintenance exclusively on affirmative verdicts.",
+        "status": "CLOSED",
+        "closedBy": "Route Non-Continuation Decision To Audit"
+      },
+      {
+        "id": "DEAD-01",
+        "title": "Sunk Cost Exclusion Guard produces an orphan",
+        "observedOn": "JPN-LISTENING",
+        "detail": "Salience 200, the highest in the base, and no left-hand side anywhere consumes Guard.",
+        "status": "CLOSED",
+        "closedBy": "Consume Sunk Cost Guard Into The Audit Record"
+      },
+      {
+        "id": "THR-01",
+        "title": "Crisp certainty cliff at terminalHitRate >= 1.0",
+        "observedOn": "RND-13.3",
+        "detail": "0.99999 and 0.5 are treated identically. No graded response and no diagnostic distinguishing near-certain from a coin flip.",
+        "status": "MITIGATED",
+        "closedBy": "Flag Threshold Cliff Exposure (flags 0.95..0.999; does not soften the test)"
+      },
+      {
+        "id": "ORD-01",
+        "title": "Verdict inverts on a single salience edit",
+        "observedOn": "RND-13.3",
+        "detail": "Preconditions Complete at salience 1 is the only thing sequencing focus transfer after HazardLink construction. Raise it above 180 and the outcome flips to a halt.",
+        "status": "OPEN_DOCUMENTED",
+        "closedBy": null
+      },
+      {
+        "id": "ORD-02",
+        "title": "Preconditions Complete verifies no precondition",
+        "observedOn": "JPN-LISTENING",
+        "detail": "Its left-hand side is bare Program existence. It transferred focus with zero Precondition and zero HazardLink facts present. The name asserts a guarantee the code does not provide.",
+        "status": "OPEN_UNPATCHED",
+        "closedBy": null,
+        "reason": "Patching requires editing a seed rule. Seed retention takes precedence."
+      },
+      {
+        "id": "T-1",
+        "title": "The operative verdict is not truth-maintained",
+        "observedOn": "RND-13.3",
+        "detail": "Seed MCT creates Decision with plain insert(). The audit footnotes are truth-maintained; the verdict they annotate is not. Retract a premise and the Dominated facts die correctly while the Decision survives unjustified.",
+        "status": "OPEN_UNPATCHED",
+        "closedBy": null,
+        "reason": "Patching requires editing a seed rule. Seed retention takes precedence."
+      }
+    ]
+  },
+  "invariants": {
+    "description": "Findings promoted to standing law. These hold for every program this kbase will ever adjudicate, independent of instance values.",
+    "rules": [
+      "INV-01 SUNK COST SYMMETRY. Prior outlay is NON-MATCHABLE in every decision-bearing left-hand side. The quarantine cuts both ways: past investment neither justifies continuing nor evidences incapacity.",
+      "INV-02 ABSENCE IS NOT A VERDICT. A halt caused by missing facts must be reported as BLOCKED, never as adverse. HALT_INSUFFICIENT_FACTS and NEVER_INVEST are different findings and must never be conflated.",
+      "INV-03 A VALUE AND ITS BASIS ARE SEPARATE FACTS. An introspective report cannot ground a rate or a direction. A level claim is not a direction claim. A belief about an outcome is not a field value.",
+      "INV-04 EXHAUSTIBILITY IS NOT BOUNDEDNESS. A finite maxStages is a planning artifact. Only terminalHitRate >= 1.0 makes corner collapse available.",
+      "INV-05 PRICE THE ASSET YOU ACTUALLY WANT. A payoff already captured by an existing substitute yields a small residual. That is a fact about the substitute, not about the program.",
+      "INV-06 INTERIOR OPTIMA ARE LEGITIMATE. Under a non-increasing or non-exhaustible hazard, a genuine interior stopping rule is the correct answer, not a failure of nerve.",
+      "INV-07 UNDER INCREASING HAZARD THE WORST POLICY IS PARTIAL COMMITMENT. The RND-13.3 expected-value curve is U-shaped with its minimum at STOP_AFTER_2. Where hazard rises, halfway is strictly worse than either corner.",
+      "INV-08 CONTRADICTIONS ARE FINDINGS, NOT NUISANCES. Two facts that disagree must be surfaced and adjudicated, never resolved by binding order.",
+      "INV-09 NO RULE MAY DECIDE ON GEOMETRY ALONE. Any rule producing a Decision must have cost and payoff on the record, or must declare itself blocked.",
+      "INV-10 THE TRACE IS THE DELIVERABLE. Non-firings are evidence. An undeclared arbitration is an arbitrary arbitration."
+    ]
+  }
 }
