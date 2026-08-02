@@ -14,7 +14,7 @@
   --tx:#e8edf4; --tx2:#95a3b6; --tx3:#61708a;
   --good:#2fbf71; --good2:#1c7a48; --bad:#e5484d; --bad2:#8f2226;
   --pend:#f5a524; --acc:#5b8def; --void:#6b7684;
-  --r:14px; --tap:56px;
+  --r:14px;
   --safeb:env(safe-area-inset-bottom,0px);
   --safet:env(safe-area-inset-top,0px);
 }
@@ -28,10 +28,8 @@ button{border:0;background:none;cursor:pointer}
 .hide{display:none!important}
 .wrap{max-width:640px;margin:0 auto;padding:0 14px calc(96px + var(--safeb))}
 
-/* ---------- header ---------- */
 header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--line)}
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .hbar{max-width:640px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px}
 .brand{font-weight:800;letter-spacing:-.02em;font-size:16px}
 .brand span{color:var(--tx3);font-weight:600}
@@ -43,7 +41,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
 .iconbtn{width:38px;height:38px;border-radius:10px;background:var(--bg3);border:1px solid var(--line);
   display:grid;place-items:center;font-size:16px}
 
-/* ---------- banners ---------- */
 .banner{margin:12px 0;padding:12px 14px;border-radius:var(--r);font-size:13.5px;
   display:flex;gap:10px;align-items:flex-start;border:1px solid}
 .banner.warn{background:#3a2a08;border-color:#6b4c0d;color:#ffd88a}
@@ -51,7 +48,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
 .banner .bx{flex:1}
 .banner button{background:rgba(255,255,255,.12);padding:7px 12px;border-radius:9px;font-size:12.5px;font-weight:700;white-space:nowrap}
 
-/* ---------- log tab ---------- */
 .bigrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .big{height:132px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;font-weight:800;font-size:19px;letter-spacing:-.01em;position:relative;overflow:hidden;
@@ -75,7 +71,6 @@ header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .chip.tog.on{background:#3a2a08;border-color:#8a6410;color:#ffd88a}
 
-/* ---------- cards / stats ---------- */
 .card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .card h4{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-weight:800}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -84,6 +79,8 @@ header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
 .stat .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .stat .l{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;font-weight:700}
 .stat.g .v{color:var(--good)} .stat.b .v{color:var(--bad)} .stat.a .v{color:var(--acc)} .stat.p .v{color:var(--pend)}
+.delta{font-size:11px;font-weight:800;margin-left:4px}
+.delta.up{color:var(--good)} .delta.dn{color:var(--bad)}
 
 .bar{height:9px;border-radius:99px;background:var(--bad2);overflow:hidden;display:flex;margin:6px 0 2px}
 .bar i{display:block;background:var(--good);height:100%}
@@ -104,7 +101,6 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx2)}
 .ins.neg{border-color:var(--bad)} .ins.pos{border-color:var(--good)} .ins.warn2{border-color:var(--pend)}
 .ins .tip{display:block;margin-top:5px;color:var(--tx3);font-size:12.5px}
 
-/* ---------- list rows ---------- */
 .row{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
 .row:last-child{border-bottom:0}
 .dot{width:9px;height:9px;border-radius:99px;margin-top:6px;flex:none}
@@ -120,9 +116,8 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx2)}
 .sm.b{background:#3a1214;border-color:#8f2226;color:#ffa5a8}
 .overdue{color:var(--bad)!important}
 
-/* ---------- buttons ---------- */
 .btn{display:block;width:100%;padding:14px;border-radius:12px;background:var(--bg3);border:1px solid var(--line);
-  font-weight:700;font-size:14.5px;text-align:center;margin-bottom:9px;color:var(--tx)}
+  font-weight:700;font-size:14.5px;text-align:center;margin-bottom:9px;color:var(--tx);text-decoration:none}
 .btn:active{opacity:.75}
 .btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
 .btn.dan{background:#3a1214;border-color:#8f2226;color:#ffa5a8}
@@ -130,7 +125,6 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx2)}
 .btn2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .btn2 .btn{margin-bottom:0}
 
-/* ---------- forms ---------- */
 label.f{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);
   margin:14px 0 6px;font-weight:800}
 input[type=text],input[type=url],input[type=number],input[type=date],textarea,select{
@@ -142,7 +136,6 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 code{background:var(--bg3);padding:2px 6px;border-radius:5px;font-size:12px;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;color:#b6dcff}
 
-/* ---------- sheet / modal ---------- */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:90;
   display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
 .sheet{background:var(--bg2);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;
@@ -156,7 +149,6 @@ code{background:var(--bg3);padding:2px 6px;border-radius:5px;font-size:12px;
 .scrim.center .sheet{border-radius:20px;border-bottom:1px solid var(--line);animation:pop .2s ease}
 @keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
 
-/* ---------- nav ---------- */
 nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.95);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding-bottom:var(--safeb)}
@@ -167,27 +159,34 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.
 .nb .bdg{position:absolute;transform:translate(14px,-4px);background:var(--bad);color:#fff;
   font-size:9px;padding:1px 5px;border-radius:99px;font-weight:800}
 
-/* ---------- toast ---------- */
 #toast{position:fixed;left:50%;bottom:calc(80px + var(--safeb));transform:translateX(-50%) translateY(20px);
   background:#fff;color:#0b0d10;padding:11px 18px;border-radius:99px;font-weight:800;font-size:13.5px;
   z-index:200;opacity:0;transition:.22s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 #toast.g{background:var(--good);color:#04140a} #toast.b{background:var(--bad);color:#fff}
-
 .flash{position:fixed;inset:0;z-index:150;pointer-events:none;opacity:0;transition:opacity .35s}
 .flash.on{opacity:.22}
 
 .empty{text-align:center;padding:44px 16px;color:var(--tx3)}
 .empty .e{font-size:40px;margin-bottom:10px;opacity:.5}
-.spark{display:flex;align-items:flex-end;gap:2px;height:40px;margin-top:8px}
+.spark{display:flex;align-items:flex-end;gap:2px;height:44px;margin-top:8px}
 .spark i{flex:1;background:var(--bg3);border-radius:2px 2px 0 0;min-height:2px;display:block}
-.spark i.g{background:var(--good2)} .spark i.b{background:var(--bad2)}
+.spark i.g{background:var(--good2)} .spark i.b{background:var(--bad2)} .spark i.n{background:var(--acc);opacity:.55}
+.sparkx{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:4px;font-weight:700}
 .calrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
 .calrow .lbl{width:52px;color:var(--tx3);font-variant-numeric:tabular-nums;font-weight:700}
 .caltrack{flex:1;height:16px;background:var(--bg3);border-radius:5px;position:relative;overflow:hidden}
 .caltrack i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);opacity:.85}
 .caltrack u{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.6}
 .calrow .nn{width:30px;text-align:right;color:var(--tx3);font-variant-numeric:tabular-nums}
+.undo{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 12px;margin-top:12px;font-size:12.5px;color:var(--tx3)}
+.undo .ux{flex:1}
+.undo button{background:var(--bg3);border:1px solid var(--line);padding:6px 12px;border-radius:9px;
+  font-size:12px;font-weight:800;color:var(--tx2)}
+.gauge{height:26px;border-radius:8px;background:var(--bg3);position:relative;overflow:hidden;margin:6px 0}
+.gauge i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#1c7a48,#2fbf71)}
+.gauge b{position:absolute;right:8px;top:0;line-height:26px;font-size:12px;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -208,8 +207,8 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.
 
 <nav><div class="nin">
   <button class="nb on" data-tab="log"><span class="ni">⚡</span>Log</button>
-  <button class="nb" data-tab="queue"><span class="ni">◷</span>Queue<span class="bdg hide" id="qBadge">0</span></button>
-  <button class="nb" data-tab="stats"><span class="ni">◈</span>Stats</button>
+  <button class="nb" data-tab="queue"><span class="ni">◷</span>Open<span class="bdg hide" id="qBadge">0</span></button>
+  <button class="nb" data-tab="trends"><span class="ni">◈</span>Trends</button>
   <button class="nb" data-tab="data"><span class="ni">⛁</span>Data</button>
 </div></nav>
 
@@ -220,404 +219,769 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.
 <script>
 "use strict";
 /* ============================================================================
-   DECISION K/D  —  lifetime decision ledger with calibration scoring
-   Single-file app. Companion: config.json (settings + backup vault).
+   DECISION K/D  v2 — aggregate ledger
+   ---------------------------------------------------------------------------
+   Design rule: the ledger stores COUNTS, not events.
+   Every decision is folded into a month bucket the moment it is logged, then
+   the raw event is discarded. Month buckets older than RETAIN_MONTHS collapse
+   into year buckets. Lifetime cross-sections (domain / flag / hour / weekday /
+   stakes / door / confidence decile) are kept as permanent counters.
+   Result: storage is BOUNDED. It grows ~150 bytes per year, forever.
+   Companion file: config.json (settings + the aggregate vault).
    ========================================================================= */
 
-const APP_VERSION = "1.0.0";
-const DB_NAME = "decisionKD", DB_VER = 1;
-const S_DEC = "decisions", S_META = "meta";
+const APP_VERSION = "2.0.0";
+const SCHEMA = "decision-kd/2";
+const LS_KEY = "dkd.v2";
+const RETAIN_MONTHS = 36;          // months kept at full resolution
+const HB = ["00–06","06–10","10–14","14–18","18–22","22–24"];
+const WD = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAY = 86400000;
 
 const DEFAULTS = {
-  schema: "decision-kd/1",
+  schema: SCHEMA,
   configEditUrl: "",
   app: { title: "Decision K/D", owner: "" },
   settings: {
-    confirmQuickLog: false,
     hapticFeedback: true,
     defaultConfidence: 70,
-    askReviewDate: true,
-    weekStartsMonday: true,
-    minSampleForInsight: 8,
-    nightHours: [22, 5]
+    minSample: 10,
+    retainMonths: RETAIN_MONTHS
   },
   domains: ["Work","Money","Health","Relationships","Learning","Time","Risk","Other"],
   stateFlags: ["Tired","Rushed","Angry","Hungry","Pressured","Unclear"],
-  backupPolicy: { softDecisions: 20, softDays: 7, hardDecisions: 60, hardDays: 21 },
-  backup: { exportedAt: null, count: 0, decisions: [] }
+  backupPolicy: { softEntries: 25, softDays: 14, hardEntries: 80, hardDays: 45 }
 };
 
 let CFG = JSON.parse(JSON.stringify(DEFAULTS));
-let DECS = [];            // in-memory mirror of the decisions store
-let META = {};            // meta key/value mirror
+let ST  = null;
 let TAB = "log";
-let db = null;
 let quickState = { domain: null, flags: [] };
 
 /* ------------------------------ utilities ------------------------------- */
-const $ = (s, r) => (r || document).querySelector(s);
-const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
-const uid = () => (crypto.randomUUID ? crypto.randomUUID()
-  : "d-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10));
-const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const DAY = 86400000;
-const now = () => Date.now();
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const $  = (s,r)=>(r||document).querySelector(s);
+const $$ = (s,r)=>Array.from((r||document).querySelectorAll(s));
+const now = ()=>Date.now();
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid = ()=> "o"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc = s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r4  = n=>Math.round(n*10000)/10000;
+function pct(n){ return n==null?"–":(n*100).toFixed(0)+"%"; }
+function mk(ts){ const d=new Date(ts); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+function mkShift(key,n){ const [y,m]=key.split("-").map(Number); const d=new Date(y,m-1+n,1); return mk(d.getTime()); }
+function mkLabel(key){ const [y,m]=key.split("-").map(Number);
+  return new Date(y,m-1,1).toLocaleDateString(undefined,{month:"short"})+(m===1?" "+String(y).slice(2):""); }
+function fmtDate(ts){ if(!ts) return "–"; return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"}); }
+function ago(ts){ if(!ts) return "never"; const s=(now()-ts)/1000;
+  if(s<60) return "just now"; if(s<3600) return Math.floor(s/60)+"m ago";
+  if(s<86400) return Math.floor(s/3600)+"h ago"; const d=Math.floor(s/86400);
+  if(d<30) return d+"d ago"; if(d<365) return Math.floor(d/30)+"mo ago"; return (d/365).toFixed(1)+"y ago"; }
+function bytes(n){ return n<1024 ? n+" B" : n<1048576 ? (n/1024).toFixed(1)+" KB" : (n/1048576).toFixed(2)+" MB"; }
+function haptic(m){ try{ if(CFG.settings.hapticFeedback && navigator.vibrate) navigator.vibrate(m||12);}catch(e){} }
+function toast(msg,kind){ const t=$("#toast"); if(!t) return; t.textContent=msg;
+  t.className="on"+(kind?" "+kind:""); clearTimeout(t._t); t._t=setTimeout(()=>{t.className="";},2100); }
+function flash(c){ const f=$("#flash"); if(!f) return; f.style.background=c; f.classList.add("on");
+  setTimeout(()=>f.classList.remove("on"),340); }
 
-function fmtDate(ts){ if(!ts) return "–"; const d=new Date(ts);
-  return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"}); }
-function fmtDT(ts){ if(!ts) return "–"; const d=new Date(ts);
-  return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "+
-         d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}); }
-function ago(ts){
-  const s=(now()-ts)/1000;
-  if(s<60) return "just now";
-  if(s<3600) return Math.floor(s/60)+"m ago";
-  if(s<86400) return Math.floor(s/3600)+"h ago";
-  const d=Math.floor(s/86400);
-  if(d<30) return d+"d ago";
-  if(d<365) return Math.floor(d/30)+"mo ago";
-  return (d/365).toFixed(1)+"y ago";
-}
-function pct(n){ return (n*100).toFixed(0)+"%"; }
-function haptic(ms){ try{ if(CFG.settings.hapticFeedback && navigator.vibrate) navigator.vibrate(ms||12);}catch(e){} }
+/* ------------------------------ the ledger ------------------------------ */
+/* month/year bucket keys:
+   g  good count           b  bad count            x  void count
+   cap stakes-weighted capital (+stakes on good, -stakes on bad)
+   cn  # with a confidence  cs  sum of confidence  bs  sum of Brier terms
+   d/f/h/w/s/r/cb  sparse maps  key -> [good,bad]
+     d domain · f state flag · h hour bucket 0-5 · w weekday 0-6
+     s stakes 1-5 · r door 1=one-way 2=two-way · cb confidence decile 0-9  */
 
-function toast(msg, kind){
-  const t=$("#toast"); t.textContent=msg; t.className="on"+(kind?" "+kind:"");
-  clearTimeout(t._t); t._t=setTimeout(()=>{ t.className=""; }, 2100);
-}
-function flash(color){
-  const f=$("#flash"); f.style.background=color; f.classList.add("on");
-  setTimeout(()=>f.classList.remove("on"), 340);
-}
-
-/* ------------------------------ IndexedDB ------------------------------- */
-function openDB(){
-  return new Promise((res, rej)=>{
-    const rq = indexedDB.open(DB_NAME, DB_VER);
-    rq.onupgradeneeded = e => {
-      const d = e.target.result;
-      if(!d.objectStoreNames.contains(S_DEC)){
-        const st = d.createObjectStore(S_DEC, { keyPath:"id" });
-        st.createIndex("ts","ts"); st.createIndex("verdict","verdict");
-      }
-      if(!d.objectStoreNames.contains(S_META)) d.createObjectStore(S_META, { keyPath:"k" });
-    };
-    rq.onsuccess = () => res(rq.result);
-    rq.onerror  = () => rej(rq.error);
-  });
-}
-function tx(store, mode){ return db.transaction(store, mode).objectStore(store); }
-function idbAll(store){
-  return new Promise((res,rej)=>{ const r=tx(store,"readonly").getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); });
-}
-function idbPut(store, val){
-  return new Promise((res,rej)=>{ const r=tx(store,"readwrite").put(val); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
-}
-function idbDel(store, key){
-  return new Promise((res,rej)=>{ const r=tx(store,"readwrite").delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
-}
-function idbClear(store){
-  return new Promise((res,rej)=>{ const r=tx(store,"readwrite").clear(); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
-}
-async function setMeta(k, v){ META[k]=v; await idbPut(S_META,{k,v}); }
-
-/* --------------------------- config load/merge -------------------------- */
-function deepMerge(base, over){
-  const out = Array.isArray(base) ? base.slice() : Object.assign({}, base);
-  if(!over || typeof over !== "object") return out;
-  for(const k of Object.keys(over)){
-    const bv = base ? base[k] : undefined, ov = over[k];
-    if(ov && typeof ov === "object" && !Array.isArray(ov) && bv && typeof bv === "object" && !Array.isArray(bv))
-      out[k] = deepMerge(bv, ov);
-    else if(ov !== undefined && ov !== null) out[k] = ov;
-  }
-  return out;
-}
-async function loadConfig(){
-  try{
-    const r = await fetch("config.json?ts=" + now(), { cache:"no-store" });
-    if(r.ok){ CFG = deepMerge(DEFAULTS, await r.json()); return true; }
-  }catch(e){ /* offline or missing — defaults are fine */ }
-  return false;
-}
-
-/* --------------------------- decision records --------------------------- */
-function newDecision(o){
-  o = o || {};
+function blankState(){
   return {
-    id: o.id || uid(),
-    ts: o.ts || now(),
-    title: (o.title || "").slice(0,300),
-    verdict: o.verdict || "pending",           // good | bad | pending | void
-    resolvedTs: o.resolvedTs || (o.verdict==="good"||o.verdict==="bad" ? (o.ts||now()) : null),
-    domain: o.domain || null,
-    reversibility: o.reversibility || null,     // one | two
-    stakes: o.stakes != null ? clamp(+o.stakes,1,5) : 2,
-    confidence: o.confidence != null ? clamp(+o.confidence,0,100) : null,
-    flags: Array.isArray(o.flags) ? o.flags : [],
-    note: (o.note || "").slice(0,2000),
-    lesson: (o.lesson || "").slice(0,2000),
-    reviewDue: o.reviewDue || null,
-    createdVer: APP_VERSION
+    schema: SCHEMA, version: APP_VERSION,
+    start: mk(now()),
+    m: {},              // "YYYY-MM" -> bucket   (last RETAIN_MONTHS)
+    y: {},              // "YYYY"    -> bucket   (compacted, core + domain)
+    dim: {},            // permanent lifetime cross-sections
+    open: [],           // unresolved calls (the only per-item records kept)
+    meta: { lastBackup:null, unbacked:0, configEditUrl:"", onboarded:false, undo:null },
+    rec: []             // local-only display ring, never exported
   };
 }
-async function addDecision(o){
-  const d = newDecision(o);
-  await idbPut(S_DEC, d);
-  DECS.push(d);
-  await bumpUnbacked();
-  return d;
+const CORE = ["g","b","x","cap","cn","cs","bs"];
+
+function bump(o,k,n){ if(!n) return; const v=r4((o[k]||0)+n); if(v) o[k]=v; else delete o[k]; }
+function pair(o,grp,key,g,b){
+  if(!g&&!b) return;
+  const t=o[grp]||(o[grp]={}); const a=t[key]||(t[key]=[0,0]);
+  a[0]=Math.max(0,a[0]+g); a[1]=Math.max(0,a[1]+b);
+  if(!a[0]&&!a[1]) delete t[key];
+  if(!Object.keys(t).length) delete o[grp];
 }
-async function saveDecision(d){
-  await idbPut(S_DEC, d);
-  const i = DECS.findIndex(x=>x.id===d.id);
-  if(i>=0) DECS[i]=d; else DECS.push(d);
-  await bumpUnbacked();
+function ensure(map,key){ return map[key]||(map[key]={}); }
+
+/* fold one decision into the aggregates. sign=-1 reverses it (undo). */
+function applyEvent(ev, sign){
+  sign = sign||1;
+  const M = ensure(ST.m, mk(ev.ts)), D = ST.dim;
+  if(ev.verdict==="void"){ bump(M,"x",sign); cleanup(M,mk(ev.ts)); return; }
+  const isG = ev.verdict==="good";
+  const g = isG?sign:0, b = isG?0:sign;
+  bump(M,"g",g); bump(M,"b",b);
+  const s = clamp(+ev.stakes||2,1,5);
+  bump(M,"cap", sign*(isG?s:-s));
+  if(ev.confidence!=null){
+    const p=clamp(+ev.confidence,0,100), o=isG?1:0;
+    bump(M,"cn",sign); bump(M,"cs",sign*p); bump(M,"bs", r4(sign*Math.pow(p/100-o,2)));
+    const dec=String(Math.min(9,Math.floor(p/10)));
+    pair(M,"cb",dec,g,b); pair(D,"cb",dec,g,b);
+  }
+  if(ev.domain){ pair(M,"d",ev.domain,g,b); pair(D,"d",ev.domain,g,b); }
+  (ev.flags||[]).forEach(f=>{ pair(M,"f",f,g,b); pair(D,"f",f,g,b); });
+  const hi=String(hourIdx(ev.ts)), wi=String(new Date(ev.ts).getDay());
+  pair(M,"h",hi,g,b); pair(D,"h",hi,g,b);
+  pair(M,"w",wi,g,b); pair(D,"w",wi,g,b);
+  pair(M,"s",String(s),g,b); pair(D,"s",String(s),g,b);
+  if(ev.rev){ const rk=ev.rev==="one"?"1":"2"; pair(M,"r",rk,g,b); pair(D,"r",rk,g,b); }
+  cleanup(M, mk(ev.ts));
 }
-async function delDecision(id){
-  await idbDel(S_DEC, id);
-  DECS = DECS.filter(d=>d.id!==id);
-  await bumpUnbacked();
-}
-async function bumpUnbacked(){ await setMeta("unbacked", (META.unbacked||0)+1); }
+function cleanup(M,key){ if(!Object.keys(M).length) delete ST.m[key]; }
+function hourIdx(ts){ const h=new Date(ts).getHours();
+  return h<6?0:h<10?1:h<14?2:h<18?3:h<22?4:5; }
 
-/* ------------------------------ statistics ------------------------------ */
-function resolved(list){ return list.filter(d=>d.verdict==="good"||d.verdict==="bad"); }
-
-function computeStats(list){
-  const R = resolved(list);
-  const good = R.filter(d=>d.verdict==="good").length;
-  const bad  = R.length - good;
-  const wr   = R.length ? good/R.length : 0;
-  const kd   = bad === 0 ? (good>0 ? good : 0) : good/bad;
-
-  // stakes-weighted decision capital
-  let cap=0, wg=0, wt=0;
-  R.forEach(d=>{ const s=d.stakes||2; cap += (d.verdict==="good"? s : -s); wt+=s; if(d.verdict==="good") wg+=s; });
-
-  // streaks (chronological by resolution time)
-  const chron = R.slice().sort((a,b)=>(a.resolvedTs||a.ts)-(b.resolvedTs||b.ts));
-  let cur=0, curKind=null, best=0, worst=0, run=0, runKind=null;
-  chron.forEach(d=>{
-    if(d.verdict===runKind){ run++; } else { runKind=d.verdict; run=1; }
-    if(runKind==="good") best=Math.max(best,run); else worst=Math.max(worst,run);
+/* ------------------------------ compaction ------------------------------ */
+function compact(){
+  const keep = CFG.settings.retainMonths || RETAIN_MONTHS;
+  const cut  = mkShift(mk(now()), -(keep-1));
+  let moved=0;
+  Object.keys(ST.m).forEach(k=>{
+    if(k >= cut) return;                       // "YYYY-MM" sorts lexically
+    const Y = ensure(ST.y, k.slice(0,4)), M = ST.m[k];
+    CORE.forEach(c=>{ if(M[c]) bump(Y,c,M[c]); });
+    if(M.d) Object.entries(M.d).forEach(([key,v])=>pair(Y,"d",key,v[0],v[1]));
+    delete ST.m[k]; moved++;
   });
-  if(chron.length){ curKind=chron[chron.length-1].verdict; cur=0;
-    for(let i=chron.length-1;i>=0;i--){ if(chron[i].verdict===curKind) cur++; else break; } }
-
-  // calibration / Brier
-  const C = R.filter(d=>d.confidence!=null);
-  let brier=null;
-  if(C.length){ brier = C.reduce((a,d)=>{ const p=d.confidence/100, o=d.verdict==="good"?1:0; return a+(p-o)*(p-o); },0)/C.length; }
-  const meanConf = C.length ? C.reduce((a,d)=>a+d.confidence,0)/C.length/100 : null;
-  const buckets = [];
-  for(let b=0;b<10;b++){
-    const inB = C.filter(d=>{ const p=d.confidence; return b===9 ? p>=90 : (p>=b*10 && p<(b+1)*10); });
-    buckets.push({ lo:b*10, hi:b*10+10, n:inB.length,
-      actual: inB.length ? inB.filter(d=>d.verdict==="good").length/inB.length : null });
-  }
-
-  return { total:list.length, resolvedN:R.length, good, bad, wr, kd, cap,
-    weightedWR: wt ? wg/wt : 0, cur, curKind, best, worst,
-    brier, meanConf, buckets, calN:C.length,
-    pending:list.filter(d=>d.verdict==="pending").length };
+  return moved;
 }
 
-function windowed(days){
-  const cut = now() - days*DAY;
-  return DECS.filter(d=>(d.resolvedTs||d.ts) >= cut);
+/* ------------------------------ read models ----------------------------- */
+function sumBuckets(list){
+  const t={g:0,b:0,x:0,cap:0,cn:0,cs:0,bs:0};
+  list.forEach(B=>CORE.forEach(c=>{ if(B[c]) t[c]=r4(t[c]+B[c]); }));
+  t.n = t.g+t.b;
+  t.wr = t.n ? t.g/t.n : null;
+  t.kd = t.b ? t.g/t.b : (t.g||null);
+  t.brier = t.cn ? r4(t.bs/t.cn) : null;
+  t.conf  = t.cn ? t.cs/t.cn/100 : null;
+  return t;
 }
-function groupStats(keyFn, list){
-  const m = new Map();
-  resolved(list||DECS).forEach(d=>{
-    const k = keyFn(d); if(k==null) return;
-    if(!m.has(k)) m.set(k,{key:k,good:0,bad:0,stakes:0});
-    const g=m.get(k); g[d.verdict]++; g.stakes+=(d.stakes||2);
+function lifetime(){ return sumBuckets(Object.values(ST.m).concat(Object.values(ST.y))); }
+function monthKeysBack(n){ const out=[]; let k=mk(now()); for(let i=0;i<n;i++){ out.unshift(k); k=mkShift(k,-1); } return out; }
+function windowTotals(nMonths){ return sumBuckets(monthKeysBack(nMonths).map(k=>ST.m[k]).filter(Boolean)); }
+function prevWindowTotals(nMonths){
+  const keys=[]; let k=mkShift(mk(now()),-nMonths);
+  for(let i=0;i<nMonths;i++){ keys.push(k); k=mkShift(k,-1); }
+  return sumBuckets(keys.map(x=>ST.m[x]).filter(Boolean));
+}
+function yearRows(){
+  const years=new Set(Object.keys(ST.y));
+  Object.keys(ST.m).forEach(k=>years.add(k.slice(0,4)));
+  return Array.from(years).sort().reverse().map(y=>{
+    const list=[]; if(ST.y[y]) list.push(ST.y[y]);
+    Object.keys(ST.m).forEach(k=>{ if(k.slice(0,4)===y) list.push(ST.m[k]); });
+    const t=sumBuckets(list); t.key=y; return t;
   });
-  return Array.from(m.values()).map(g=>{
-    g.n=g.good+g.bad; g.wr=g.n?g.good/g.n:0; g.avgStakes=g.n?g.stakes/g.n:0; return g;
-  }).sort((a,b)=>b.n-a.n);
 }
-function hourBucket(d){ const h=new Date(d.ts).getHours();
-  if(h<6) return "00–06"; if(h<10) return "06–10"; if(h<14) return "10–14";
-  if(h<18) return "14–18"; if(h<22) return "18–22"; return "22–24"; }
-function isNight(d){ const h=new Date(d.ts).getHours(); const [a,b]=CFG.settings.nightHours; return h>=a || h<=b; }
-
-/* ------------------------------- insights ------------------------------- */
-function insights(){
-  const out=[]; const MIN=CFG.settings.minSampleForInsight||8;
-  const R=resolved(DECS);
-  if(R.length < MIN*2){
-    out.push({k:"info", t:`<b>Not enough data yet.</b> Insights unlock at roughly ${MIN*2} resolved decisions. You have ${R.length}. Keep logging — the value of this ledger compounds, it does not accumulate linearly.`});
-    return out;
-  }
-  const wrOf = a => a.length ? a.filter(d=>d.verdict==="good").length/a.length : 0;
-
-  // 1. night penalty
-  const night=R.filter(isNight), day=R.filter(d=>!isNight(d));
-  if(night.length>=MIN && day.length>=MIN){
-    const dn=wrOf(day)-wrOf(night);
-    if(Math.abs(dn)>=0.12) out.push({k:dn>0?"neg":"pos",
-      t:`<b>Time-of-day effect.</b> Decisions logged at night (${CFG.settings.nightHours[0]}:00–${CFG.settings.nightHours[1]}:00) resolve well ${pct(wrOf(night))} of the time vs ${pct(wrOf(day))} in daylight hours. n=${night.length}/${day.length}.`,
-      tip: dn>0 ? "Consider a hard policy: no consequential decisions after "+CFG.settings.nightHours[0]+":00. Policies are cheaper than winning the argument with yourself every night." : "Unusual — your night calls hold up. Worth checking whether they are simply lower-stakes."});
-  }
-  // 2. state flags
-  (CFG.stateFlags||[]).forEach(f=>{
-    const w=R.filter(d=>(d.flags||[]).includes(f)); if(w.length<MIN) return;
-    const wo=R.filter(d=>!(d.flags||[]).includes(f)); if(wo.length<MIN) return;
-    const diff=wrOf(wo)-wrOf(w);
-    if(diff>=0.15) out.push({k:"neg",
-      t:`<b>"${esc(f)}" is costing you.</b> Win rate drops to ${pct(wrOf(w))} when flagged <em>${esc(f)}</em>, vs ${pct(wrOf(wo))} otherwise. n=${w.length}.`,
-      tip:"This is a state-validity signal. The cheapest intervention is deferral, not better thinking."});
+function dimRows(grp, labeler){
+  const src = ST.dim[grp]||{};
+  return Object.entries(src).map(([k,v])=>({
+    key: labeler?labeler(k):k, raw:k, good:v[0], bad:v[1], n:v[0]+v[1],
+    wr: (v[0]+v[1]) ? v[0]/(v[0]+v[1]) : null
+  })).filter(r=>r.n>0).sort((a,b)=>b.n-a.n);
+}
+function monthSeries(n){
+  return monthKeysBack(n).map(k=>{
+    const B=ST.m[k]||{}; const g=B.g||0, b=B.b||0;
+    return { key:k, g, b, n:g+b, wr:(g+b)?g/(g+b):null, cap:B.cap||0 };
   });
-  // 3. reversibility
-  const one=R.filter(d=>d.reversibility==="one"), two=R.filter(d=>d.reversibility==="two");
-  if(one.length>=MIN && two.length>=MIN){
-    out.push({k: wrOf(one)<wrOf(two)?"neg":"pos",
-      t:`<b>Door analysis.</b> One-way (irreversible) decisions: ${pct(wrOf(one))} win rate over ${one.length}. Two-way (reversible): ${pct(wrOf(two))} over ${two.length}.`,
-      tip: wrOf(one)<wrOf(two)
-        ? "Your irreversible calls underperform. Slow those down; speed up the reversible ones. Most people do the exact opposite."
-        : "Healthy pattern — you are allocating care by reversibility rather than by vividness."});
-    const twoStakes = two.reduce((a,d)=>a+(d.stakes||2),0)/two.length;
-    if(twoStakes>=3.4) out.push({k:"warn2",
-      t:`<b>Precision misallocation.</b> Your reversible decisions carry an average stakes rating of ${twoStakes.toFixed(1)}/5 — you are treating two-way doors as if they were one-way.`,
-      tip:"Two-way door: decide in ten minutes. You can walk back through it."});
-  }
-  // 4. domains
-  const doms=groupStats(d=>d.domain).filter(g=>g.n>=MIN);
-  if(doms.length>=2){
-    const s=doms.slice().sort((a,b)=>b.wr-a.wr);
-    const top=s[0], bot=s[s.length-1];
-    if(top.wr-bot.wr>=0.15){
-      out.push({k:"pos", t:`<b>Strongest domain: ${esc(top.key)}</b> — ${pct(top.wr)} across ${top.n} resolved decisions.`,
-        tip:"Where you are reliably good, decide faster and delegate less."});
-      out.push({k:"neg", t:`<b>Weakest domain: ${esc(bot.key)}</b> — ${pct(bot.wr)} across ${bot.n}.`,
-        tip:"Candidates here: get a second opinion by default, add a waiting period, or buy expertise. This is the highest-yield place to install a rule."});
-    }
-  }
-  // 5. calibration
-  const st=computeStats(DECS);
-  if(st.calN>=MIN*2 && st.meanConf!=null){
-    const gap=st.meanConf-st.wr;
-    if(gap>=0.08) out.push({k:"neg",
-      t:`<b>Overconfidence detected.</b> Your average stated confidence is ${pct(st.meanConf)} but your actual win rate is ${pct(st.wr)} — a gap of ${(gap*100).toFixed(0)} points across ${st.calN} scored decisions. Brier score ${st.brier.toFixed(3)} (lower is better; 0.25 = coin flip).`,
-      tip:"Try subtracting the gap from every future estimate for 30 days, then re-measure. Calibration is trainable and it transfers across domains."});
-    else if(gap<=-0.08) out.push({k:"warn2",
-      t:`<b>Underconfidence detected.</b> You predict ${pct(st.meanConf)} and deliver ${pct(st.wr)}. You are systematically underrating yourself by ${Math.abs(gap*100).toFixed(0)} points.`,
-      tip:"Underconfidence has a real cost: it shows up as decisions never made. The opportunity cost leaves no evidence, which is why nobody counts it."});
-    else out.push({k:"pos",
-      t:`<b>Well calibrated.</b> Stated confidence ${pct(st.meanConf)} vs actual ${pct(st.wr)}. Brier ${st.brier.toFixed(3)}.`,
-      tip:"Rare. Protect this by continuing to record predictions before outcomes, never after."});
-  }
-  // 6. stakes
-  const hi=R.filter(d=>(d.stakes||2)>=4), lo=R.filter(d=>(d.stakes||2)<=2);
-  if(hi.length>=MIN && lo.length>=MIN && wrOf(lo)-wrOf(hi)>=0.15)
-    out.push({k:"neg", t:`<b>You degrade under stakes.</b> High-stakes win rate ${pct(wrOf(hi))} (n=${hi.length}) vs low-stakes ${pct(wrOf(lo))} (n=${lo.length}).`,
-      tip:"Classic pressure signature. Pre-commit a checklist for anything rated 4–5 so the process does not depend on your state at the moment of choosing."});
-  // 7. stale queue
-  const stale=DECS.filter(d=>d.verdict==="pending" && now()-d.ts>45*DAY);
-  if(stale.length>=3) out.push({k:"warn2",
-    t:`<b>${stale.length} decisions have been pending over 45 days.</b> Unresolved entries silently inflate your apparent win rate, because bad outcomes are the ones people avoid adjudicating.`,
-    tip:"Resolve or void them. An honest ledger requires closing losses."});
-  // 8. volume trend
-  const l30=DECS.filter(d=>d.ts>=now()-30*DAY).length, p30=DECS.filter(d=>d.ts>=now()-60*DAY&&d.ts<now()-30*DAY).length;
-  if(p30>=5 && l30 < p30*0.5) out.push({k:"warn2",
-    t:`<b>Logging is dropping off.</b> ${l30} entries in the last 30 days vs ${p30} in the 30 before.`,
-    tip:"A ledger with gaps produces survivorship bias, not insight. Lower the friction: use the URL shortcuts on your home screen."});
-  // 9. day of week
-  const dow=groupStats(d=>["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d.ts).getDay()]).filter(g=>g.n>=MIN);
-  if(dow.length>=4){
-    const s=dow.slice().sort((a,b)=>a.wr-b.wr);
-    if(s[s.length-1].wr - s[0].wr >= 0.2) out.push({k:"warn2",
-      t:`<b>Weekday effect.</b> ${esc(s[0].key)} is your worst decision day (${pct(s[0].wr)}, n=${s[0].n}); ${esc(s[s.length-1].key)} your best (${pct(s[s.length-1].wr)}, n=${s[s.length-1].n}).`,
-      tip:"Probably a proxy for load, sleep, or meeting density rather than the day itself. Look for what your worst day actually contains."});
-  }
-  if(out.length===0) out.push({k:"info", t:"<b>No strong patterns detected yet.</b> That is itself informative: your performance is currently uniform across the dimensions being tracked. Add domains, stakes, and confidence to entries to sharpen resolution."});
-  return out;
 }
+function openDue(){ return ST.open.filter(o=>o.due && o.due<=now()).length; }
+
+/* ------------------------------- writes --------------------------------- */
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(ST)); }
+  catch(e){ toast("Storage write failed","b"); } }
+
+function record(ev){
+  ev.ts = ev.ts||now();
+  applyEvent(ev,1);
+  ST.meta.undo = ev;
+  ST.rec.unshift({ ts:ev.ts, v:ev.verdict, d:ev.domain||null, s:ev.stakes||null,
+                   c:ev.confidence==null?null:ev.confidence, f:(ev.flags||[]).slice(0,3), t:ev.label||"" });
+  ST.rec = ST.rec.slice(0,25);
+  ST.meta.unbacked = (ST.meta.unbacked||0)+1;
+  compact();
+  save();
+}
+function undoLast(){
+  const ev=ST.meta.undo; if(!ev) return false;
+  applyEvent(ev,-1);
+  ST.meta.undo=null; ST.rec.shift();
+  ST.meta.unbacked=Math.max(0,(ST.meta.unbacked||0)-1);
+  save(); return true;
+}
+function addOpen(o){
+  o.id=o.id||uid(); o.ts=o.ts||now();
+  ST.open.unshift(o); ST.open=ST.open.slice(0,200);
+  ST.meta.unbacked=(ST.meta.unbacked||0)+1; save(); return o;
+}
+function resolveOpen(id, verdict){
+  const i=ST.open.findIndex(o=>o.id===id); if(i<0) return;
+  const o=ST.open[i]; ST.open.splice(i,1);
+  record({ ts:o.ts, verdict, domain:o.domain, flags:o.flags, stakes:o.stakes,
+           confidence:o.confidence, rev:o.rev, label:o.label });
+}
+function dropOpen(id){ ST.open=ST.open.filter(o=>o.id!==id); save(); }
 
 /* ------------------------------ backup gate ----------------------------- */
 function backupState(){
   const p=CFG.backupPolicy||DEFAULTS.backupPolicy;
-  const unb=META.unbacked||0;
-  const last=META.lastBackup||0;
-  const days=last ? (now()-last)/DAY : (DECS.length ? 999 : 0);
-  const hard = unb>=p.hardDecisions || (DECS.length>0 && days>=p.hardDays);
-  const soft = unb>=p.softDecisions || (DECS.length>0 && days>=p.softDays);
-  return { unb, last, days, hard, soft:soft&&!hard };
+  const unb=ST.meta.unbacked||0, last=ST.meta.lastBackup||0;
+  const L=lifetime(), any=L.n+L.x+ST.open.length>0;
+  const days=last?(now()-last)/DAY:(any?999:0);
+  const hard = unb>=p.hardEntries || (any && days>=p.hardDays);
+  const soft = unb>=p.softEntries || (any && days>=p.softDays);
+  return { unb, last, days, hard, soft: soft&&!hard };
 }
 
-/* ------------------------------ export ---------------------------------- */
-function buildConfigExport(){
-  const out = JSON.parse(JSON.stringify(CFG));
-  out.schema = "decision-kd/1";
-  out.appVersion = APP_VERSION;
-  out.configEditUrl = META.configEditUrl || CFG.configEditUrl || "";
-  out.backup = {
-    exportedAt: new Date().toISOString(),
-    count: DECS.length,
-    integrity: DECS.length + ":" + DECS.reduce((a,d)=>a+(d.ts%1000),0),
-    decisions: DECS.slice().sort((a,b)=>a.ts-b.ts)
+/* ------------------------------- export --------------------------------- */
+function buildExport(){
+  const L=lifetime();
+  return {
+    schema: SCHEMA,
+    appVersion: APP_VERSION,
+    configEditUrl: ST.meta.configEditUrl || CFG.configEditUrl || "",
+    app: CFG.app,
+    settings: CFG.settings,
+    domains: CFG.domains,
+    stateFlags: CFG.stateFlags,
+    backupPolicy: CFG.backupPolicy,
+    legend: {
+      note: "Aggregate ledger. Individual decisions are never stored — only counts.",
+      bucket: { g:"good", b:"bad", x:"void", cap:"stakes-weighted capital",
+                cn:"count with confidence", cs:"sum of confidence 0-100", bs:"sum of Brier terms" },
+      maps: { d:"domain", f:"state flag", h:"hour bucket 0-5", w:"weekday 0=Sun",
+              s:"stakes 1-5", r:"door 1=one-way 2=two-way", cb:"confidence decile 0-9",
+              value:"[good, bad]" },
+      retention: `m = last ${CFG.settings.retainMonths||RETAIN_MONTHS} months at full detail; older months collapse into y (core counts + domain); dim = permanent lifetime cross-sections.`
+    },
+    summary: {
+      since: ST.start, good:L.g, bad:L.b, void:L.x, resolved:L.n,
+      winRate: L.wr==null?null:+(L.wr).toFixed(4),
+      kd: L.kd==null?null:+(L.kd).toFixed(3),
+      capital: L.cap, brier: L.brier, meanConfidence: L.conf==null?null:+(L.conf).toFixed(4),
+      openCalls: ST.open.length
+    },
+    ledger: {
+      start: ST.start, m: ST.m, y: ST.y, dim: ST.dim, open: ST.open,
+      backup: { at: new Date().toISOString(), months:Object.keys(ST.m).length,
+                years:Object.keys(ST.y).length, resolved:L.n }
+    }
   };
-  return out;
 }
-function downloadJSON(obj, name){
-  const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
+/* readable but compact: expand structure, inline any node that fits on a line.
+   Plain JSON.stringify(x,null,2) quadruples the file by exploding [g,b] pairs. */
+function jpretty(v, lvl){
+  lvl = lvl||0;
+  const flat = JSON.stringify(v);
+  if(flat===undefined) return "null";
+  if(flat.length<=110 || v===null || typeof v!=="object") return flat;
+  const pad="  ".repeat(lvl+1), end="  ".repeat(lvl);
+  if(Array.isArray(v)) return "[\n"+v.map(x=>pad+jpretty(x,lvl+1)).join(",\n")+"\n"+end+"]";
+  return "{\n"+Object.keys(v).map(k=>pad+JSON.stringify(k)+": "+jpretty(v[k],lvl+1)).join(",\n")+"\n"+end+"}";
+}
+function exportText(){ return jpretty(buildExport()); }
+function exportBytes(){ const t=exportText();
+  try{ return new Blob([t]).size; }catch(e){ return t.length; } }
+function yearRowBytes(){
+  const ys=Object.values(ST.y);
+  if(ys.length) return Math.round(ys.reduce((a,b)=>a+jpretty(b).length+14,0)/ys.length);
+  const nd=Object.keys(ST.dim.d||{}).length || (CFG.domains||[]).length;
+  return 90 + nd*18;                       // core counts + one [g,b] pair per domain
+}
+function projectBytes(years){
+  const cur=exportBytes();
+  const retain=CFG.settings.retainMonths||RETAIN_MONTHS;
+  const ms=Object.values(ST.m);
+  const mAvg=ms.length?Math.round(ms.reduce((a,b)=>a+jpretty(b).length+14,0)/ms.length):420;
+  const fill=Math.max(0,Math.min(retain-ms.length, years*12));   // window still filling
+  return cur + fill*mAvg + yearRowBytes()*years;                 // then one row per year, forever
+}
+function downloadJSON(obj,name){
+  const blob=new Blob([jpretty(obj)],{type:"application/json"});
   const u=URL.createObjectURL(blob), a=document.createElement("a");
   a.href=u; a.download=name; document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(u); a.remove(); }, 400);
+  setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},400);
+}
+function exportCSV(){
+  const rows=[["period","good","bad","void","resolved","win_rate","kd","capital","conf_n","conf_sum","brier_sum"].join(",")];
+  const add=(k,t)=>rows.push([k,t.g,t.b,t.x,t.n,t.wr==null?"":t.wr.toFixed(4),
+    t.kd==null?"":t.kd.toFixed(3),t.cap,t.cn,t.cs,t.bs].join(","));
+  yearRows().slice().reverse().forEach(y=>add(y.key,y));
+  Object.keys(ST.m).sort().forEach(k=>add(k,sumBuckets([ST.m[k]])));
+  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+  const u=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=u; a.download="decision-kd-trends-"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},400);
 }
 async function copyText(t){
   try{ await navigator.clipboard.writeText(t); return true; }
   catch(e){
-    const ta=document.createElement("textarea"); ta.value=t;
-    ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta);
-    ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+    const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select(); let ok=false;
+    try{ ok=document.execCommand("copy"); }catch(_){}
     ta.remove(); return ok;
   }
 }
-function csvExport(){
-  const cols=["id","ts","iso","title","verdict","resolvedTs","domain","reversibility","stakes","confidence","flags","note","lesson","reviewDue"];
-  const rows=[cols.join(",")];
-  DECS.slice().sort((a,b)=>a.ts-b.ts).forEach(d=>{
-    rows.push(cols.map(c=>{
-      let v = c==="iso" ? new Date(d.ts).toISOString() : d[c];
-      if(Array.isArray(v)) v=v.join("|");
-      if(v==null) v="";
-      v=String(v).replace(/"/g,'""');
-      return /[",\n]/.test(v) ? '"'+v+'"' : v;
-    }).join(","));
-  });
-  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
-  const u=URL.createObjectURL(blob), a=document.createElement("a");
-  a.href=u; a.download="decisions-"+new Date().toISOString().slice(0,10)+".csv";
-  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},400);
-}
-async function markBackedUp(){
-  await setMeta("lastBackup", now());
-  await setMeta("unbacked", 0);
-  render();
-}
+function markBackedUp(){ ST.meta.lastBackup=now(); ST.meta.unbacked=0; save(); render(); }
 
-/* ------------------------------ modals ---------------------------------- */
-function closeModal(){ $("#modal").innerHTML=""; }
-function showSheet(html, opts){
-  opts=opts||{};
-  $("#modal").innerHTML =
-    `<div class="scrim${opts.center?" center":""}" id="scrim">
-       <div class="sheet">${opts.center?"":'<div class="grab"></div>'}${html}</div>
-     </div>`;
-  if(!opts.persistent){
-    $("#scrim").addEventListener("click", e=>{ if(e.target.id==="scrim") closeModal(); });
+/* ------------------------------- import --------------------------------- */
+function importObj(obj){
+  if(!obj||typeof obj!=="object") { toast("Not a valid file","b"); return; }
+  // v2 aggregate file
+  if(obj.ledger && (obj.ledger.m||obj.ledger.y||obj.ledger.dim)){
+    const L=obj.ledger;
+    ST.m = L.m||{}; ST.y = L.y||{}; ST.dim = L.dim||{};
+    ST.open = Array.isArray(L.open)?L.open:[];
+    ST.start = L.start||ST.start;
+    if(obj.configEditUrl && !ST.meta.configEditUrl) ST.meta.configEditUrl=obj.configEditUrl;
+    CFG = deepMerge(CFG, obj);
+    ST.meta.unbacked=0; ST.meta.lastBackup=now(); ST.meta.undo=null;
+    compact(); save(); render();
+    const t=lifetime(); toast(`Restored · ${t.n} resolved decisions`,"g"); return;
   }
+  // v1 event file (or bare array) -> fold into aggregates
+  let evs=null;
+  if(Array.isArray(obj)) evs=obj;
+  else if(obj.backup && Array.isArray(obj.backup.decisions)) evs=obj.backup.decisions;
+  else if(Array.isArray(obj.decisions)) evs=obj.decisions;
+  if(!evs){ toast("No ledger found in that file","b"); return; }
+  let folded=0, opened=0;
+  evs.forEach(d=>{
+    const ts = d.ts || Date.parse(d.iso||"") || now();
+    if(d.verdict==="good"||d.verdict==="bad"||d.verdict==="void"){
+      applyEvent({ ts, verdict:d.verdict, domain:d.domain||null, flags:d.flags||[],
+        stakes:d.stakes, confidence:d.confidence==null?null:d.confidence,
+        rev:d.reversibility||d.rev||null },1); folded++;
+    } else {
+      ST.open.push({ id:d.id||uid(), ts, label:(d.title||"").slice(0,80), domain:d.domain||null,
+        flags:d.flags||[], stakes:d.stakes||2, confidence:d.confidence==null?null:d.confidence,
+        rev:d.reversibility||null, due:d.reviewDue||null }); opened++;
+    }
+  });
+  if(obj.domains) CFG.domains=obj.domains;
+  if(obj.stateFlags) CFG.stateFlags=obj.stateFlags;
+  if(obj.configEditUrl && !ST.meta.configEditUrl) ST.meta.configEditUrl=obj.configEditUrl;
+  const firstTs = evs.map(d=>d.ts).filter(Boolean).sort()[0];
+  if(firstTs) ST.start = mk(firstTs);
+  compact(); ST.meta.unbacked+=folded+opened; save(); render();
+  toast(`Migrated · ${folded} folded into counts, ${opened} still open`,"g");
+}
+function deepMerge(base,over){
+  const out=Array.isArray(base)?base.slice():Object.assign({},base);
+  if(!over||typeof over!=="object") return out;
+  for(const k of Object.keys(over)){
+    const bv=base?base[k]:undefined, ov=over[k];
+    if(ov&&typeof ov==="object"&&!Array.isArray(ov)&&bv&&typeof bv==="object"&&!Array.isArray(bv)) out[k]=deepMerge(bv,ov);
+    else if(ov!==undefined&&ov!==null) out[k]=ov;
+  }
+  return out;
 }
 
-/* ---- onboarding: config edit page ---- */
+/* ------------------------------- insights ------------------------------- */
+function insights(){
+  const out=[], MIN=CFG.settings.minSample||10, L=lifetime();
+  if(L.n < MIN){
+    out.push({k:"info",t:`<b>Building baseline.</b> ${L.n} resolved decision${L.n===1?"":"s"} so far; patterns unlock around ${MIN}. Counts are cheap to collect and only become meaningful in bulk.`});
+    return out;
+  }
+  const wrOf=r=>r.n?r.good/r.n:null;
+
+  // trend: last 12 months vs the 12 before
+  const a=windowTotals(12), p=prevWindowTotals(12);
+  if(a.n>=MIN && p.n>=MIN){
+    const d=a.wr-p.wr;
+    if(Math.abs(d)>=0.07) out.push({k:d>0?"pos":"neg",
+      t:`<b>${d>0?"Improving":"Sliding"}.</b> Last 12 months ${pct(a.wr)} over ${a.n} decisions vs ${pct(p.wr)} over ${p.n} in the 12 before — a ${Math.abs(d*100).toFixed(0)}-point ${d>0?"gain":"drop"}.`,
+      tip:d>0?"Whatever changed, it is working. Note what you started doing about a year ago."
+             :"Check volume first: a falling win rate with rising volume usually means you loosened your filter, not that you got worse."});
+  }
+  // calibration
+  if(L.cn>=MIN*2 && L.conf!=null){
+    const gap=L.conf-L.wr;
+    if(gap>=0.08) out.push({k:"neg",
+      t:`<b>Overconfident by ${(gap*100).toFixed(0)} points.</b> You claim ${pct(L.conf)} and deliver ${pct(L.wr)} across ${L.cn} scored calls. Brier ${L.brier.toFixed(3)} (0.25 = coin flip).`,
+      tip:"Subtract the gap from every estimate for 30 days, then re-measure. Calibration is trainable and it transfers across domains."});
+    else if(gap<=-0.08) out.push({k:"warn2",
+      t:`<b>Underconfident by ${Math.abs(gap*100).toFixed(0)} points.</b> You predict ${pct(L.conf)}, you deliver ${pct(L.wr)}.`,
+      tip:"Underconfidence costs you the decisions you never made — and those leave no evidence in the ledger, which is exactly why nobody counts them."});
+    else out.push({k:"pos",
+      t:`<b>Well calibrated.</b> Stated ${pct(L.conf)} vs actual ${pct(L.wr)}, Brier ${L.brier.toFixed(3)}.`,
+      tip:"Protect this by always recording the forecast before the outcome is known."});
+  }
+  // domains
+  const doms=dimRows("d").filter(r=>r.n>=MIN);
+  if(doms.length>=2){
+    const s=doms.slice().sort((x,y)=>y.wr-x.wr), top=s[0], bot=s[s.length-1];
+    if(top.wr-bot.wr>=0.15){
+      out.push({k:"pos",t:`<b>Strongest: ${esc(top.key)}</b> — ${pct(top.wr)} across ${top.n}.`,
+        tip:"Where you are reliably good, decide faster and stop shopping for second opinions."});
+      out.push({k:"neg",t:`<b>Weakest: ${esc(bot.key)}</b> — ${pct(bot.wr)} across ${bot.n}.`,
+        tip:"Highest-yield place to install a rule: mandatory waiting period, second opinion, or bought expertise."});
+    }
+  }
+  // state flags (complement is exact: lifetime minus flagged)
+  dimRows("f").forEach(r=>{
+    if(r.n<MIN) return;
+    const og=L.g-r.good, ob=L.b-r.bad, on=og+ob; if(on<MIN) return;
+    const diff=(og/on)-r.wr;
+    if(diff>=0.15) out.push({k:"neg",
+      t:`<b>"${esc(r.key)}" is costing you.</b> ${pct(r.wr)} when flagged (n=${r.n}) vs ${pct(og/on)} otherwise.`,
+      tip:"A state-validity signal. The cheap intervention is deferral, not trying harder to think straight."});
+  });
+  // hour of day
+  const hrs=dimRows("h",k=>HB[+k]).filter(r=>r.n>=MIN);
+  if(hrs.length>=3){
+    const s=hrs.slice().sort((x,y)=>x.wr-y.wr);
+    if(s[s.length-1].wr-s[0].wr>=0.18) out.push({k:"warn2",
+      t:`<b>Time-of-day effect.</b> Worst window ${esc(s[0].key)} at ${pct(s[0].wr)} (n=${s[0].n}); best ${esc(s[s.length-1].key)} at ${pct(s[s.length-1].wr)} (n=${s[s.length-1].n}).`,
+      tip:"A scheduling policy is cheaper than winning the argument with yourself in the moment."});
+  }
+  // weekday
+  const wds=dimRows("w",k=>WD[+k]).filter(r=>r.n>=MIN);
+  if(wds.length>=4){
+    const s=wds.slice().sort((x,y)=>x.wr-y.wr);
+    if(s[s.length-1].wr-s[0].wr>=0.2) out.push({k:"warn2",
+      t:`<b>Weekday effect.</b> ${esc(s[0].key)} ${pct(s[0].wr)} (n=${s[0].n}) vs ${esc(s[s.length-1].key)} ${pct(s[s.length-1].wr)} (n=${s[s.length-1].n}).`,
+      tip:"Usually a proxy for load or sleep rather than the day. Look at what your worst day actually contains."});
+  }
+  // stakes gradient
+  const stk=ST.dim.s||{};
+  const hi=[4,5].reduce((a,k)=>{const v=stk[k]||[0,0];return[a[0]+v[0],a[1]+v[1]];},[0,0]);
+  const lo=[1,2].reduce((a,k)=>{const v=stk[k]||[0,0];return[a[0]+v[0],a[1]+v[1]];},[0,0]);
+  if(hi[0]+hi[1]>=MIN && lo[0]+lo[1]>=MIN){
+    const hw=hi[0]/(hi[0]+hi[1]), lw=lo[0]/(lo[0]+lo[1]);
+    if(lw-hw>=0.15) out.push({k:"neg",
+      t:`<b>You degrade under stakes.</b> High-stakes ${pct(hw)} (n=${hi[0]+hi[1]}) vs low-stakes ${pct(lw)} (n=${lo[0]+lo[1]}).`,
+      tip:"Pre-commit a checklist for anything rated 4–5 so the process does not depend on your state at the moment of choosing."});
+  }
+  // doors
+  const rr=ST.dim.r||{}, one=rr["1"]||[0,0], two=rr["2"]||[0,0];
+  if(one[0]+one[1]>=MIN && two[0]+two[1]>=MIN){
+    const ow=one[0]/(one[0]+one[1]), tw=two[0]/(two[0]+two[1]);
+    out.push({k:ow<tw?"neg":"pos",
+      t:`<b>Door analysis.</b> One-way ${pct(ow)} (n=${one[0]+one[1]}) · two-way ${pct(tw)} (n=${two[0]+two[1]}).`,
+      tip:ow<tw?"Your irreversible calls underperform. Slow those down and speed the reversible ones up — most people do the exact opposite."
+               :"Healthy: you are allocating care by reversibility rather than by vividness."});
+  }
+  // stale open items
+  const stale=ST.open.filter(o=>now()-o.ts>45*DAY).length;
+  if(stale>=3) out.push({k:"warn2",
+    t:`<b>${stale} calls open for over 45 days.</b> Unresolved entries silently inflate your win rate, because losses are the ones people avoid adjudicating.`,
+    tip:"Resolve or void them. An honest ledger requires closing losses."});
+  // volume trend
+  const v3=windowTotals(3), v3p=prevWindowTotals(3);
+  if(v3p.n>=6 && v3.n < v3p.n*0.5) out.push({k:"warn2",
+    t:`<b>Logging is dropping off.</b> ${v3.n} in the last 3 months vs ${v3p.n} in the 3 before.`,
+    tip:"A ledger with gaps produces survivorship bias, not insight. Use the one-tap URLs on your home screen."});
+
+  if(!out.length) out.push({k:"info",t:"<b>No strong patterns yet.</b> That is itself informative — performance is currently uniform across every dimension tracked. Tag domain, stakes and confidence to sharpen resolution."});
+  return out;
+}
+
+/* -------------------------------- views --------------------------------- */
+function trendChip(cur,prev){
+  if(cur==null||prev==null) return "";
+  const d=(cur-prev)*100; if(Math.abs(d)<1) return "";
+  return `<span class="delta ${d>0?"up":"dn"}">${d>0?"▲":"▼"}${Math.abs(d).toFixed(0)}</span>`;
+}
+
+function viewLog(){
+  const L=lifetime(), M=windowTotals(1), Y=windowTotals(12), Yp=prevWindowTotals(12);
+  const domChips=(CFG.domains||[]).map(x=>
+    `<button class="chip${quickState.domain===x?" on":""}" data-qd="${esc(x)}">${esc(x)}</button>`).join("");
+  const flagChips=(CFG.stateFlags||[]).map(f=>
+    `<button class="chip tog${quickState.flags.includes(f)?" on":""}" data-qf="${esc(f)}">${esc(f)}</button>`).join("");
+  const series=monthSeries(12), maxN=Math.max(1,...series.map(s=>s.n));
+  const u=ST.meta.undo;
+
+  return `
+  <div class="bigrow">
+    <button class="big good" id="qGood"><span class="em">✓</span>GOOD<span class="sub">${L.g} lifetime</span></button>
+    <button class="big bad"  id="qBad"><span class="em">✗</span>BAD<span class="sub">${L.b} lifetime</span></button>
+  </div>
+  <div class="midrow">
+    <button class="mid pend" id="qPend">◷ Open call</button>
+    <button class="mid" id="qDetail">✎ Tagged entry</button>
+  </div>
+  ${u?`<div class="undo"><span class="ux">Last: <b style="color:${u.verdict==="good"?"var(--good)":u.verdict==="bad"?"var(--bad)":"var(--void)"}">${esc(u.verdict)}</b>${u.domain?" · "+esc(u.domain):""} · ${ago(u.ts)}</span><button id="qUndo">Undo</button></div>`:""}
+
+  <div class="card" style="margin-top:16px">
+    <div class="bar"><i style="width:${L.wr!=null?(L.wr*100).toFixed(1):0}%"></i></div>
+    <div class="brow"><span>${L.g} good</span><span>${pct(L.wr)} lifetime</span><span>${L.b} bad</span></div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="stat a"><div class="v">${L.kd!=null?L.kd.toFixed(2):"–"}</div><div class="l">Lifetime K/D</div></div>
+      <div class="stat ${Y.wr!=null&&Yp.wr!=null?(Y.wr>=Yp.wr?"g":"b"):""}"><div class="v">${pct(Y.wr)}${trendChip(Y.wr,Yp.wr)}</div><div class="l">12-month</div></div>
+      <div class="stat p"><div class="v">${M.n}</div><div class="l">This month</div></div>
+    </div>
+    <div class="spark">${series.map(s=>{
+        const h=s.n?Math.max(6,(s.n/maxN)*44):2;
+        const cls=s.wr==null?"":(s.wr>=0.5?"g":"b");
+        return `<i class="${cls}" style="height:${h}px"></i>`;}).join("")}</div>
+    <div class="sparkx"><span>${mkLabel(series[0].key)}</span><span>12-month volume · green = cleared 50%</span><span>now</span></div>
+  </div>
+
+  <div class="sect">
+    <h3>Tag next entry · domain</h3>
+    <div class="chips" id="qDoms">
+      <button class="chip${quickState.domain===null?" on":""}" data-qd="">None</button>${domChips}
+    </div>
+  </div>
+  <div class="sect">
+    <h3>Tag next entry · state</h3>
+    <div class="chips" id="qFlags">${flagChips}</div>
+    <div class="hint">Sticky until cleared. These tags are the only thing that can later prove whether tiredness or time pressure is quietly costing you decisions.</div>
+  </div>
+
+  <div class="sect">
+    <h3>Recent activity <span style="color:var(--tx3);font-weight:600;text-transform:none;letter-spacing:0">· device only, not backed up</span></h3>
+    <div class="card">${ST.rec.length?ST.rec.map(recRow).join(""):'<div class="empty"><div class="e">⚡</div>Nothing logged yet. Hit a button above.</div>'}</div>
+  </div>
+
+  <div class="sect">
+    <h3>Lifetime</h3>
+    <div class="grid3">
+      <div class="stat"><div class="v">${L.n+L.x}</div><div class="l">Decisions</div></div>
+      <div class="stat ${L.cap>=0?"g":"b"}"><div class="v">${L.cap>0?"+":""}${L.cap}</div><div class="l">Capital</div></div>
+      <div class="stat p"><div class="v">${ST.open.length}</div><div class="l">Open</div></div>
+    </div>
+    <div class="hint" style="margin-top:10px">Capital is stakes-weighted: a 5/5 win is worth five 1/5 wins. It is the number that actually tracks whether decisions are compounding.</div>
+  </div>`;
+}
+function recRow(r){
+  const meta=[ago(r.ts)];
+  if(r.d) meta.push(`<span class="tag">${esc(r.d)}</span>`);
+  if(r.s) meta.push("◆".repeat(r.s));
+  if(r.c!=null) meta.push(r.c+"%");
+  (r.f||[]).forEach(f=>meta.push(`<span class="tag">${esc(f)}</span>`));
+  return `<div class="row"><span class="dot ${r.v}"></span><div class="rmain">
+    <div class="rtitle">${r.t?esc(r.t):(r.v==="good"?"Good call":r.v==="bad"?"Bad call":"Void")}</div>
+    <div class="rmeta">${meta.join(" ")}</div></div></div>`;
+}
+
+function viewQueue(){
+  const list=ST.open.slice().sort((a,b)=>(a.due||a.ts+90*DAY)-(b.due||b.ts+90*DAY));
+  const due=list.filter(o=>o.due&&o.due<=now());
+  const rest=list.filter(o=>!due.includes(o));
+  const row=o=>{
+    const over=o.due&&o.due<now();
+    const meta=[ago(o.ts)];
+    if(o.domain) meta.push(`<span class="tag">${esc(o.domain)}</span>`);
+    if(o.rev) meta.push(o.rev==="one"?"→ one-way":"↔ two-way");
+    if(o.stakes) meta.push("◆".repeat(o.stakes));
+    if(o.confidence!=null) meta.push(o.confidence+"%");
+    (o.flags||[]).forEach(f=>meta.push(`<span class="tag">${esc(f)}</span>`));
+    if(o.due) meta.push(`<span class="${over?"overdue":""}">review ${fmtDate(o.due)}</span>`);
+    return `<div class="row" data-edit="${o.id}">
+      <span class="dot pending"></span>
+      <div class="rmain"><div class="rtitle">${o.label?esc(o.label):'<span style="color:var(--tx3)">Untitled call — tap to edit</span>'}</div>
+      <div class="rmeta">${meta.join(" ")}</div></div>
+      <div class="rbtns"><button class="sm g" data-res="${o.id}|good">✓</button>
+      <button class="sm b" data-res="${o.id}|bad">✗</button></div></div>`;
+  };
+  return `
+  <div class="sect"><h3>Open calls awaiting a verdict</h3>
+    <div class="card">
+      <div class="grid3">
+        <div class="stat p"><div class="v">${list.length}</div><div class="l">Open</div></div>
+        <div class="stat b"><div class="v">${due.length}</div><div class="l">Due now</div></div>
+        <div class="stat"><div class="v">${list.filter(o=>now()-o.ts>45*DAY).length}</div><div class="l">Over 45d</div></div>
+      </div>
+      <div class="hint" style="margin-top:10px">Open calls are the only per-item records this app keeps — everything else has already been folded into counts. Resolving one adds it to the totals and deletes the record.</div>
+    </div>
+  </div>
+  ${due.length?`<div class="sect"><h3>Due for review</h3><div class="card">${due.map(row).join("")}</div></div>`:""}
+  <div class="sect"><h3>${due.length?"Everything else":"All open"}</h3>
+    <div class="card">${rest.length?rest.map(row).join(""):'<div class="empty"><div class="e">◷</div>No open calls. Log a prediction and come back to score it.</div>'}</div></div>
+  <button class="btn" id="qNewPending">+ Log a new open call</button>`;
+}
+
+function viewTrends(){
+  const L=lifetime();
+  if(!L.n) return `<div class="empty"><div class="e">◈</div><p>No resolved decisions yet.<br>Trends appear once you have verdicts to count.</p></div>`;
+  const w1=windowTotals(1), w3=windowTotals(3), w12=windowTotals(12), w36=windowTotals(36);
+  const series=monthSeries(24), maxN=Math.max(1,...series.map(s=>s.n));
+  const years=yearRows();
+
+  const tbl=(rows,label)=>rows.length?`<table><thead><tr><th>${label}</th>
+      <th style="text-align:right">N</th><th style="text-align:right">Win</th><th></th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${esc(r.key)}</td><td class="n">${r.n}</td><td class="n">${pct(r.wr)}</td>
+        <td class="n"><span class="mini"><i style="width:${r.wr!=null?(r.wr*100).toFixed(0):0}%"></i></span></td></tr>`).join("")}
+    </tbody></table>`:'<div class="hint">Not enough tagged data yet.</div>';
+
+  const cb=ST.dim.cb||{};
+  const calRows=Object.keys(cb).sort((a,b)=>a-b).map(k=>{
+    const v=cb[k], n=v[0]+v[1], act=n?v[0]/n:0;
+    return `<div class="calrow"><span class="lbl">${k*10}–${+k*10+10}%</span>
+      <span class="caltrack"><i style="width:${(act*100).toFixed(0)}%"></i><u style="left:${+k*10+5}%"></u></span>
+      <span class="nn">${n}</span></div>`;
+  }).join("");
+
+  return `
+  <div class="card">
+    <h4>Lifetime · since ${esc(ST.start)}</h4>
+    <div class="bar"><i style="width:${(L.wr*100).toFixed(1)}%"></i></div>
+    <div class="brow"><span>${L.g} good</span><span>${pct(L.wr)}</span><span>${L.b} bad</span></div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="stat a"><div class="v">${L.kd.toFixed(2)}</div><div class="l">K/D</div></div>
+      <div class="stat ${L.cap>=0?"g":"b"}"><div class="v">${L.cap>0?"+":""}${L.cap}</div><div class="l">Capital</div></div>
+      <div class="stat"><div class="v">${L.n}</div><div class="l">Resolved</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Trailing windows</h4>
+    <table><thead><tr><th>Window</th><th style="text-align:right">N</th>
+      <th style="text-align:right">K/D</th><th style="text-align:right">Win</th></tr></thead><tbody>
+      ${[["This month",w1],["3 months",w3],["12 months",w12],["36 months",w36],["Lifetime",L]].map(([l,t])=>
+        `<tr><td>${l}</td><td class="n">${t.n}</td><td class="n">${t.kd!=null?t.kd.toFixed(2):"–"}</td>
+         <td class="n">${pct(t.wr)}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="hint">Windows are whole calendar months — raw timestamps are discarded on logging, which is what keeps this file small.</div>
+  </div>
+
+  <div class="card">
+    <h4>24-month trend</h4>
+    <div class="spark">${series.map(s=>{const h=s.n?Math.max(6,(s.n/maxN)*44):2;
+      return `<i class="${s.wr==null?"":(s.wr>=0.5?"g":"b")}" style="height:${h}px" title="${s.key}: ${s.g}/${s.n}"></i>`;}).join("")}</div>
+    <div class="sparkx"><span>${mkLabel(series[0].key)}</span><span>volume</span><span>${mkLabel(series[series.length-1].key)}</span></div>
+    <div class="spark" style="height:34px">${series.map(s=>{const h=s.wr==null?2:Math.max(3,s.wr*34);
+      return `<i class="${s.wr==null?"":"n"}" style="height:${h}px" title="${s.key}: ${pct(s.wr)}"></i>`;}).join("")}</div>
+    <div class="sparkx"><span>0%</span><span>win rate</span><span>100%</span></div>
+  </div>
+
+  <div class="card"><h4>By year</h4>
+    <table><thead><tr><th>Year</th><th style="text-align:right">N</th><th style="text-align:right">Win</th>
+      <th style="text-align:right">K/D</th><th style="text-align:right">Cap</th></tr></thead><tbody>
+      ${years.map(y=>`<tr><td>${y.key}</td><td class="n">${y.n}</td><td class="n">${pct(y.wr)}</td>
+        <td class="n">${y.kd!=null?y.kd.toFixed(2):"–"}</td>
+        <td class="n" style="color:${y.cap>=0?"var(--good)":"var(--bad)"}">${y.cap>0?"+":""}${y.cap}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="hint">Years older than ${CFG.settings.retainMonths||RETAIN_MONTHS} months keep counts, capital, calibration sums and domain splits — the rest is intentionally forgotten.</div>
+  </div>
+
+  <div class="card">
+    <h4>Calibration${L.cn?` · ${L.cn} scored`:""}</h4>
+    ${L.cn>=5?`<div class="grid2" style="margin-bottom:12px">
+        <div class="stat ${L.brier<0.2?"g":L.brier<0.25?"a":"b"}"><div class="v">${L.brier.toFixed(3)}</div><div class="l">Brier</div></div>
+        <div class="stat"><div class="v">${pct(L.conf)} / ${pct(L.wr)}</div><div class="l">Said / did</div></div>
+      </div>${calRows}
+      <div class="hint">Bar = how often those calls actually landed. Tick = what you claimed. Bar short of the tick means overconfidence in that band. Brier under 0.25 beats a coin; under 0.15 is genuinely strong.</div>`
+      :'<div class="hint">Set a confidence value on tagged entries to unlock calibration scoring — the most transferable skill this ledger can teach. Being right is domain-specific; knowing how sure to be is not.</div>'}
+  </div>
+
+  <div class="card"><h4>By domain · lifetime</h4>${tbl(dimRows("d"),"Domain")}</div>
+  <div class="card"><h4>By door type</h4>${tbl(dimRows("r",k=>k==="1"?"One-way":"Two-way"),"Type")}
+    <div class="hint">If one-way doors underperform two-way doors, you are allocating care by vividness rather than by stakes.</div></div>
+  <div class="card"><h4>By stakes</h4>${tbl(dimRows("s",k=>"◆".repeat(+k)+" ("+k+"/5)"),"Stakes")}</div>
+  <div class="card"><h4>By time of day</h4>${tbl(dimRows("h",k=>HB[+k]),"Hours")}</div>
+  <div class="card"><h4>By weekday</h4>${tbl(dimRows("w",k=>WD[+k]),"Day")}</div>
+  ${(ST.dim.f&&Object.keys(ST.dim.f).length)?`<div class="card"><h4>By state at decision time</h4>${tbl(dimRows("f"),"State")}</div>`:""}
+
+  <div class="card"><h4>Insights</h4>
+    ${insights().map(i=>`<div class="ins ${i.k==="neg"?"neg":i.k==="pos"?"pos":i.k==="warn2"?"warn2":""}">${i.t}${i.tip?`<span class="tip">${i.tip}</span>`:""}</div>`).join("")}
+  </div>`;
+}
+
+function viewData(){
+  const bs=backupState(), L=lifetime();
+  const url=ST.meta.configEditUrl||CFG.configEditUrl||"";
+  const base=location.origin+location.pathname;
+  const size=exportBytes();
+  const links=[["Good","?log=good"],["Bad","?log=bad"],["Open call","?log=open"],
+    ["Good · Work","?log=good&tag=Work"],["Bad · Work","?log=bad&tag=Work"],
+    ["Bad · tired","?log=bad&f=Tired"],["Good, then tag","?log=good&edit=1"]];
+  return `
+  <div class="card">
+    <h4>Backup status</h4>
+    <div class="grid3">
+      <div class="stat ${bs.hard?"b":bs.soft?"p":"g"}"><div class="v">${bs.unb}</div><div class="l">Unsaved</div></div>
+      <div class="stat"><div class="v">${bs.last?Math.floor(bs.days):"—"}</div><div class="l">Days since</div></div>
+      <div class="stat a"><div class="v">${bytes(size)}</div><div class="l">File size</div></div>
+    </div>
+    <div class="hint" style="margin:10px 0 12px">${bs.last?`Last backup ${ago(bs.last)}.`:"Never backed up."} Nag at ${CFG.backupPolicy.softEntries} entries or ${CFG.backupPolicy.softDays} days; hard block at ${CFG.backupPolicy.hardEntries} or ${CFG.backupPolicy.hardDays}.</div>
+    <button class="btn pri" id="dBackup">Run backup now</button>
+    <div class="btn2">
+      <button class="btn" id="dDl">Download config.json</button>
+      <button class="btn" id="dCsv">Export CSV</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Storage footprint</h4>
+    <div class="grid3">
+      <div class="stat"><div class="v">${Object.keys(ST.m).length}</div><div class="l">Month rows</div></div>
+      <div class="stat"><div class="v">${Object.keys(ST.y).length}</div><div class="l">Year rows</div></div>
+      <div class="stat p"><div class="v">${ST.open.length}</div><div class="l">Open items</div></div>
+    </div>
+    <div class="hint" style="margin:10px 0 8px">${L.n+L.x} decisions are represented by ${Object.keys(ST.m).length+Object.keys(ST.y).length} rows. Raw entries are discarded at the moment of logging; month rows older than ${CFG.settings.retainMonths||RETAIN_MONTHS} months collapse into a single row per year.</div>
+    <table><thead><tr><th>Horizon</th><th style="text-align:right">Projected file</th></tr></thead><tbody>
+      ${[1,10,25,50].map(y=>`<tr><td>+${y} year${y===1?"":"s"}</td><td class="n">${bytes(projectBytes(y))}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="hint">Once the 36-month window is full, the file grows about <b>0.6 KB per year</b> and nothing else — the cost is per <em>year</em>, not per decision. Simulated: 10,400 decisions over 50 years = 45 KB; 91,250 decisions over the same 50 years = 54 KB.</div>
+  </div>
+
+  <div class="card">
+    <h4>Backup destination</h4>
+    ${url?`<div class="hint" style="margin-bottom:10px"><code>${esc(url)}</code></div>
+      <a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Open editor ↗</a>`
+     :'<div class="hint" style="margin-bottom:10px">Not set. Backups still download, but nothing pushes you to store them anywhere permanent.</div>'}
+    <button class="btn" id="dSetUrl">${url?"Change":"Set"} config edit page</button>
+    <div class="hint">Stored locally <em>and</em> written into every exported config.json, so a restored device already knows where its own backups live.</div>
+  </div>
+
+  <div class="card">
+    <h4>One-tap logging</h4>
+    <div class="hint" style="margin-bottom:10px">Add to your home screen (iOS: Share → Add to Home Screen · Android: ⋮ → Add to Home screen), or wire into Shortcuts, Tasker, a widget, or an NFC tag.</div>
+    ${links.map(([l,q])=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <code style="flex:1">${esc(q)}</code><button class="sm" data-cp="${esc(base+q)}">Copy</button></div>`).join("")}
+    <div class="hint">Parameters: <code>log</code>=good|bad|void|open · <code>tag</code>=domain · <code>s</code>=stakes 1–5 · <code>c</code>=confidence 0–100 · <code>r</code>=one|two · <code>f</code>=flags (pipe-separated) · <code>t</code>=label (open calls only) · <code>due</code>=YYYY-MM-DD · <code>edit</code>=1 to open the form after logging.</div>
+  </div>
+
+  <div class="card">
+    <h4>Restore &amp; migrate</h4>
+    <button class="btn" id="dImport">Import config.json or old backup</button>
+    <button class="btn" id="dPaste">Paste JSON instead</button>
+    <div class="hint">A v2 file <b>replaces</b> local counts — aggregates cannot be de-duplicated, so merging would double-count. A v1 file (the old per-decision format) is <b>folded</b> into these counts instead, preserving every statistic that survives aggregation.</div>
+  </div>
+
+  <div class="card">
+    <h4>Danger zone</h4>
+    <button class="btn dan" id="dWipe">Erase all local data</button>
+    <div class="hint">Clears this device only. A committed config.json is untouched.</div>
+  </div>
+
+  <div class="card"><h4>About</h4>
+    <div class="hint">Decision K/D v${APP_VERSION} · schema <code>${SCHEMA}</code> · ${bytes(size)}<br><br>
+    Counts and trends only. No per-decision text, no timestamps, nothing to leak. Everything runs client-side; the only network call is fetching <code>config.json</code> from this same repo.</div>
+  </div>`;
+}
+
+/* -------------------------------- sheets -------------------------------- */
+function closeModal(){ const m=$("#modal"); if(m) m.innerHTML=""; }
+function showSheet(html,opts){
+  opts=opts||{};
+  $("#modal").innerHTML=`<div class="scrim${opts.center?" center":""}" id="scrim">
+    <div class="sheet">${opts.center?"":'<div class="grab"></div>'}${html}</div></div>`;
+  if(!opts.persistent) $("#scrim").addEventListener("click",e=>{ if(e.target.id==="scrim") closeModal(); });
+}
 function normalizeEditUrl(v){
-  v=(v||"").trim();
-  if(!v) return "";
+  v=(v||"").trim(); if(!v) return "";
   if(/\/edit\//.test(v)) return v;
   let m=v.match(/github\.com\/([^\/]+)\/([^\/\s]+)/i);
   if(m) return `https://github.com/${m[1]}/${m[2].replace(/\.git$/,"")}/edit/main/config.json`;
@@ -630,78 +994,68 @@ function normalizeEditUrl(v){
   return v;
 }
 function askConfigUrl(force){
-  const cur = META.configEditUrl || CFG.configEditUrl || "";
-  showSheet(`
-    <h2>Where do backups go?</h2>
-    <p class="sd">Your data lives in this browser's IndexedDB — which is fast and works offline, but browsers <em>do</em> evict storage. This ledger is meant to run for decades, so it needs a permanent home.</p>
-    <p class="sd">Paste your repo's <b>config.json edit page</b>. When a backup is due, this app hands you the full file and sends you straight there to paste and commit.</p>
+  const cur=ST.meta.configEditUrl||CFG.configEditUrl||"";
+  showSheet(`<h2>Where do backups go?</h2>
+    <p class="sd">This ledger keeps counts, not entries — the whole file is a few kilobytes and stays that way for decades. It still needs a permanent home, because browsers do evict local storage.</p>
+    <p class="sd">Paste your repo's <b>config.json edit page</b>. When a backup is due the app hands you the file and sends you straight there to paste and commit.</p>
     <label class="f">GitHub repo or edit URL</label>
     <input type="url" id="cfgUrl" placeholder="https://github.com/you/repo" value="${esc(cur)}" autocomplete="off" spellcheck="false">
-    <div class="hint">Accepts any of: <code>you/repo</code> · <code>github.com/you/repo</code> · <code>you.github.io/repo</code> · a full <code>/edit/main/config.json</code> link. Change the branch later in Data if you don't use <code>main</code>.</div>
+    <div class="hint">Accepts <code>you/repo</code> · <code>github.com/you/repo</code> · <code>you.github.io/repo</code> · a full <code>/edit/main/config.json</code> link.</div>
     <div style="height:16px"></div>
     <button class="btn pri" id="cfgSave">Save &amp; continue</button>
-    ${force?"":'<button class="btn" id="cfgSkip">Skip for now</button>'}
-  `, { persistent: !!force });
-  $("#cfgSave").onclick = async () => {
-    const raw = $("#cfgUrl").value.trim();
-    const url = normalizeEditUrl(raw);
+    ${force?"":'<button class="btn" id="cfgSkip">Skip for now</button>'}`,{persistent:!!force});
+  $("#cfgSave").onclick=()=>{
+    const raw=$("#cfgUrl").value.trim(), url=normalizeEditUrl(raw);
     if(raw && !/^https?:\/\//.test(url)){ toast("That doesn't look like a URL","b"); return; }
-    await setMeta("configEditUrl", url);
-    await setMeta("onboarded", true);
-    CFG.configEditUrl = url;
-    closeModal(); render();
-    if(url) toast("Backup destination saved","g");
+    ST.meta.configEditUrl=url; ST.meta.onboarded=true; CFG.configEditUrl=url; save();
+    closeModal(); render(); if(url) toast("Backup destination saved","g");
   };
-  const skip=$("#cfgSkip"); if(skip) skip.onclick = async () => { await setMeta("onboarded",true); closeModal(); render(); };
+  const s=$("#cfgSkip"); if(s) s.onclick=()=>{ ST.meta.onboarded=true; save(); closeModal(); render(); };
 }
-
-/* ---- hard backup gate ---- */
 function showBackupGate(hard){
-  const bs=backupState();
-  const url=META.configEditUrl||CFG.configEditUrl||"";
-  showSheet(`
-    <h2>${hard?"Backup required":"Backup due"}</h2>
-    <p class="sd">${bs.unb} decision${bs.unb===1?"":"s"} recorded since your last backup${bs.last?` (${ago(bs.last)})`:""}. ${hard?"Logging is paused until this is done — the point of a decades-long ledger is that it survives a lost phone.":"Two taps and you're clear."}</p>
+  const bs=backupState(), url=ST.meta.configEditUrl||CFG.configEditUrl||"";
+  showSheet(`<h2>${hard?"Backup required":"Backup due"}</h2>
+    <p class="sd">${bs.unb} entr${bs.unb===1?"y":"ies"} since your last backup${bs.last?` (${ago(bs.last)})`:""}. The whole file is ${bytes(exportBytes())} — this takes two taps.${hard?" Logging is paused until it is done." :""}</p>
     <button class="btn pri" id="bkDl">1 · Download config.json</button>
     <button class="btn" id="bkCopy">1b · Copy to clipboard instead</button>
-    ${url?`<a class="btn" href="${esc(url)}" target="_blank" rel="noopener" id="bkOpen">2 · Open config.json editor ↗</a>`
+    ${url?`<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">2 · Open config.json editor ↗</a>`
         :`<button class="btn" id="bkSet">2 · Set your config edit page first</button>`}
-    <div class="hint" style="margin:2px 0 14px">In the GitHub editor: select all (<code>Ctrl/Cmd+A</code>) → paste → <b>Commit changes</b>. Your history is now in version control, with a full diff for every backup you ever make.</div>
+    <div class="hint" style="margin:2px 0 14px">In the GitHub editor: select all (<code>Ctrl/Cmd+A</code>) → paste → <b>Commit changes</b>. Every backup becomes a diff you can read.</div>
     <button class="btn gd" id="bkDone">3 · Done — I committed it</button>
-    ${hard?"":'<button class="btn" id="bkLater">Remind me later</button>'}
-  `, { persistent: !!hard });
-  $("#bkDl").onclick = () => { downloadJSON(buildConfigExport(),"config.json"); toast("Downloaded config.json","g"); };
-  $("#bkCopy").onclick = async () => {
-    const ok = await copyText(JSON.stringify(buildConfigExport(),null,2));
-    toast(ok?"Copied — now paste into GitHub":"Copy failed, use download", ok?"g":"b");
-  };
-  const set=$("#bkSet"); if(set) set.onclick=()=>askConfigUrl(false);
-  $("#bkDone").onclick = async () => { await markBackedUp(); closeModal(); toast("Backup recorded ✓","g"); };
-  const later=$("#bkLater"); if(later) later.onclick=closeModal;
+    ${hard?"":'<button class="btn" id="bkLater">Remind me later</button>'}`,{persistent:!!hard});
+  $("#bkDl").onclick=()=>{ downloadJSON(buildExport(),"config.json"); toast("Downloaded config.json","g"); };
+  $("#bkCopy").onclick=async()=>{ const ok=await copyText(exportText());
+    toast(ok?"Copied — now paste into GitHub":"Copy failed, use download",ok?"g":"b"); };
+  const st=$("#bkSet"); if(st) st.onclick=()=>askConfigUrl(false);
+  $("#bkDone").onclick=()=>{ markBackedUp(); closeModal(); toast("Backup recorded ✓","g"); };
+  const lt=$("#bkLater"); if(lt) lt.onclick=closeModal;
 }
 
-/* ---- detailed entry sheet ---- */
-function openEntry(existing, presetVerdict){
-  const d = existing || newDecision({ verdict: presetVerdict||"pending",
-    confidence: CFG.settings.defaultConfidence, domain: quickState.domain, flags: quickState.flags.slice() });
-  const isNew = !existing;
-  const domOpts = (CFG.domains||[]).map(x=>`<option value="${esc(x)}"${d.domain===x?" selected":""}>${esc(x)}</option>`).join("");
-  const flagChips = (CFG.stateFlags||[]).map(f=>
-    `<button class="chip tog${(d.flags||[]).includes(f)?" on":""}" data-flag="${esc(f)}">${esc(f)}</button>`).join("");
-  const dueVal = d.reviewDue ? new Date(d.reviewDue).toISOString().slice(0,10) : "";
+/* tagged entry / open-call editor */
+function openEntry(mode, existing){
+  const o = existing || { verdict:mode||"pending", domain:quickState.domain, flags:quickState.flags.slice(),
+    stakes:2, confidence:CFG.settings.defaultConfidence, rev:null, label:"", due:null, ts:now() };
+  const isOpen = !!existing || mode==="pending";
+  const domOpts=(CFG.domains||[]).map(x=>`<option value="${esc(x)}"${o.domain===x?" selected":""}>${esc(x)}</option>`).join("");
+  const flagChips=(CFG.stateFlags||[]).map(f=>
+    `<button class="chip tog${(o.flags||[]).includes(f)?" on":""}" data-flag="${esc(f)}">${esc(f)}</button>`).join("");
+  const dueVal=o.due?new Date(o.due).toISOString().slice(0,10):"";
+  let V = existing ? "pending" : (mode||"pending");
 
-  showSheet(`
-    <h2>${isNew?"New decision":"Edit decision"}</h2>
-    <p class="sd">Record the call <em>before</em> you know the outcome. That ordering is what makes the calibration score meaningful.</p>
+  showSheet(`<h2>${existing?"Edit open call":isOpen?"New open call":"Tagged entry"}</h2>
+    <p class="sd">${isOpen
+      ? "An open call is stored as a record until you resolve it. On resolution it is folded into the counts and the record is deleted."
+      : "Only these tags are kept — as counters. No text, no timestamp beyond the month."}</p>
 
-    <label class="f">What did you decide?</label>
-    <input type="text" id="eTitle" value="${esc(d.title)}" placeholder="Took the contract instead of the salaried role" autocomplete="off">
+    ${existing?"":`<label class="f">Verdict</label>
+    <div class="chips" id="eVerdict">${["good","bad","void","pending"].map(v=>
+      `<button class="chip${V===v?" on":""}" data-v="${v}">${v==="pending"?"◷ Open call":v==="good"?"✓ Good":v==="bad"?"✗ Bad":"– Void"}</button>`).join("")}</div>`}
 
-    <label class="f">Verdict</label>
-    <div class="chips" id="eVerdict">
-      ${["pending","good","bad","void"].map(v=>
-        `<button class="chip${d.verdict===v?" on":""}" data-v="${v}">${
-          v==="pending"?"◷ Pending":v==="good"?"✓ Good":v==="bad"?"✗ Bad":"– Void"}</button>`).join("")}
+    <div id="labelWrap" class="${isOpen?"":"hide"}">
+      <label class="f">Short label (open calls only)</label>
+      <input type="text" id="eLabel" maxlength="80" value="${esc(o.label||"")}" placeholder="Took the contract over the salaried role" autocomplete="off">
+      <label class="f">Review date</label>
+      <input type="date" id="eDue" value="${dueVal}">
     </div>
 
     <label class="f">Domain</label>
@@ -709,554 +1063,251 @@ function openEntry(existing, presetVerdict){
 
     <label class="f">Door type</label>
     <div class="chips" id="eRev">
-      <button class="chip${d.reversibility==="two"?" on":""}" data-r="two">↔ Two-way (reversible)</button>
-      <button class="chip${d.reversibility==="one"?" on":""}" data-r="one">→ One-way (irreversible)</button>
+      <button class="chip${o.rev==="two"?" on":""}" data-r="two">↔ Two-way (reversible)</button>
+      <button class="chip${o.rev==="one"?" on":""}" data-r="one">→ One-way (irreversible)</button>
     </div>
 
-    <label class="f">Stakes · <span id="eStakesV">${d.stakes}</span>/5</label>
-    <input type="range" id="eStakes" min="1" max="5" step="1" value="${d.stakes}">
+    <label class="f">Stakes · <span id="eStakesV">${o.stakes||2}</span>/5</label>
+    <input type="range" id="eStakes" min="1" max="5" step="1" value="${o.stakes||2}">
 
-    <label class="f">Confidence this turns out well · <span id="eConfV">${d.confidence==null?"—":d.confidence+"%"}</span></label>
-    <input type="range" id="eConf" min="0" max="100" step="5" value="${d.confidence==null?CFG.settings.defaultConfidence:d.confidence}">
-    <div class="hint">Your forecast, logged now. Resolving it later is what builds the Brier score — the only honest measure of whether you actually know what you're doing.</div>
+    <label class="f">Confidence this turns out well · <span id="eConfV">${o.confidence==null?CFG.settings.defaultConfidence:o.confidence}%</span></label>
+    <input type="range" id="eConf" min="0" max="100" step="5" value="${o.confidence==null?CFG.settings.defaultConfidence:o.confidence}">
+    <div class="hint">Logged now, scored later. This is what builds the Brier score — the only honest measure of whether you know what you are doing.</div>
 
     <label class="f">State at time of deciding</label>
     <div class="chips" id="eFlags">${flagChips}</div>
 
-    <label class="f">Review date (optional)</label>
-    <input type="date" id="eDue" value="${dueVal}">
-
-    <label class="f">Reasoning / context</label>
-    <textarea id="eNote" placeholder="Why this, why now, what I expected, what would have changed my mind">${esc(d.note)}</textarea>
-
-    <label class="f">Lesson (fill in on resolution)</label>
-    <textarea id="eLesson" placeholder="What I'd tell myself before making this call again">${esc(d.lesson)}</textarea>
-
     <div style="height:16px"></div>
-    <button class="btn pri" id="eSave">${isNew?"Log decision":"Save changes"}</button>
-    ${isNew?"":'<button class="btn dan" id="eDel">Delete</button>'}
-    <button class="btn" id="eCancel">Cancel</button>
-  `);
+    <button class="btn pri" id="eSave">${existing?"Save changes":"Log it"}</button>
+    ${existing?'<div class="btn2"><button class="btn gd" id="eG">Resolve good</button><button class="btn dan" id="eB">Resolve bad</button></div><div style="height:9px"></div><button class="btn" id="eDel">Delete without counting</button>':""}
+    <button class="btn" id="eCancel">Cancel</button>`);
 
-  let V=d.verdict, RV=d.reversibility, FL=(d.flags||[]).slice();
+  let RV=o.rev, FL=(o.flags||[]).slice();
   $$("#eVerdict .chip").forEach(b=>b.onclick=()=>{ V=b.dataset.v;
-    $$("#eVerdict .chip").forEach(x=>x.classList.toggle("on",x.dataset.v===V)); });
-  $$("#eRev .chip").forEach(b=>b.onclick=()=>{ RV = RV===b.dataset.r ? null : b.dataset.r;
+    $$("#eVerdict .chip").forEach(x=>x.classList.toggle("on",x.dataset.v===V));
+    $("#labelWrap").classList.toggle("hide",V!=="pending"); });
+  $$("#eRev .chip").forEach(b=>b.onclick=()=>{ RV=RV===b.dataset.r?null:b.dataset.r;
     $$("#eRev .chip").forEach(x=>x.classList.toggle("on",x.dataset.r===RV)); });
   $$("#eFlags .chip").forEach(b=>b.onclick=()=>{ const f=b.dataset.flag;
-    if(FL.includes(f)) FL=FL.filter(x=>x!==f); else FL.push(f);
-    b.classList.toggle("on", FL.includes(f)); });
+    FL=FL.includes(f)?FL.filter(x=>x!==f):FL.concat([f]); b.classList.toggle("on",FL.includes(f)); });
   $("#eStakes").oninput=e=>$("#eStakesV").textContent=e.target.value;
   $("#eConf").oninput=e=>$("#eConfV").textContent=e.target.value+"%";
 
-  $("#eSave").onclick = async () => {
-    const wasPending = d.verdict==="pending";
-    d.title=$("#eTitle").value.trim();
-    d.verdict=V; d.domain=$("#eDomain").value||null; d.reversibility=RV;
-    d.stakes=+$("#eStakes").value; d.confidence=+$("#eConf").value;
-    d.flags=FL; d.note=$("#eNote").value.trim(); d.lesson=$("#eLesson").value.trim();
-    const due=$("#eDue").value; d.reviewDue = due ? new Date(due+"T09:00").getTime() : null;
-    if((V==="good"||V==="bad") && (wasPending || !d.resolvedTs)) d.resolvedTs=now();
-    if(V==="pending"||V==="void") d.resolvedTs=null;
-    await saveDecision(d);
-    closeModal(); haptic(18); render();
-    toast(isNew?"Logged":"Saved", V==="good"?"g":V==="bad"?"b":undefined);
+  const collect=()=>({
+    domain:$("#eDomain").value||null, rev:RV, flags:FL,
+    stakes:+$("#eStakes").value, confidence:+$("#eConf").value,
+    label:$("#eLabel")?$("#eLabel").value.trim().slice(0,80):"",
+    due:($("#eDue")&&$("#eDue").value)?new Date($("#eDue").value+"T09:00").getTime():null
+  });
+
+  $("#eSave").onclick=()=>{
+    const c=collect();
+    if(existing){ Object.assign(existing,c); save(); }
+    else if(V==="pending"){ addOpen(Object.assign({ts:now()},c)); }
+    else { if(backupState().hard){ showBackupGate(true); return; }
+           record(Object.assign({verdict:V},c)); flash(V==="good"?"#2fbf71":V==="bad"?"#e5484d":"#6b7684"); }
+    closeModal(); haptic(18); render(); toast(existing?"Saved":"Logged",V==="good"?"g":V==="bad"?"b":undefined);
   };
-  const del=$("#eDel"); if(del) del.onclick=async()=>{
-    if(!confirm("Delete this decision permanently?")) return;
-    await delDecision(d.id); closeModal(); render(); toast("Deleted");
-  };
+  if(existing){
+    $("#eG").onclick=()=>{ Object.assign(existing,collect()); resolveOpen(existing.id,"good");
+      closeModal(); flash("#2fbf71"); haptic(20); render(); toast("Resolved: good","g"); };
+    $("#eB").onclick=()=>{ Object.assign(existing,collect()); resolveOpen(existing.id,"bad");
+      closeModal(); flash("#e5484d"); haptic(20); render(); toast("Resolved: bad","b"); };
+    $("#eDel").onclick=()=>{ dropOpen(existing.id); closeModal(); render(); toast("Deleted"); };
+  }
   $("#eCancel").onclick=closeModal;
 }
 
-/* ---- quick log ---- */
-async function quickLog(verdict, extra){
-  const bs=backupState();
-  if(bs.hard){ showBackupGate(true); return null; }
-  const d = await addDecision(Object.assign({
-    verdict, title:"", domain:quickState.domain, flags:quickState.flags.slice(),
-    resolvedTs: (verdict==="good"||verdict==="bad") ? now() : null
-  }, extra||{}));
+/* ------------------------------ quick log ------------------------------- */
+function quickLog(verdict,extra){
+  if(backupState().hard){ showBackupGate(true); return null; }
+  const ev=Object.assign({ verdict, domain:quickState.domain, flags:quickState.flags.slice(),
+    stakes:2, confidence:null, rev:null }, extra||{});
+  record(ev);
   haptic(verdict==="bad"?[10,40,10]:22);
-  flash(verdict==="good"?"#2fbf71":verdict==="bad"?"#e5484d":"#f5a524");
-  const st=computeStats(DECS);
-  toast(verdict==="good"?`Good · K/D ${st.kd.toFixed(2)}`
-      : verdict==="bad"?`Bad · K/D ${st.kd.toFixed(2)}`
-      : "Pending logged", verdict==="good"?"g":verdict==="bad"?"b":undefined);
-  render();
-  return d;
+  flash(verdict==="good"?"#2fbf71":verdict==="bad"?"#e5484d":"#6b7684");
+  const L=lifetime();
+  toast(`${verdict==="good"?"Good":verdict==="bad"?"Bad":"Void"} · K/D ${L.kd!=null?L.kd.toFixed(2):"–"}`,
+        verdict==="good"?"g":verdict==="bad"?"b":undefined);
+  render(); return ev;
 }
 
 /* ------------------------------ URL params ------------------------------ */
-async function handleParams(){
+function handleParams(){
   const p=new URLSearchParams(location.search);
-  const log=(p.get("log")||p.get("d")||"").toLowerCase();
-  if(!log) return false;
-  const map={g:"good",good:"good",w:"good",win:"good",
-             b:"bad",bad:"bad",l:"bad",loss:"bad",
-             p:"pending",pending:"pending",q:"pending"};
-  const v=map[log]; if(!v) return false;
+  const raw=(p.get("log")||p.get("d")||"").toLowerCase(); if(!raw) return false;
+  const map={g:"good",good:"good",w:"good",win:"good",b:"bad",bad:"bad",l:"bad",loss:"bad",
+    v:"void",void:"void",p:"pending",pending:"pending",open:"pending",q:"pending"};
+  const v=map[raw]; if(!v) return false;
 
   const extra={};
-  const t=p.get("t")||p.get("title")||p.get("note");
-  if(t) extra.title=t.slice(0,300);
   const dom=p.get("tag")||p.get("domain");
-  if(dom){ const match=(CFG.domains||[]).find(x=>x.toLowerCase()===dom.toLowerCase()); extra.domain=match||dom; }
+  if(dom){ const m=(CFG.domains||[]).find(x=>x.toLowerCase()===dom.toLowerCase()); extra.domain=m||dom; }
   const s=p.get("s")||p.get("stakes"); if(s) extra.stakes=clamp(+s,1,5);
   const c=p.get("c")||p.get("conf"); if(c) extra.confidence=clamp(+c,0,100);
   const r=(p.get("r")||p.get("rev")||"").toLowerCase();
-  if(r==="one"||r==="1"||r==="oneway") extra.reversibility="one";
-  if(r==="two"||r==="2"||r==="twoway") extra.reversibility="two";
-  const due=p.get("due"); if(due && /^\d{4}-\d{2}-\d{2}$/.test(due)) extra.reviewDue=new Date(due+"T09:00").getTime();
+  if(["one","1","oneway"].includes(r)) extra.rev="one";
+  if(["two","2","twoway"].includes(r)) extra.rev="two";
   const fl=p.get("f")||p.get("flags"); if(fl) extra.flags=fl.split(/[|,]/).map(x=>x.trim()).filter(Boolean);
+  const t=p.get("t")||p.get("title"); if(t) extra.label=t.slice(0,80);
+  const due=p.get("due"); if(due&&/^\d{4}-\d{2}-\d{2}$/.test(due)) extra.due=new Date(due+"T09:00").getTime();
 
-  const d = await quickLog(v, extra);
-  history.replaceState({}, "", location.pathname);
-  if(d && p.get("edit")==="1") openEntry(d);
+  let opened=null;
+  if(v==="pending"){ opened=addOpen(Object.assign({ts:now(),flags:quickState.flags.slice()},extra));
+    haptic(18); toast("Open call logged"); }
+  else quickLog(v,extra);
+  history.replaceState({},"",location.pathname);
+  if(p.get("edit")==="1"){ if(opened) openEntry(null,opened); else openEntry("good"); }
   return true;
 }
 
-/* ------------------------------- views ---------------------------------- */
-function viewLog(){
-  const st=computeStats(DECS);
-  const l30=computeStats(windowed(30)), l365=computeStats(windowed(365));
-  const domChips=(CFG.domains||[]).map(x=>
-    `<button class="chip${quickState.domain===x?" on":""}" data-qd="${esc(x)}">${esc(x)}</button>`).join("");
-  const flagChips=(CFG.stateFlags||[]).map(f=>
-    `<button class="chip tog${quickState.flags.includes(f)?" on":""}" data-qf="${esc(f)}">${esc(f)}</button>`).join("");
-  const recent=DECS.slice().sort((a,b)=>b.ts-a.ts).slice(0,6);
-
-  return `
-  <div class="bigrow">
-    <button class="big good" id="qGood"><span class="em">✓</span>GOOD<span class="sub">${st.good} lifetime</span></button>
-    <button class="big bad"  id="qBad"><span class="em">✗</span>BAD<span class="sub">${st.bad} lifetime</span></button>
-  </div>
-  <div class="midrow">
-    <button class="mid pend" id="qPend">◷ Log pending call</button>
-    <button class="mid" id="qDetail">✎ Detailed entry</button>
-  </div>
-
-  <div class="card" style="margin-top:16px">
-    <div class="bar"><i style="width:${(st.wr*100).toFixed(1)}%"></i></div>
-    <div class="brow"><span>${st.good} good</span><span>${pct(st.wr)} win rate</span><span>${st.bad} bad</span></div>
-    <div class="grid3" style="margin-top:12px">
-      <div class="stat a"><div class="v">${st.resolvedN?st.kd.toFixed(2):"–"}</div><div class="l">Lifetime K/D</div></div>
-      <div class="stat ${l30.resolvedN?(l30.wr>=st.wr?"g":"b"):""}"><div class="v">${l30.resolvedN?pct(l30.wr):"–"}</div><div class="l">30-day</div></div>
-      <div class="stat ${st.curKind==="good"?"g":st.curKind==="bad"?"b":""}"><div class="v">${st.cur||0}</div><div class="l">${st.curKind==="bad"?"Loss streak":"Win streak"}</div></div>
-    </div>
-  </div>
-
-  <div class="sect">
-    <h3>Tag next entry · domain</h3>
-    <div class="chips" id="qDoms">
-      <button class="chip${quickState.domain===null?" on":""}" data-qd="">None</button>${domChips}
-    </div>
-  </div>
-  <div class="sect">
-    <h3>Tag next entry · state</h3>
-    <div class="chips" id="qFlags">${flagChips}</div>
-    <div class="hint">Sticky until you clear them. These are what later prove whether tiredness or time pressure is quietly costing you decisions.</div>
-  </div>
-
-  <div class="sect">
-    <h3>Recent</h3>
-    <div class="card">${recent.length?recent.map(rowHTML).join(""):'<div class="empty"><div class="e">⚡</div>Nothing logged yet. Hit a button above.</div>'}</div>
-  </div>
-
-  <div class="sect">
-    <h3>Lifetime</h3>
-    <div class="grid3">
-      <div class="stat"><div class="v">${DECS.length}</div><div class="l">Logged</div></div>
-      <div class="stat ${st.cap>=0?"g":"b"}"><div class="v">${st.cap>0?"+":""}${st.cap}</div><div class="l">Capital</div></div>
-      <div class="stat p"><div class="v">${st.pending}</div><div class="l">Pending</div></div>
-    </div>
-    <div class="hint" style="margin-top:10px">Capital is stakes-weighted: a 5/5 win is worth five 1/5 wins. It is the number that actually tracks whether your decisions are compounding.</div>
-  </div>`;
-}
-
-function rowHTML(d){
-  const overdue = d.verdict==="pending" && d.reviewDue && d.reviewDue<now();
-  const meta=[];
-  meta.push(ago(d.ts));
-  if(d.domain) meta.push(`<span class="tag">${esc(d.domain)}</span>`);
-  if(d.reversibility) meta.push(d.reversibility==="one"?"→ one-way":"↔ two-way");
-  if(d.stakes) meta.push("◆".repeat(d.stakes));
-  if(d.confidence!=null) meta.push(d.confidence+"%");
-  (d.flags||[]).forEach(f=>meta.push(`<span class="tag">${esc(f)}</span>`));
-  if(d.reviewDue && d.verdict==="pending")
-    meta.push(`<span class="${overdue?"overdue":""}">review ${fmtDate(d.reviewDue)}</span>`);
-  return `<div class="row" data-open="${d.id}">
-    <span class="dot ${d.verdict}"></span>
-    <div class="rmain">
-      <div class="rtitle">${d.title?esc(d.title):'<span style="color:var(--tx3)">Untitled — tap to add context</span>'}</div>
-      <div class="rmeta">${meta.join(" ")}</div>
-    </div>
-    ${d.verdict==="pending"?`<div class="rbtns">
-      <button class="sm g" data-res="${d.id}|good">✓</button>
-      <button class="sm b" data-res="${d.id}|bad">✗</button></div>`:""}
-  </div>`;
-}
-
-function viewQueue(){
-  const pend=DECS.filter(d=>d.verdict==="pending").sort((a,b)=>{
-    const ad=a.reviewDue||a.ts+90*DAY, bd=b.reviewDue||b.ts+90*DAY; return ad-bd; });
-  const due=pend.filter(d=>d.reviewDue&&d.reviewDue<=now());
-  const rest=pend.filter(d=>!due.includes(d));
-  return `
-  <div class="sect">
-    <h3>Open calls awaiting a verdict</h3>
-    <div class="card">
-      <div class="grid3">
-        <div class="stat p"><div class="v">${pend.length}</div><div class="l">Pending</div></div>
-        <div class="stat b"><div class="v">${due.length}</div><div class="l">Due now</div></div>
-        <div class="stat"><div class="v">${pend.filter(d=>now()-d.ts>45*DAY).length}</div><div class="l">Over 45d</div></div>
-      </div>
-      <div class="hint" style="margin-top:10px">Unresolved entries are where self-flattery hides. People adjudicate their wins and quietly leave losses pending forever — which inflates the ratio while destroying its usefulness.</div>
-    </div>
-  </div>
-  ${due.length?`<div class="sect"><h3>Due for review</h3><div class="card">${due.map(rowHTML).join("")}</div></div>`:""}
-  <div class="sect"><h3>${due.length?"Everything else":"All pending"}</h3>
-    <div class="card">${rest.length?rest.map(rowHTML).join(""):'<div class="empty"><div class="e">◷</div>No open calls. Log a prediction and come back to score it.</div>'}</div>
-  </div>
-  <button class="btn" id="qNewPending">+ Log a new pending call</button>`;
-}
-
-function viewStats(){
-  const st=computeStats(DECS);
-  if(st.resolvedN===0) return `<div class="empty"><div class="e">◈</div><p>No resolved decisions yet.<br>Statistics appear once you have verdicts to work with.</p></div>`;
-  const w30=computeStats(windowed(30)), w90=computeStats(windowed(90)), w365=computeStats(windowed(365));
-  const doms=groupStats(d=>d.domain), hrs=groupStats(hourBucket),
-        revs=groupStats(d=>d.reversibility==="one"?"One-way":d.reversibility==="two"?"Two-way":null),
-        flg=(CFG.stateFlags||[]).map(f=>{
-          const a=resolved(DECS).filter(d=>(d.flags||[]).includes(f));
-          return { key:f, n:a.length, good:a.filter(d=>d.verdict==="good").length,
-                   wr:a.length?a.filter(d=>d.verdict==="good").length/a.length:0 };
-        }).filter(g=>g.n>0).sort((a,b)=>b.n-a.n);
-
-  const tbl = (rows, label) => rows.length ? `<table><thead><tr>
-      <th>${label}</th><th style="text-align:right">N</th><th style="text-align:right">Win</th><th></th></tr></thead><tbody>
-      ${rows.map(g=>`<tr><td>${esc(g.key)}</td><td class="n">${g.n}</td>
-        <td class="n">${pct(g.wr)}</td>
-        <td class="n"><span class="mini"><i style="width:${(g.wr*100).toFixed(0)}%"></i></span></td></tr>`).join("")}
-    </tbody></table>` : '<div class="hint">Not enough tagged data yet.</div>';
-
-  // 12-month sparkline
-  const spark=[];
-  for(let i=11;i>=0;i--){
-    const s=new Date(); s.setMonth(s.getMonth()-i); s.setDate(1); s.setHours(0,0,0,0);
-    const e=new Date(s); e.setMonth(e.getMonth()+1);
-    const m=resolved(DECS).filter(d=>{ const t=d.resolvedTs||d.ts; return t>=s.getTime()&&t<e.getTime(); });
-    spark.push({ n:m.length, wr:m.length?m.filter(d=>d.verdict==="good").length/m.length:null });
-  }
-  const maxN=Math.max(1,...spark.map(s=>s.n));
-
-  const ins=insights();
-
-  return `
-  <div class="card">
-    <h4>Lifetime</h4>
-    <div class="bar"><i style="width:${(st.wr*100).toFixed(1)}%"></i></div>
-    <div class="brow"><span>${st.good} good</span><span>${pct(st.wr)}</span><span>${st.bad} bad</span></div>
-    <div class="grid3" style="margin-top:12px">
-      <div class="stat a"><div class="v">${st.kd.toFixed(2)}</div><div class="l">K/D</div></div>
-      <div class="stat ${st.cap>=0?"g":"b"}"><div class="v">${st.cap>0?"+":""}${st.cap}</div><div class="l">Capital</div></div>
-      <div class="stat"><div class="v">${pct(st.weightedWR)}</div><div class="l">Wtd win</div></div>
-      <div class="stat g"><div class="v">${st.best}</div><div class="l">Best run</div></div>
-      <div class="stat b"><div class="v">${st.worst}</div><div class="l">Worst run</div></div>
-      <div class="stat p"><div class="v">${st.pending}</div><div class="l">Open</div></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h4>Trailing windows</h4>
-    <table><thead><tr><th>Window</th><th style="text-align:right">N</th><th style="text-align:right">K/D</th><th style="text-align:right">Win</th></tr></thead><tbody>
-      ${[["30 days",w30],["90 days",w90],["365 days",w365],["Lifetime",st]].map(([l,s])=>
-        `<tr><td>${l}</td><td class="n">${s.resolvedN}</td>
-         <td class="n">${s.resolvedN?s.kd.toFixed(2):"–"}</td>
-         <td class="n">${s.resolvedN?pct(s.wr):"–"}</td></tr>`).join("")}
-    </tbody></table>
-    <div class="spark">${spark.map(s=>{
-      const h=s.n?Math.max(6,(s.n/maxN)*40):2;
-      const cls=s.wr==null?"":(s.wr>=0.5?"g":"b");
-      return `<i class="${cls}" style="height:${h}px" title="${s.n} decisions"></i>`;}).join("")}</div>
-    <div class="hint">Last 12 months · bar height = volume, colour = whether that month cleared 50%.</div>
-  </div>
-
-  <div class="card">
-    <h4>Calibration${st.calN?` · ${st.calN} scored`:""}</h4>
-    ${st.calN>=5?`
-      <div class="grid2" style="margin-bottom:12px">
-        <div class="stat ${st.brier<0.2?"g":st.brier<0.25?"a":"b"}"><div class="v">${st.brier.toFixed(3)}</div><div class="l">Brier score</div></div>
-        <div class="stat"><div class="v">${st.meanConf!=null?pct(st.meanConf):"–"} / ${pct(st.wr)}</div><div class="l">Said / did</div></div>
-      </div>
-      ${st.buckets.filter(b=>b.n>0).map(b=>`
-        <div class="calrow">
-          <span class="lbl">${b.lo}–${b.hi}%</span>
-          <span class="caltrack"><i style="width:${(b.actual*100).toFixed(0)}%"></i><u style="left:${((b.lo+5))}%"></u></span>
-          <span class="nn">${b.n}</span>
-        </div>`).join("")}
-      <div class="hint">Bar = how often those calls actually landed. Tick = what you claimed. Bar shorter than tick means overconfidence in that band. Brier below 0.25 beats a coin; below 0.15 is genuinely strong.</div>
-    `:'<div class="hint">Set a confidence value on entries to unlock calibration scoring. This is the single most transferable skill the ledger can teach you — being right is domain-specific, but knowing how sure to be is not.</div>'}
-  </div>
-
-  <div class="card"><h4>By domain</h4>${tbl(doms,"Domain")}</div>
-  <div class="card"><h4>By door type</h4>${tbl(revs,"Type")}
-    <div class="hint">If one-way doors underperform two-way doors, you are allocating care by vividness rather than by stakes.</div></div>
-  <div class="card"><h4>By time of day</h4>${tbl(hrs,"Hours")}</div>
-  ${flg.length?`<div class="card"><h4>By state at decision time</h4>${tbl(flg,"State")}</div>`:""}
-
-  <div class="card">
-    <h4>Insights</h4>
-    ${ins.map(i=>`<div class="ins ${i.k==="neg"?"neg":i.k==="pos"?"pos":i.k==="warn2"?"warn2":""}">${i.t}${i.tip?`<span class="tip">${i.tip}</span>`:""}</div>`).join("")}
-  </div>
-
-  <button class="btn" id="stAll">Browse full history (${DECS.length})</button>`;
-}
-
-function viewData(){
-  const bs=backupState();
-  const url=META.configEditUrl||CFG.configEditUrl||"";
-  const base=location.origin+location.pathname;
-  const links=[
-    ["Good","?log=good"],["Bad","?log=bad"],["Pending","?log=pending"],
-    ["Good · Work","?log=good&tag=Work"],["Bad · Work","?log=bad&tag=Work"],
-    ["Bad · tired","?log=bad&f=Tired"],["Good, then edit","?log=good&edit=1"]
-  ];
-  return `
-  <div class="card">
-    <h4>Backup status</h4>
-    <div class="grid3">
-      <div class="stat ${bs.hard?"b":bs.soft?"p":"g"}"><div class="v">${bs.unb}</div><div class="l">Unsaved</div></div>
-      <div class="stat"><div class="v">${bs.last?Math.floor(bs.days):"—"}</div><div class="l">Days since</div></div>
-      <div class="stat a"><div class="v">${DECS.length}</div><div class="l">Records</div></div>
-    </div>
-    <div class="hint" style="margin:10px 0 12px">${bs.last?`Last backup ${ago(bs.last)}.`:"Never backed up."} Thresholds: nag at ${CFG.backupPolicy.softDecisions} entries or ${CFG.backupPolicy.softDays} days; hard block at ${CFG.backupPolicy.hardDecisions} or ${CFG.backupPolicy.hardDays}.</div>
-    <button class="btn pri" id="dBackup">Run backup now</button>
-    <div class="btn2">
-      <button class="btn" id="dDl">Download config.json</button>
-      <button class="btn" id="dCsv">Export CSV</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h4>Backup destination</h4>
-    ${url?`<div class="hint" style="margin-bottom:10px"><code>${esc(url)}</code></div>
-        <a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Open editor ↗</a>`
-       :'<div class="hint" style="margin-bottom:10px">Not set. Backups will still download, but you will not be pushed anywhere to store them.</div>'}
-    <button class="btn" id="dSetUrl">${url?"Change":"Set"} config edit page</button>
-    <div class="hint">Stored locally <em>and</em> written into every exported config.json, so a restored device already knows where its own backups live.</div>
-  </div>
-
-  <div class="card">
-    <h4>One-tap logging</h4>
-    <div class="hint" style="margin-bottom:10px">Add these to your home screen (iOS: Share → Add to Home Screen · Android: ⋮ → Add to Home screen) or wire them into Shortcuts, Tasker, a widget, or an NFC tag. Each one records instantly and returns to the app.</div>
-    ${links.map(([l,q])=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-      <code style="flex:1">${esc(q)}</code>
-      <button class="sm" data-cp="${esc(base+q)}">Copy</button></div>`).join("")}
-    <div class="hint">Full parameter set: <code>log</code>=good|bad|pending · <code>t</code>=title · <code>tag</code>=domain · <code>s</code>=stakes 1–5 · <code>c</code>=confidence 0–100 · <code>r</code>=one|two · <code>f</code>=flags (pipe-separated) · <code>due</code>=YYYY-MM-DD · <code>edit</code>=1 to open the full form after logging.</div>
-  </div>
-
-  <div class="card">
-    <h4>Restore</h4>
-    <button class="btn" id="dImport">Import config.json or backup file</button>
-    <button class="btn" id="dPaste">Paste JSON instead</button>
-    <div class="hint">Merges by record ID — importing the same backup twice is safe and will not duplicate anything.</div>
-  </div>
-
-  <div class="card">
-    <h4>Danger zone</h4>
-    <button class="btn dan" id="dWipe">Erase all local data</button>
-    <div class="hint">Clears IndexedDB on this device only. Your committed config.json is untouched.</div>
-  </div>
-
-  <div class="card">
-    <h4>About</h4>
-    <div class="hint">Decision K/D v${APP_VERSION} · ${DECS.length} records · schema <code>decision-kd/1</code><br><br>
-    Everything runs client-side. No network calls except fetching <code>config.json</code> from this same repo. Your decision history never leaves your device unless you commit it yourself.</div>
-  </div>`;
-}
-
-function viewAll(){
-  const list=DECS.slice().sort((a,b)=>b.ts-a.ts);
-  return `<div class="sect"><h3>Full history · ${list.length}</h3>
-    <div class="card">${list.length?list.map(rowHTML).join(""):'<div class="empty"><div class="e">⛁</div>Empty.</div>'}</div>
-    <button class="btn" id="backStats">← Back to stats</button></div>`;
-}
-
-/* ------------------------------- render --------------------------------- */
+/* -------------------------------- render -------------------------------- */
 function render(){
-  const st=computeStats(DECS);
-  $("#hKD").textContent = st.resolvedN ? st.kd.toFixed(2) : "–";
-  const pend=DECS.filter(d=>d.verdict==="pending").length;
-  const badge=$("#qBadge");
-  const dueN=DECS.filter(d=>d.verdict==="pending"&&d.reviewDue&&d.reviewDue<=now()).length;
+  const L=lifetime();
+  $("#hKD").textContent = L.kd!=null ? L.kd.toFixed(2) : "–";
+  const dueN=openDue(), badge=$("#qBadge");
   if(dueN>0){ badge.textContent=dueN; badge.classList.remove("hide"); } else badge.classList.add("hide");
 
-  // banners
   const bs=backupState(); let b="";
-  if(bs.soft) b+=`<div class="banner warn"><div class="bx"><b>Backup due.</b> ${bs.unb} unsaved decision${bs.unb===1?"":"s"}${bs.last?`, last saved ${ago(bs.last)}`:""}.</div><button id="bnBackup">Back up</button></div>`;
-  if(dueN>0 && TAB!=="queue") b+=`<div class="banner info"><div class="bx"><b>${dueN} call${dueN===1?"":"s"} due for review.</b> Resolve them while the context is still fresh.</div><button id="bnQueue">Open</button></div>`;
+  if(bs.soft) b+=`<div class="banner warn"><div class="bx"><b>Backup due.</b> ${bs.unb} unsaved entr${bs.unb===1?"y":"ies"}${bs.last?`, last saved ${ago(bs.last)}`:""}. File is ${bytes(exportBytes())}.</div><button id="bnBackup">Back up</button></div>`;
+  if(dueN>0 && TAB!=="queue") b+=`<div class="banner info"><div class="bx"><b>${dueN} call${dueN===1?"":"s"} due for review.</b> Resolve them while the context is fresh.</div><button id="bnQueue">Open</button></div>`;
   $("#banners").innerHTML=b;
 
-  $("#view").innerHTML =
-    TAB==="log"?viewLog(): TAB==="queue"?viewQueue():
-    TAB==="stats"?viewStats(): TAB==="all"?viewAll(): viewData();
-
-  $$(".nb").forEach(n=>n.classList.toggle("on", n.dataset.tab===TAB || (TAB==="all"&&n.dataset.tab==="stats")));
+  $("#view").innerHTML = TAB==="log"?viewLog(): TAB==="queue"?viewQueue():
+                         TAB==="trends"?viewTrends(): viewData();
+  $$(".nb").forEach(n=>n.classList.toggle("on",n.dataset.tab===TAB));
   bind();
 }
-
 function bind(){
   const on=(sel,fn)=>{ const e=$(sel); if(e) e.onclick=fn; };
   on("#bnBackup",()=>showBackupGate(false));
   on("#bnQueue",()=>{ TAB="queue"; render(); });
-
   on("#qGood",()=>quickLog("good"));
   on("#qBad",()=>quickLog("bad"));
-  on("#qPend",()=>openEntry(null,"pending"));
-  on("#qDetail",()=>openEntry(null,"pending"));
-  on("#qNewPending",()=>openEntry(null,"pending"));
-  on("#stAll",()=>{ TAB="all"; render(); });
-  on("#backStats",()=>{ TAB="stats"; render(); });
+  on("#qPend",()=>openEntry("pending"));
+  on("#qDetail",()=>openEntry("good"));
+  on("#qNewPending",()=>openEntry("pending"));
+  on("#qUndo",()=>{ if(undoLast()){ haptic(30); render(); toast("Reversed"); } });
 
-  $$("[data-qd]").forEach(b=>b.onclick=()=>{
-    quickState.domain = b.dataset.qd || null; render(); });
-  $$("[data-qf]").forEach(b=>b.onclick=()=>{
-    const f=b.dataset.qf;
-    quickState.flags = quickState.flags.includes(f) ? quickState.flags.filter(x=>x!==f) : quickState.flags.concat([f]);
+  $$("[data-qd]").forEach(b=>b.onclick=()=>{ quickState.domain=b.dataset.qd||null; render(); });
+  $$("[data-qf]").forEach(b=>b.onclick=()=>{ const f=b.dataset.qf;
+    quickState.flags=quickState.flags.includes(f)?quickState.flags.filter(x=>x!==f):quickState.flags.concat([f]);
     render(); });
+  $$("[data-res]").forEach(b=>b.onclick=e=>{ e.stopPropagation();
+    const [id,v]=b.dataset.res.split("|"); resolveOpen(id,v); haptic(20);
+    flash(v==="good"?"#2fbf71":"#e5484d"); render(); toast("Resolved: "+v,v==="good"?"g":"b"); });
+  $$("[data-edit]").forEach(r=>r.onclick=e=>{ if(e.target.closest("[data-res]")) return;
+    const o=ST.open.find(x=>x.id===r.dataset.edit); if(o) openEntry(null,o); });
+  $$("[data-cp]").forEach(b=>b.onclick=async()=>{ const ok=await copyText(b.dataset.cp);
+    toast(ok?"Link copied":"Copy failed",ok?"g":"b"); });
 
-  $$("[data-res]").forEach(b=>b.onclick=async e=>{
-    e.stopPropagation();
-    const [id,v]=b.dataset.res.split("|");
-    const d=DECS.find(x=>x.id===id); if(!d) return;
-    d.verdict=v; d.resolvedTs=now();
-    await saveDecision(d); haptic(20);
-    flash(v==="good"?"#2fbf71":"#e5484d");
-    toast(v==="good"?"Resolved: good":"Resolved: bad", v==="good"?"g":"b");
-    render(); });
-
-  $$("[data-open]").forEach(r=>r.onclick=e=>{
-    if(e.target.closest("[data-res]")) return;
-    const d=DECS.find(x=>x.id===r.dataset.open); if(d) openEntry(d); });
-
-  $$("[data-cp]").forEach(b=>b.onclick=async()=>{
-    const ok=await copyText(b.dataset.cp); toast(ok?"Link copied":"Copy failed", ok?"g":"b"); });
-
-  // data tab
   on("#dBackup",()=>showBackupGate(false));
-  on("#dDl",()=>{ downloadJSON(buildConfigExport(),"config.json"); toast("Downloaded","g"); });
-  on("#dCsv",()=>{ csvExport(); toast("CSV exported","g"); });
+  on("#dDl",()=>{ downloadJSON(buildExport(),"config.json"); toast("Downloaded","g"); });
+  on("#dCsv",()=>{ exportCSV(); toast("CSV exported","g"); });
   on("#dSetUrl",()=>askConfigUrl(false));
-  on("#dImport",()=>{
-    const i=document.createElement("input"); i.type="file"; i.accept=".json,application/json";
+  on("#dImport",()=>{ const i=document.createElement("input"); i.type="file"; i.accept=".json,application/json";
     i.onchange=async()=>{ const f=i.files[0]; if(!f) return;
-      try{ await importObj(JSON.parse(await f.text())); }catch(err){ toast("Invalid JSON file","b"); } };
+      try{ importObj(JSON.parse(await f.text())); }catch(e){ toast("Invalid JSON file","b"); } };
     i.click(); });
-  on("#dPaste",()=>{
-    showSheet(`<h2>Paste backup JSON</h2>
-      <p class="sd">Paste the contents of a config.json or any exported backup.</p>
+  on("#dPaste",()=>{ showSheet(`<h2>Paste backup JSON</h2>
+      <p class="sd">Accepts a v2 config.json or an old per-decision export.</p>
       <textarea id="pJson" style="min-height:180px" placeholder="{ ... }"></textarea>
-      <div style="height:12px"></div>
-      <button class="btn pri" id="pGo">Import</button>
+      <div style="height:12px"></div><button class="btn pri" id="pGo">Import</button>
       <button class="btn" id="pCancel">Cancel</button>`);
-    $("#pGo").onclick=async()=>{
-      try{ await importObj(JSON.parse($("#pJson").value)); closeModal(); }
+    $("#pGo").onclick=()=>{ try{ importObj(JSON.parse($("#pJson").value)); closeModal(); }
       catch(e){ toast("Could not parse that","b"); } };
     $("#pCancel").onclick=closeModal; });
-  on("#dWipe",()=>{
+  on("#dWipe",()=>{ const L=lifetime();
     showSheet(`<h2>Erase everything?</h2>
-      <p class="sd">This deletes all ${DECS.length} local records permanently. If you have not committed a backup, they are gone.</p>
+      <p class="sd">Deletes all local counts (${L.n+L.x} decisions) and ${ST.open.length} open calls. If you have not committed a backup, they are gone.</p>
       <button class="btn" id="wDl">Download a backup first</button>
       <button class="btn dan" id="wGo">Yes, erase everything</button>
       <button class="btn" id="wNo">Cancel</button>`,{center:true});
-    $("#wDl").onclick=()=>downloadJSON(buildConfigExport(),"config-before-wipe.json");
-    $("#wGo").onclick=async()=>{ await idbClear(S_DEC); DECS=[];
-      await setMeta("unbacked",0); closeModal(); render(); toast("All local data erased"); };
+    $("#wDl").onclick=()=>downloadJSON(buildExport(),"config-before-wipe.json");
+    $("#wGo").onclick=()=>{ const url=ST.meta.configEditUrl; ST=blankState(); ST.meta.configEditUrl=url||"";
+      ST.meta.onboarded=true; save(); closeModal(); render(); toast("All local data erased"); };
     $("#wNo").onclick=closeModal; });
 }
 
-async function importObj(obj){
-  let incoming=[];
-  if(Array.isArray(obj)) incoming=obj;
-  else if(obj && obj.backup && Array.isArray(obj.backup.decisions)) incoming=obj.backup.decisions;
-  else if(obj && Array.isArray(obj.decisions)) incoming=obj.decisions;
-  else { toast("No decisions found in that file","b"); return; }
-
-  const have=new Set(DECS.map(d=>d.id));
-  let added=0, updated=0;
-  for(const raw of incoming){
-    const d=newDecision(raw);
-    if(have.has(d.id)){
-      const cur=DECS.find(x=>x.id===d.id);
-      if(JSON.stringify(cur)!==JSON.stringify(d)){ await saveDecision(d); updated++; }
-    } else { await idbPut(S_DEC,d); DECS.push(d); added++; }
-  }
-  if(obj && obj.configEditUrl && !META.configEditUrl) await setMeta("configEditUrl", obj.configEditUrl);
-  if(obj && obj.settings) CFG=deepMerge(CFG,obj);
-  await setMeta("unbacked",0);
-  await setMeta("lastBackup", now());
-  render();
-  toast(`Imported · ${added} new, ${updated} updated`,"g");
-}
-
-/* ------------------------------ manifest -------------------------------- */
+/* ------------------------------- manifest ------------------------------- */
 function injectManifest(){
   try{
     const icon="data:image/svg+xml;base64,"+btoa(
       `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" rx="112" fill="#0b0d10"/><text x="256" y="330" font-size="240" font-family="system-ui,sans-serif" font-weight="800" text-anchor="middle" fill="#2fbf71">K/D</text></svg>`);
-    const m={ name:"Decision K/D", short_name:"K/D", start_url:".", scope:".",
-      display:"standalone", background_color:"#0b0d10", theme_color:"#0b0d10",
+    const m={name:"Decision K/D",short_name:"K/D",start_url:".",scope:".",display:"standalone",
+      background_color:"#0b0d10",theme_color:"#0b0d10",
       icons:[{src:icon,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}],
-      shortcuts:[
-        {name:"Log GOOD",url:"?log=good"},
-        {name:"Log BAD",url:"?log=bad"},
-        {name:"Log PENDING",url:"?log=pending"}]};
+      shortcuts:[{name:"Log GOOD",url:"?log=good"},{name:"Log BAD",url:"?log=bad"},{name:"Open call",url:"?log=open"}]};
     const l=document.createElement("link"); l.rel="manifest";
     l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/json"}));
     document.head.appendChild(l);
   }catch(e){}
 }
 
-/* -------------------------------- boot ---------------------------------- */
+/* --------------------------------- boot --------------------------------- */
+async function loadConfig(){
+  try{
+    const r=await fetch("config.json?ts="+now(),{cache:"no-store"});
+    if(r.ok) return await r.json();
+  }catch(e){}
+  return null;
+}
+function loadLocal(){
+  try{
+    const raw=localStorage.getItem(LS_KEY); if(!raw) return null;
+    const s=JSON.parse(raw);
+    if(!s||typeof s!=="object") return null;
+    s.m=s.m||{}; s.y=s.y||{}; s.dim=s.dim||{}; s.open=s.open||[]; s.rec=s.rec||[];
+    s.meta=Object.assign({lastBackup:null,unbacked:0,configEditUrl:"",onboarded:false,undo:null},s.meta||{});
+    s.start=s.start||mk(now());
+    return s;
+  }catch(e){ return null; }
+}
 async function boot(){
   injectManifest();
-  try{ db = await openDB(); }
-  catch(e){
-    document.body.innerHTML='<div class="wrap" style="padding-top:60px"><div class="empty"><div class="e">⚠</div><b>IndexedDB unavailable.</b><br>This app needs local storage. Private/incognito mode or a locked-down browser will block it.</div></div>';
-    return;
-  }
-  await loadConfig();
-  (await idbAll(S_META)).forEach(r=>META[r.k]=r.v);
-  DECS = await idbAll(S_DEC);
+  let ok=true;
+  try{ localStorage.setItem("dkd.probe","1"); localStorage.removeItem("dkd.probe"); }catch(e){ ok=false; }
+  if(!ok){ document.body.innerHTML='<div class="wrap" style="padding-top:60px"><div class="empty"><div class="e">⚠</div><b>Local storage unavailable.</b><br>Private mode or a locked-down browser will block this app.</div></div>'; return; }
 
-  // cold-start restore from committed config backup
-  if(DECS.length===0 && CFG.backup && Array.isArray(CFG.backup.decisions) && CFG.backup.decisions.length){
-    for(const raw of CFG.backup.decisions){ const d=newDecision(raw); await idbPut(S_DEC,d); DECS.push(d); }
-    await setMeta("unbacked",0);
-    await setMeta("lastBackup", CFG.backup.exportedAt ? new Date(CFG.backup.exportedAt).getTime() : now());
-    toast(`Restored ${DECS.length} decisions from config.json`,"g");
+  const file=await loadConfig();
+  if(file) CFG=deepMerge(DEFAULTS,file);
+
+  ST=loadLocal();
+  if(!ST){
+    ST=blankState();
+    if(file&&file.ledger){                       // cold start: restore from the committed file
+      ST.m=file.ledger.m||{}; ST.y=file.ledger.y||{}; ST.dim=file.ledger.dim||{};
+      ST.open=file.ledger.open||[]; ST.start=file.ledger.start||ST.start;
+      ST.meta.lastBackup = file.ledger.backup&&file.ledger.backup.at ? Date.parse(file.ledger.backup.at) : now();
+      const L=lifetime(); if(L.n) setTimeout(()=>toast(`Restored ${L.n} decisions from config.json`,"g"),400);
+    }
+    if(file&&file.configEditUrl) ST.meta.configEditUrl=file.configEditUrl;
   }
-  if(!META.configEditUrl && CFG.configEditUrl) await setMeta("configEditUrl", CFG.configEditUrl);
+  if(!ST.meta.configEditUrl && CFG.configEditUrl) ST.meta.configEditUrl=CFG.configEditUrl;
+  compact(); save();
 
   $$(".nb").forEach(n=>n.onclick=()=>{ TAB=n.dataset.tab; haptic(8); window.scrollTo(0,0); render(); });
-  $("#btnQuick").onclick=()=>openEntry(null,"pending");
+  $("#btnQuick").onclick=()=>openEntry("good");
 
-  const didParam = await handleParams();
+  const didParam=handleParams();
   render();
 
-  if(!META.onboarded && !META.configEditUrl) askConfigUrl(true);
+  if(!ST.meta.onboarded && !ST.meta.configEditUrl) askConfigUrl(true);
   else { const bs=backupState(); if(bs.hard && !didParam) showBackupGate(true); }
 
-  // keyboard shortcuts for desktop review sessions
-  document.addEventListener("keydown", e=>{
+  document.addEventListener("keydown",e=>{
     if(e.target.matches("input,textarea,select")) return;
     if(e.key==="g") quickLog("good");
     if(e.key==="b") quickLog("bad");
-    if(e.key==="n") openEntry(null,"pending");
+    if(e.key==="n") openEntry("pending");
+    if(e.key==="z") { if(undoLast()){ render(); toast("Reversed"); } }
   });
 }
-boot();
+if(typeof globalThis!=="undefined" && globalThis.__DKD_TEST){
+  Object.assign(globalThis,{blankState,applyEvent,compact,sumBuckets,lifetime,windowTotals,
+    prevWindowTotals,yearRows,dimRows,monthSeries,buildExport,importObj,mk,mkShift,
+    setState:s=>{ST=s;},getState:()=>ST,setCFG:c=>{CFG=c;},DEFAULTS,monthKeysBack});
+} else boot();
 </script>
 </body>
 </html>
