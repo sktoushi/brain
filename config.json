@@ -1,24 +1,10 @@
 {
   "schema": "decision-kd/1",
-  "appVersion": "1.0.0",
-
-  "_readme": [
-    "This file is BOTH your settings file AND your backup vault.",
-    "When the app tells you a backup is due, it hands you a complete replacement",
-    "for this file. Open this file's edit page on GitHub, select all, paste, commit.",
-    "Every backup then lives in git history with a full diff - a decision ledger",
-    "that is versioned, timestamped, and effectively permanent.",
-    "A fresh device that loads the app will auto-restore from backup.decisions below."
-  ],
-
-  "configEditUrl": "",
-  "_configEditUrl_help": "Leave blank on first deploy - the app asks you for it on first load and writes it here on your next backup. Format: https://github.com/USER/REPO/edit/main/config.json (change 'main' to 'gh-pages' if that is your Pages branch).",
-
+  "configEditUrl": "https://github.com/sktoushi/brain/edit/main/config.json",
   "app": {
     "title": "Decision K/D",
     "owner": ""
   },
-
   "settings": {
     "confirmQuickLog": false,
     "hapticFeedback": true,
@@ -26,14 +12,11 @@
     "askReviewDate": true,
     "weekStartsMonday": true,
     "minSampleForInsight": 8,
-    "nightHours": [22, 5]
+    "nightHours": [
+      22,
+      5
+    ]
   },
-  "_settings_help": {
-    "defaultConfidence": "Pre-filled confidence slider value (0-100) for new entries.",
-    "minSampleForInsight": "Minimum n before the insights engine will report a pattern. Raise it to 15+ once you have a few hundred records to cut false positives.",
-    "nightHours": "[start, end] hours counted as 'night' for the time-of-day analysis. Decisions made in this window get flagged separately."
-  },
-
   "domains": [
     "Work",
     "Money",
@@ -44,8 +27,6 @@
     "Risk",
     "Other"
   ],
-  "_domains_help": "Your decision categories. Keep this list SHORT and STABLE - changing it later fragments your historical comparisons. 5-8 is the sweet spot.",
-
   "stateFlags": [
     "Tired",
     "Rushed",
@@ -54,20 +35,51 @@
     "Pressured",
     "Unclear"
   ],
-  "_stateFlags_help": "Conditions you were in when deciding. These are the highest-value field in the whole schema: they are what eventually PROVE whether fatigue or time pressure is costing you decisions, rather than you merely suspecting it.",
-
   "backupPolicy": {
     "softDecisions": 20,
     "softDays": 7,
     "hardDecisions": 60,
     "hardDays": 21
   },
-  "_backupPolicy_help": "soft* triggers a dismissable banner. hard* BLOCKS further logging until you confirm a backup. Set hardDecisions/hardDays higher if you find it nagging, lower if you value the data more than the convenience.",
-
   "backup": {
-    "exportedAt": null,
-    "count": 0,
-    "integrity": null,
-    "decisions": []
-  }
+    "exportedAt": "2026-08-02T05:56:10.033Z",
+    "count": 1,
+    "integrity": "1:245",
+    "decisions": [
+      {
+        "id": "ab035c66-52e0-4613-a90a-c8bcd97ecd54",
+        "ts": 1785649770245,
+        "title": "",
+        "verdict": "good",
+        "resolvedTs": 1785649770245,
+        "domain": "Learning",
+        "reversibility": null,
+        "stakes": 2,
+        "confidence": null,
+        "flags": [],
+        "note": "",
+        "lesson": "",
+        "reviewDue": null,
+        "createdVer": "1.0.0"
+      }
+    ]
+  },
+  "appVersion": "1.0.0",
+  "_readme": [
+    "This file is BOTH your settings file AND your backup vault.",
+    "When the app tells you a backup is due, it hands you a complete replacement",
+    "for this file. Open this file's edit page on GitHub, select all, paste, commit.",
+    "Every backup then lives in git history with a full diff - a decision ledger",
+    "that is versioned, timestamped, and effectively permanent.",
+    "A fresh device that loads the app will auto-restore from backup.decisions below."
+  ],
+  "_configEditUrl_help": "Leave blank on first deploy - the app asks you for it on first load and writes it here on your next backup. Format: https://github.com/USER/REPO/edit/main/config.json (change 'main' to 'gh-pages' if that is your Pages branch).",
+  "_settings_help": {
+    "defaultConfidence": "Pre-filled confidence slider value (0-100) for new entries.",
+    "minSampleForInsight": "Minimum n before the insights engine will report a pattern. Raise it to 15+ once you have a few hundred records to cut false positives.",
+    "nightHours": "[start, end] hours counted as 'night' for the time-of-day analysis. Decisions made in this window get flagged separately."
+  },
+  "_domains_help": "Your decision categories. Keep this list SHORT and STABLE - changing it later fragments your historical comparisons. 5-8 is the sweet spot.",
+  "_stateFlags_help": "Conditions you were in when deciding. These are the highest-value field in the whole schema: they are what eventually PROVE whether fatigue or time pressure is costing you decisions, rather than you merely suspecting it.",
+  "_backupPolicy_help": "soft* triggers a dismissable banner. hard* BLOCKS further logging until you confirm a backup. Set hardDecisions/hardDays higher if you find it nagging, lower if you value the data more than the convenience."
 }
