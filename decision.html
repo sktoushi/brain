@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
+<meta name="theme-color" content="#0b0d10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="D/KDR">
+<title>Decision K/D</title>
+<style>
+:root{
+  --bg:#0b0d10; --bg2:#12161c; --bg3:#1a2029; --line:#242c37;
+  --tx:#e8edf4; --tx2:#95a3b6; --tx3:#61708a;
+  --good:#2fbf71; --good2:#1c7a48; --bad:#e5484d; --bad2:#8f2226;
+  --pend:#f5a524; --acc:#5b8def; --void:#6b7684;
+  --r:14px; --tap:56px;
+  --safeb:env(safe-area-inset-bottom,0px);
+  --safet:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--tx);
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  overscroll-behavior-y:none;-webkit-text-size-adjust:100%}
+body{padding-top:var(--safet)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+.hide{display:none!important}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px calc(96px + var(--safeb))}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line)}
+.hbar{max-width:640px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.brand span{color:var(--tx3);font-weight:600}
+.hspace{flex:1}
+.kdchip{display:flex;align-items:baseline;gap:6px;background:var(--bg3);border:1px solid var(--line);
+  padding:6px 11px;border-radius:999px}
+.kdchip b{font-size:16px;font-variant-numeric:tabular-nums}
+.kdchip i{font-style:normal;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+.iconbtn{width:38px;height:38px;border-radius:10px;background:var(--bg3);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:16px}
+
+/* ---------- banners ---------- */
+.banner{margin:12px 0;padding:12px 14px;border-radius:var(--r);font-size:13.5px;
+  display:flex;gap:10px;align-items:flex-start;border:1px solid}
+.banner.warn{background:#3a2a08;border-color:#6b4c0d;color:#ffd88a}
+.banner.info{background:#0f2436;border-color:#1d4a6e;color:#b6dcff}
+.banner .bx{flex:1}
+.banner button{background:rgba(255,255,255,.12);padding:7px 12px;border-radius:9px;font-size:12.5px;font-weight:700;white-space:nowrap}
+
+/* ---------- log tab ---------- */
+.bigrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.big{height:132px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;font-weight:800;font-size:19px;letter-spacing:-.01em;position:relative;overflow:hidden;
+  border:1px solid transparent;transition:transform .09s ease}
+.big:active{transform:scale(.96)}
+.big .em{font-size:30px;line-height:1}
+.big .sub{font-size:11px;font-weight:600;opacity:.75;letter-spacing:.04em;text-transform:uppercase}
+.big.good{background:linear-gradient(160deg,#175c38,#0e2f1e);border-color:#1f7a4a;color:#8ff0bb}
+.big.bad{background:linear-gradient(160deg,#5c1a1c,#2f0f11);border-color:#8f2226;color:#ffb3b5}
+.midrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.mid{height:60px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;color:var(--tx2)}
+.mid:active{background:var(--bg3)}
+.mid.pend{color:#ffcd6e;border-color:#5a4210}
+
+.sect{margin-top:22px}
+.sect h3{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--tx3);margin:0 0 9px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:8px 13px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);
+  font-size:13px;color:var(--tx2);font-weight:600}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chip.tog.on{background:#3a2a08;border-color:#8a6410;color:#ffd88a}
+
+/* ---------- cards / stats ---------- */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card h4{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-weight:800}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center}
+.stat .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat .l{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;font-weight:700}
+.stat.g .v{color:var(--good)} .stat.b .v{color:var(--bad)} .stat.a .v{color:var(--acc)} .stat.p .v{color:var(--pend)}
+
+.bar{height:9px;border-radius:99px;background:var(--bad2);overflow:hidden;display:flex;margin:6px 0 2px}
+.bar i{display:block;background:var(--good);height:100%}
+.brow{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);
+  padding:0 0 7px;font-weight:800;border-bottom:1px solid var(--line)}
+td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx2)}
+.mini{height:6px;border-radius:99px;background:var(--bg3);overflow:hidden;width:52px;display:inline-block;vertical-align:middle}
+.mini i{display:block;height:100%;background:var(--good)}
+
+.ins{border-left:3px solid var(--acc);background:var(--bg3);padding:11px 12px;border-radius:0 10px 10px 0;
+  margin-bottom:9px;font-size:13.5px;line-height:1.5}
+.ins b{color:#fff}
+.ins.neg{border-color:var(--bad)} .ins.pos{border-color:var(--good)} .ins.warn2{border-color:var(--pend)}
+.ins .tip{display:block;margin-top:5px;color:var(--tx3);font-size:12.5px}
+
+/* ---------- list rows ---------- */
+.row{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.row:last-child{border-bottom:0}
+.dot{width:9px;height:9px;border-radius:99px;margin-top:6px;flex:none}
+.dot.good{background:var(--good)} .dot.bad{background:var(--bad)}
+.dot.pending{background:var(--pend)} .dot.void{background:var(--void)}
+.rmain{flex:1;min-width:0}
+.rtitle{font-size:14px;font-weight:600;word-break:break-word}
+.rmeta{font-size:11.5px;color:var(--tx3);margin-top:3px;display:flex;flex-wrap:wrap;gap:8px}
+.tag{background:var(--bg3);padding:2px 7px;border-radius:6px;font-size:10.5px;color:var(--tx2);font-weight:700}
+.rbtns{display:flex;gap:6px;flex:none}
+.sm{padding:7px 10px;border-radius:9px;font-size:12px;font-weight:800;background:var(--bg3);border:1px solid var(--line);color:var(--tx2)}
+.sm.g{background:#12331f;border-color:#1f7a4a;color:#7ee2ac}
+.sm.b{background:#3a1214;border-color:#8f2226;color:#ffa5a8}
+.overdue{color:var(--bad)!important}
+
+/* ---------- buttons ---------- */
+.btn{display:block;width:100%;padding:14px;border-radius:12px;background:var(--bg3);border:1px solid var(--line);
+  font-weight:700;font-size:14.5px;text-align:center;margin-bottom:9px;color:var(--tx)}
+.btn:active{opacity:.75}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.dan{background:#3a1214;border-color:#8f2226;color:#ffa5a8}
+.btn.gd{background:#12331f;border-color:#1f7a4a;color:#7ee2ac}
+.btn2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn2 .btn{margin-bottom:0}
+
+/* ---------- forms ---------- */
+label.f{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);
+  margin:14px 0 6px;font-weight:800}
+input[type=text],input[type=url],input[type=number],input[type=date],textarea,select{
+  width:100%;padding:13px;border-radius:11px;background:var(--bg3);border:1px solid var(--line);outline:0}
+input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+textarea{min-height:78px;resize:vertical;font-family:inherit}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.hint{font-size:12px;color:var(--tx3);margin-top:6px;line-height:1.45}
+code{background:var(--bg3);padding:2px 6px;border-radius:5px;font-size:12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;color:#b6dcff}
+
+/* ---------- sheet / modal ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:90;
+  display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.sheet{background:var(--bg2);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;
+  border-radius:22px 22px 0 0;border:1px solid var(--line);border-bottom:0;
+  padding:8px 16px calc(24px + var(--safeb));animation:up .22s cubic-bezier(.2,.8,.3,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.grab{width:38px;height:4px;background:var(--line);border-radius:99px;margin:6px auto 12px}
+.sheet h2{margin:0 0 4px;font-size:19px;letter-spacing:-.02em}
+.sheet .sd{color:var(--tx2);font-size:13.5px;margin:0 0 12px;line-height:1.5}
+.scrim.center{align-items:center;padding:16px}
+.scrim.center .sheet{border-radius:20px;border-bottom:1px solid var(--line);animation:pop .2s ease}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ---------- nav ---------- */
+nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.95);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding-bottom:var(--safeb)}
+.nin{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.nb{padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tx3);font-size:10px;font-weight:700}
+.nb .ni{font-size:19px;line-height:1}
+.nb.on{color:var(--acc)}
+.nb .bdg{position:absolute;transform:translate(14px,-4px);background:var(--bad);color:#fff;
+  font-size:9px;padding:1px 5px;border-radius:99px;font-weight:800}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:calc(80px + var(--safeb));transform:translateX(-50%) translateY(20px);
+  background:#fff;color:#0b0d10;padding:11px 18px;border-radius:99px;font-weight:800;font-size:13.5px;
+  z-index:200;opacity:0;transition:.22s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.g{background:var(--good);color:#04140a} #toast.b{background:var(--bad);color:#fff}
+
+.flash{position:fixed;inset:0;z-index:150;pointer-events:none;opacity:0;transition:opacity .35s}
+.flash.on{opacity:.22}
+
+.empty{text-align:center;padding:44px 16px;color:var(--tx3)}
+.empty .e{font-size:40px;margin-bottom:10px;opacity:.5}
+.spark{display:flex;align-items:flex-end;gap:2px;height:40px;margin-top:8px}
+.spark i{flex:1;background:var(--bg3);border-radius:2px 2px 0 0;min-height:2px;display:block}
+.spark i.g{background:var(--good2)} .spark i.b{background:var(--bad2)}
+.calrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.calrow .lbl{width:52px;color:var(--tx3);font-variant-numeric:tabular-nums;font-weight:700}
+.caltrack{flex:1;height:16px;background:var(--bg3);border-radius:5px;position:relative;overflow:hidden}
+.caltrack i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);opacity:.85}
+.caltrack u{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.6}
+.calrow .nn{width:30px;text-align:right;color:var(--tx3);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbar">
+    <div class="brand">Decision <span>K/D</span></div>
+    <div class="hspace"></div>
+    <div class="kdchip"><b id="hKD">–</b><i>ratio</i></div>
+    <button class="iconbtn" id="btnQuick" title="Detailed entry">✎</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="banners"></div>
+  <div id="view"></div>
+</div>
+
+<nav><div class="nin">
+  <button class="nb on" data-tab="log"><span class="ni">⚡</span>Log</button>
+  <button class="nb" data-tab="queue"><span class="ni">◷</span>Queue<span class="bdg hide" id="qBadge">0</span></button>
+  <button class="nb" data-tab="stats"><span class="ni">◈</span>Stats</button>
+  <button class="nb" data-tab="data"><span class="ni">⛁</span>Data</button>
+</div></nav>
+
+<div id="toast"></div>
+<div class="flash" id="flash"></div>
+<div id="modal"></div>
+
+<script>
+"use strict";
+/* ============================================================================
+   DECISION K/D  —  lifetime decision ledger with calibration scoring
+   Single-file app. Companion: config.json (settings + backup vault).
+   ========================================================================= */
+
+const APP_VERSION = "1.0.0";
+const DB_NAME = "decisionKD", DB_VER = 1;
+const S_DEC = "decisions", S_META = "meta";
+
+const DEFAULTS = {
+  schema: "decision-kd/1",
+  configEditUrl: "",
+  app: { title: "Decision K/D", owner: "" },
+  settings: {
+    confirmQuickLog: false,
+    hapticFeedback: true,
+    defaultConfidence: 70,
+    askReviewDate: true,
+    weekStartsMonday: true,
+    minSampleForInsight: 8,
+    nightHours: [22, 5]
+  },
+  domains: ["Work","Money","Health","Relationships","Learning","Time","Risk","Other"],
+  stateFlags: ["Tired","Rushed","Angry","Hungry","Pressured","Unclear"],
+  backupPolicy: { softDecisions: 20, softDays: 7, hardDecisions: 60, hardDays: 21 },
+  backup: { exportedAt: null, count: 0, decisions: [] }
+};
+
+let CFG = JSON.parse(JSON.stringify(DEFAULTS));
+let DECS = [];            // in-memory mirror of the decisions store
+let META = {};            // meta key/value mirror
+let TAB = "log";
+let db = null;
+let quickState = { domain: null, flags: [] };
+
+/* ------------------------------ utilities ------------------------------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID()
+  : "d-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const DAY = 86400000;
+const now = () => Date.now();
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function fmtDate(ts){ if(!ts) return "–"; const d=new Date(ts);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"}); }
+function fmtDT(ts){ if(!ts) return "–"; const d=new Date(ts);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric"})+" "+
+         d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"}); }
+function ago(ts){
+  const s=(now()-ts)/1000;
+  if(s<60) return "just now";
+  if(s<3600) return Math.floor(s/60)+"m ago";
+  if(s<86400) return Math.floor(s/3600)+"h ago";
+  const d=Math.floor(s/86400);
+  if(d<30) return d+"d ago";
+  if(d<365) return Math.floor(d/30)+"mo ago";
+  return (d/365).toFixed(1)+"y ago";
+}
+function pct(n){ return (n*100).toFixed(0)+"%"; }
+function haptic(ms){ try{ if(CFG.settings.hapticFeedback && navigator.vibrate) navigator.vibrate(ms||12);}catch(e){} }
+
+function toast(msg, kind){
+  const t=$("#toast"); t.textContent=msg; t.className="on"+(kind?" "+kind:"");
+  clearTimeout(t._t); t._t=setTimeout(()=>{ t.className=""; }, 2100);
+}
+function flash(color){
+  const f=$("#flash"); f.style.background=color; f.classList.add("on");
+  setTimeout(()=>f.classList.remove("on"), 340);
+}
+
+/* ------------------------------ IndexedDB ------------------------------- */
+function openDB(){
+  return new Promise((res, rej)=>{
+    const rq = indexedDB.open(DB_NAME, DB_VER);
+    rq.onupgradeneeded = e => {
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains(S_DEC)){
+        const st = d.createObjectStore(S_DEC, { keyPath:"id" });
+        st.createIndex("ts","ts"); st.createIndex("verdict","verdict");
+      }
+      if(!d.objectStoreNames.contains(S_META)) d.createObjectStore(S_META, { keyPath:"k" });
+    };
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror  = () => rej(rq.error);
+  });
+}
+function tx(store, mode){ return db.transaction(store, mode).objectStore(store); }
+function idbAll(store){
+  return new Promise((res,rej)=>{ const r=tx(store,"readonly").getAll(); r.onsuccess=()=>res(r.result||[]); r.onerror=()=>rej(r.error); });
+}
+function idbPut(store, val){
+  return new Promise((res,rej)=>{ const r=tx(store,"readwrite").put(val); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
+}
+function idbDel(store, key){
+  return new Promise((res,rej)=>{ const r=tx(store,"readwrite").delete(key); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
+}
+function idbClear(store){
+  return new Promise((res,rej)=>{ const r=tx(store,"readwrite").clear(); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); });
+}
+async function setMeta(k, v){ META[k]=v; await idbPut(S_META,{k,v}); }
+
+/* --------------------------- config load/merge -------------------------- */
+function deepMerge(base, over){
+  const out = Array.isArray(base) ? base.slice() : Object.assign({}, base);
+  if(!over || typeof over !== "object") return out;
+  for(const k of Object.keys(over)){
+    const bv = base ? base[k] : undefined, ov = over[k];
+    if(ov && typeof ov === "object" && !Array.isArray(ov) && bv && typeof bv === "object" && !Array.isArray(bv))
+      out[k] = deepMerge(bv, ov);
+    else if(ov !== undefined && ov !== null) out[k] = ov;
+  }
+  return out;
+}
+async function loadConfig(){
+  try{
+    const r = await fetch("config.json?ts=" + now(), { cache:"no-store" });
+    if(r.ok){ CFG = deepMerge(DEFAULTS, await r.json()); return true; }
+  }catch(e){ /* offline or missing — defaults are fine */ }
+  return false;
+}
+
+/* --------------------------- decision records --------------------------- */
+function newDecision(o){
+  o = o || {};
+  return {
+    id: o.id || uid(),
+    ts: o.ts || now(),
+    title: (o.title || "").slice(0,300),
+    verdict: o.verdict || "pending",           // good | bad | pending | void
+    resolvedTs: o.resolvedTs || (o.verdict==="good"||o.verdict==="bad" ? (o.ts||now()) : null),
+    domain: o.domain || null,
+    reversibility: o.reversibility || null,     // one | two
+    stakes: o.stakes != null ? clamp(+o.stakes,1,5) : 2,
+    confidence: o.confidence != null ? clamp(+o.confidence,0,100) : null,
+    flags: Array.isArray(o.flags) ? o.flags : [],
+    note: (o.note || "").slice(0,2000),
+    lesson: (o.lesson || "").slice(0,2000),
+    reviewDue: o.reviewDue || null,
+    createdVer: APP_VERSION
+  };
+}
+async function addDecision(o){
+  const d = newDecision(o);
+  await idbPut(S_DEC, d);
+  DECS.push(d);
+  await bumpUnbacked();
+  return d;
+}
+async function saveDecision(d){
+  await idbPut(S_DEC, d);
+  const i = DECS.findIndex(x=>x.id===d.id);
+  if(i>=0) DECS[i]=d; else DECS.push(d);
+  await bumpUnbacked();
+}
+async function delDecision(id){
+  await idbDel(S_DEC, id);
+  DECS = DECS.filter(d=>d.id!==id);
+  await bumpUnbacked();
+}
+async function bumpUnbacked(){ await setMeta("unbacked", (META.unbacked||0)+1); }
+
+/* ------------------------------ statistics ------------------------------ */
+function resolved(list){ return list.filter(d=>d.verdict==="good"||d.verdict==="bad"); }
+
+function computeStats(list){
+  const R = resolved(list);
+  const good = R.filter(d=>d.verdict==="good").length;
+  const bad  = R.length - good;
+  const wr   = R.length ? good/R.length : 0;
+  const kd   = bad === 0 ? (good>0 ? good : 0) : good/bad;
+
+  // stakes-weighted decision capital
+  let cap=0, wg=0, wt=0;
+  R.forEach(d=>{ const s=d.stakes||2; cap += (d.verdict==="good"? s : -s); wt+=s; if(d.verdict==="good") wg+=s; });
+
+  // streaks (chronological by resolution time)
+  const chron = R.slice().sort((a,b)=>(a.resolvedTs||a.ts)-(b.resolvedTs||b.ts));
+  let cur=0, curKind=null, best=0, worst=0, run=0, runKind=null;
+  chron.forEach(d=>{
+    if(d.verdict===runKind){ run++; } else { runKind=d.verdict; run=1; }
+    if(runKind==="good") best=Math.max(best,run); else worst=Math.max(worst,run);
+  });
+  if(chron.length){ curKind=chron[chron.length-1].verdict; cur=0;
+    for(let i=chron.length-1;i>=0;i--){ if(chron[i].verdict===curKind) cur++; else break; } }
+
+  // calibration / Brier
+  const C = R.filter(d=>d.confidence!=null);
+  let brier=null;
+  if(C.length){ brier = C.reduce((a,d)=>{ const p=d.confidence/100, o=d.verdict==="good"?1:0; return a+(p-o)*(p-o); },0)/C.length; }
+  const meanConf = C.length ? C.reduce((a,d)=>a+d.confidence,0)/C.length/100 : null;
+  const buckets = [];
+  for(let b=0;b<10;b++){
+    const inB = C.filter(d=>{ const p=d.confidence; return b===9 ? p>=90 : (p>=b*10 && p<(b+1)*10); });
+    buckets.push({ lo:b*10, hi:b*10+10, n:inB.length,
+      actual: inB.length ? inB.filter(d=>d.verdict==="good").length/inB.length : null });
+  }
+
+  return { total:list.length, resolvedN:R.length, good, bad, wr, kd, cap,
+    weightedWR: wt ? wg/wt : 0, cur, curKind, best, worst,
+    brier, meanConf, buckets, calN:C.length,
+    pending:list.filter(d=>d.verdict==="pending").length };
+}
+
+function windowed(days){
+  const cut = now() - days*DAY;
+  return DECS.filter(d=>(d.resolvedTs||d.ts) >= cut);
+}
+function groupStats(keyFn, list){
+  const m = new Map();
+  resolved(list||DECS).forEach(d=>{
+    const k = keyFn(d); if(k==null) return;
+    if(!m.has(k)) m.set(k,{key:k,good:0,bad:0,stakes:0});
+    const g=m.get(k); g[d.verdict]++; g.stakes+=(d.stakes||2);
+  });
+  return Array.from(m.values()).map(g=>{
+    g.n=g.good+g.bad; g.wr=g.n?g.good/g.n:0; g.avgStakes=g.n?g.stakes/g.n:0; return g;
+  }).sort((a,b)=>b.n-a.n);
+}
+function hourBucket(d){ const h=new Date(d.ts).getHours();
+  if(h<6) return "00–06"; if(h<10) return "06–10"; if(h<14) return "10–14";
+  if(h<18) return "14–18"; if(h<22) return "18–22"; return "22–24"; }
+function isNight(d){ const h=new Date(d.ts).getHours(); const [a,b]=CFG.settings.nightHours; return h>=a || h<=b; }
+
+/* ------------------------------- insights ------------------------------- */
+function insights(){
+  const out=[]; const MIN=CFG.settings.minSampleForInsight||8;
+  const R=resolved(DECS);
+  if(R.length < MIN*2){
+    out.push({k:"info", t:`<b>Not enough data yet.</b> Insights unlock at roughly ${MIN*2} resolved decisions. You have ${R.length}. Keep logging — the value of this ledger compounds, it does not accumulate linearly.`});
+    return out;
+  }
+  const wrOf = a => a.length ? a.filter(d=>d.verdict==="good").length/a.length : 0;
+
+  // 1. night penalty
+  const night=R.filter(isNight), day=R.filter(d=>!isNight(d));
+  if(night.length>=MIN && day.length>=MIN){
+    const dn=wrOf(day)-wrOf(night);
+    if(Math.abs(dn)>=0.12) out.push({k:dn>0?"neg":"pos",
+      t:`<b>Time-of-day effect.</b> Decisions logged at night (${CFG.settings.nightHours[0]}:00–${CFG.settings.nightHours[1]}:00) resolve well ${pct(wrOf(night))} of the time vs ${pct(wrOf(day))} in daylight hours. n=${night.length}/${day.length}.`,
+      tip: dn>0 ? "Consider a hard policy: no consequential decisions after "+CFG.settings.nightHours[0]+":00. Policies are cheaper than winning the argument with yourself every night." : "Unusual — your night calls hold up. Worth checking whether they are simply lower-stakes."});
+  }
+  // 2. state flags
+  (CFG.stateFlags||[]).forEach(f=>{
+    const w=R.filter(d=>(d.flags||[]).includes(f)); if(w.length<MIN) return;
+    const wo=R.filter(d=>!(d.flags||[]).includes(f)); if(wo.length<MIN) return;
+    const diff=wrOf(wo)-wrOf(w);
+    if(diff>=0.15) out.push({k:"neg",
+      t:`<b>"${esc(f)}" is costing you.</b> Win rate drops to ${pct(wrOf(w))} when flagged <em>${esc(f)}</em>, vs ${pct(wrOf(wo))} otherwise. n=${w.length}.`,
+      tip:"This is a state-validity signal. The cheapest intervention is deferral, not better thinking."});
+  });
+  // 3. reversibility
+  const one=R.filter(d=>d.reversibility==="one"), two=R.filter(d=>d.reversibility==="two");
+  if(one.length>=MIN && two.length>=MIN){
+    out.push({k: wrOf(one)<wrOf(two)?"neg":"pos",
+      t:`<b>Door analysis.</b> One-way (irreversible) decisions: ${pct(wrOf(one))} win rate over ${one.length}. Two-way (reversible): ${pct(wrOf(two))} over ${two.length}.`,
+      tip: wrOf(one)<wrOf(two)
+        ? "Your irreversible calls underperform. Slow those down; speed up the reversible ones. Most people do the exact opposite."
+        : "Healthy pattern — you are allocating care by reversibility rather than by vividness."});
+    const twoStakes = two.reduce((a,d)=>a+(d.stakes||2),0)/two.length;
+    if(twoStakes>=3.4) out.push({k:"warn2",
+      t:`<b>Precision misallocation.</b> Your reversible decisions carry an average stakes rating of ${twoStakes.toFixed(1)}/5 — you are treating two-way doors as if they were one-way.`,
+      tip:"Two-way door: decide in ten minutes. You can walk back through it."});
+  }
+  // 4. domains
+  const doms=groupStats(d=>d.domain).filter(g=>g.n>=MIN);
+  if(doms.length>=2){
+    const s=doms.slice().sort((a,b)=>b.wr-a.wr);
+    const top=s[0], bot=s[s.length-1];
+    if(top.wr-bot.wr>=0.15){
+      out.push({k:"pos", t:`<b>Strongest domain: ${esc(top.key)}</b> — ${pct(top.wr)} across ${top.n} resolved decisions.`,
+        tip:"Where you are reliably good, decide faster and delegate less."});
+      out.push({k:"neg", t:`<b>Weakest domain: ${esc(bot.key)}</b> — ${pct(bot.wr)} across ${bot.n}.`,
+        tip:"Candidates here: get a second opinion by default, add a waiting period, or buy expertise. This is the highest-yield place to install a rule."});
+    }
+  }
+  // 5. calibration
+  const st=computeStats(DECS);
+  if(st.calN>=MIN*2 && st.meanConf!=null){
+    const gap=st.meanConf-st.wr;
+    if(gap>=0.08) out.push({k:"neg",
+      t:`<b>Overconfidence detected.</b> Your average stated confidence is ${pct(st.meanConf)} but your actual win rate is ${pct(st.wr)} — a gap of ${(gap*100).toFixed(0)} points across ${st.calN} scored decisions. Brier score ${st.brier.toFixed(3)} (lower is better; 0.25 = coin flip).`,
+      tip:"Try subtracting the gap from every future estimate for 30 days, then re-measure. Calibration is trainable and it transfers across domains."});
+    else if(gap<=-0.08) out.push({k:"warn2",
+      t:`<b>Underconfidence detected.</b> You predict ${pct(st.meanConf)} and deliver ${pct(st.wr)}. You are systematically underrating yourself by ${Math.abs(gap*100).toFixed(0)} points.`,
+      tip:"Underconfidence has a real cost: it shows up as decisions never made. The opportunity cost leaves no evidence, which is why nobody counts it."});
+    else out.push({k:"pos",
+      t:`<b>Well calibrated.</b> Stated confidence ${pct(st.meanConf)} vs actual ${pct(st.wr)}. Brier ${st.brier.toFixed(3)}.`,
+      tip:"Rare. Protect this by continuing to record predictions before outcomes, never after."});
+  }
+  // 6. stakes
+  const hi=R.filter(d=>(d.stakes||2)>=4), lo=R.filter(d=>(d.stakes||2)<=2);
+  if(hi.length>=MIN && lo.length>=MIN && wrOf(lo)-wrOf(hi)>=0.15)
+    out.push({k:"neg", t:`<b>You degrade under stakes.</b> High-stakes win rate ${pct(wrOf(hi))} (n=${hi.length}) vs low-stakes ${pct(wrOf(lo))} (n=${lo.length}).`,
+      tip:"Classic pressure signature. Pre-commit a checklist for anything rated 4–5 so the process does not depend on your state at the moment of choosing."});
+  // 7. stale queue
+  const stale=DECS.filter(d=>d.verdict==="pending" && now()-d.ts>45*DAY);
+  if(stale.length>=3) out.push({k:"warn2",
+    t:`<b>${stale.length} decisions have been pending over 45 days.</b> Unresolved entries silently inflate your apparent win rate, because bad outcomes are the ones people avoid adjudicating.`,
+    tip:"Resolve or void them. An honest ledger requires closing losses."});
+  // 8. volume trend
+  const l30=DECS.filter(d=>d.ts>=now()-30*DAY).length, p30=DECS.filter(d=>d.ts>=now()-60*DAY&&d.ts<now()-30*DAY).length;
+  if(p30>=5 && l30 < p30*0.5) out.push({k:"warn2",
+    t:`<b>Logging is dropping off.</b> ${l30} entries in the last 30 days vs ${p30} in the 30 before.`,
+    tip:"A ledger with gaps produces survivorship bias, not insight. Lower the friction: use the URL shortcuts on your home screen."});
+  // 9. day of week
+  const dow=groupStats(d=>["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d.ts).getDay()]).filter(g=>g.n>=MIN);
+  if(dow.length>=4){
+    const s=dow.slice().sort((a,b)=>a.wr-b.wr);
+    if(s[s.length-1].wr - s[0].wr >= 0.2) out.push({k:"warn2",
+      t:`<b>Weekday effect.</b> ${esc(s[0].key)} is your worst decision day (${pct(s[0].wr)}, n=${s[0].n}); ${esc(s[s.length-1].key)} your best (${pct(s[s.length-1].wr)}, n=${s[s.length-1].n}).`,
+      tip:"Probably a proxy for load, sleep, or meeting density rather than the day itself. Look for what your worst day actually contains."});
+  }
+  if(out.length===0) out.push({k:"info", t:"<b>No strong patterns detected yet.</b> That is itself informative: your performance is currently uniform across the dimensions being tracked. Add domains, stakes, and confidence to entries to sharpen resolution."});
+  return out;
+}
+
+/* ------------------------------ backup gate ----------------------------- */
+function backupState(){
+  const p=CFG.backupPolicy||DEFAULTS.backupPolicy;
+  const unb=META.unbacked||0;
+  const last=META.lastBackup||0;
+  const days=last ? (now()-last)/DAY : (DECS.length ? 999 : 0);
+  const hard = unb>=p.hardDecisions || (DECS.length>0 && days>=p.hardDays);
+  const soft = unb>=p.softDecisions || (DECS.length>0 && days>=p.softDays);
+  return { unb, last, days, hard, soft:soft&&!hard };
+}
+
+/* ------------------------------ export ---------------------------------- */
+function buildConfigExport(){
+  const out = JSON.parse(JSON.stringify(CFG));
+  out.schema = "decision-kd/1";
+  out.appVersion = APP_VERSION;
+  out.configEditUrl = META.configEditUrl || CFG.configEditUrl || "";
+  out.backup = {
+    exportedAt: new Date().toISOString(),
+    count: DECS.length,
+    integrity: DECS.length + ":" + DECS.reduce((a,d)=>a+(d.ts%1000),0),
+    decisions: DECS.slice().sort((a,b)=>a.ts-b.ts)
+  };
+  return out;
+}
+function downloadJSON(obj, name){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
+  const u=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=u; a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(u); a.remove(); }, 400);
+}
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=t;
+    ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta);
+    ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+    ta.remove(); return ok;
+  }
+}
+function csvExport(){
+  const cols=["id","ts","iso","title","verdict","resolvedTs","domain","reversibility","stakes","confidence","flags","note","lesson","reviewDue"];
+  const rows=[cols.join(",")];
+  DECS.slice().sort((a,b)=>a.ts-b.ts).forEach(d=>{
+    rows.push(cols.map(c=>{
+      let v = c==="iso" ? new Date(d.ts).toISOString() : d[c];
+      if(Array.isArray(v)) v=v.join("|");
+      if(v==null) v="";
+      v=String(v).replace(/"/g,'""');
+      return /[",\n]/.test(v) ? '"'+v+'"' : v;
+    }).join(","));
+  });
+  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+  const u=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=u; a.download="decisions-"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},400);
+}
+async function markBackedUp(){
+  await setMeta("lastBackup", now());
+  await setMeta("unbacked", 0);
+  render();
+}
+
+/* ------------------------------ modals ---------------------------------- */
+function closeModal(){ $("#modal").innerHTML=""; }
+function showSheet(html, opts){
+  opts=opts||{};
+  $("#modal").innerHTML =
+    `<div class="scrim${opts.center?" center":""}" id="scrim">
+       <div class="sheet">${opts.center?"":'<div class="grab"></div>'}${html}</div>
+     </div>`;
+  if(!opts.persistent){
+    $("#scrim").addEventListener("click", e=>{ if(e.target.id==="scrim") closeModal(); });
+  }
+}
+
+/* ---- onboarding: config edit page ---- */
+function normalizeEditUrl(v){
+  v=(v||"").trim();
+  if(!v) return "";
+  if(/\/edit\//.test(v)) return v;
+  let m=v.match(/github\.com\/([^\/]+)\/([^\/\s]+)/i);
+  if(m) return `https://github.com/${m[1]}/${m[2].replace(/\.git$/,"")}/edit/main/config.json`;
+  m=v.match(/^([\w.-]+)\/([\w.-]+)$/);
+  if(m) return `https://github.com/${m[1]}/${m[2]}/edit/main/config.json`;
+  m=v.match(/^https?:\/\/([\w-]+)\.github\.io\/([^\/\s]+)/i);
+  if(m) return `https://github.com/${m[1]}/${m[2]}/edit/main/config.json`;
+  m=v.match(/^https?:\/\/([\w-]+)\.github\.io\/?$/i);
+  if(m) return `https://github.com/${m[1]}/${m[1]}.github.io/edit/main/config.json`;
+  return v;
+}
+function askConfigUrl(force){
+  const cur = META.configEditUrl || CFG.configEditUrl || "";
+  showSheet(`
+    <h2>Where do backups go?</h2>
+    <p class="sd">Your data lives in this browser's IndexedDB — which is fast and works offline, but browsers <em>do</em> evict storage. This ledger is meant to run for decades, so it needs a permanent home.</p>
+    <p class="sd">Paste your repo's <b>config.json edit page</b>. When a backup is due, this app hands you the full file and sends you straight there to paste and commit.</p>
+    <label class="f">GitHub repo or edit URL</label>
+    <input type="url" id="cfgUrl" placeholder="https://github.com/you/repo" value="${esc(cur)}" autocomplete="off" spellcheck="false">
+    <div class="hint">Accepts any of: <code>you/repo</code> · <code>github.com/you/repo</code> · <code>you.github.io/repo</code> · a full <code>/edit/main/config.json</code> link. Change the branch later in Data if you don't use <code>main</code>.</div>
+    <div style="height:16px"></div>
+    <button class="btn pri" id="cfgSave">Save &amp; continue</button>
+    ${force?"":'<button class="btn" id="cfgSkip">Skip for now</button>'}
+  `, { persistent: !!force });
+  $("#cfgSave").onclick = async () => {
+    const raw = $("#cfgUrl").value.trim();
+    const url = normalizeEditUrl(raw);
+    if(raw && !/^https?:\/\//.test(url)){ toast("That doesn't look like a URL","b"); return; }
+    await setMeta("configEditUrl", url);
+    await setMeta("onboarded", true);
+    CFG.configEditUrl = url;
+    closeModal(); render();
+    if(url) toast("Backup destination saved","g");
+  };
+  const skip=$("#cfgSkip"); if(skip) skip.onclick = async () => { await setMeta("onboarded",true); closeModal(); render(); };
+}
+
+/* ---- hard backup gate ---- */
+function showBackupGate(hard){
+  const bs=backupState();
+  const url=META.configEditUrl||CFG.configEditUrl||"";
+  showSheet(`
+    <h2>${hard?"Backup required":"Backup due"}</h2>
+    <p class="sd">${bs.unb} decision${bs.unb===1?"":"s"} recorded since your last backup${bs.last?` (${ago(bs.last)})`:""}. ${hard?"Logging is paused until this is done — the point of a decades-long ledger is that it survives a lost phone.":"Two taps and you're clear."}</p>
+    <button class="btn pri" id="bkDl">1 · Download config.json</button>
+    <button class="btn" id="bkCopy">1b · Copy to clipboard instead</button>
+    ${url?`<a class="btn" href="${esc(url)}" target="_blank" rel="noopener" id="bkOpen">2 · Open config.json editor ↗</a>`
+        :`<button class="btn" id="bkSet">2 · Set your config edit page first</button>`}
+    <div class="hint" style="margin:2px 0 14px">In the GitHub editor: select all (<code>Ctrl/Cmd+A</code>) → paste → <b>Commit changes</b>. Your history is now in version control, with a full diff for every backup you ever make.</div>
+    <button class="btn gd" id="bkDone">3 · Done — I committed it</button>
+    ${hard?"":'<button class="btn" id="bkLater">Remind me later</button>'}
+  `, { persistent: !!hard });
+  $("#bkDl").onclick = () => { downloadJSON(buildConfigExport(),"config.json"); toast("Downloaded config.json","g"); };
+  $("#bkCopy").onclick = async () => {
+    const ok = await copyText(JSON.stringify(buildConfigExport(),null,2));
+    toast(ok?"Copied — now paste into GitHub":"Copy failed, use download", ok?"g":"b");
+  };
+  const set=$("#bkSet"); if(set) set.onclick=()=>askConfigUrl(false);
+  $("#bkDone").onclick = async () => { await markBackedUp(); closeModal(); toast("Backup recorded ✓","g"); };
+  const later=$("#bkLater"); if(later) later.onclick=closeModal;
+}
+
+/* ---- detailed entry sheet ---- */
+function openEntry(existing, presetVerdict){
+  const d = existing || newDecision({ verdict: presetVerdict||"pending",
+    confidence: CFG.settings.defaultConfidence, domain: quickState.domain, flags: quickState.flags.slice() });
+  const isNew = !existing;
+  const domOpts = (CFG.domains||[]).map(x=>`<option value="${esc(x)}"${d.domain===x?" selected":""}>${esc(x)}</option>`).join("");
+  const flagChips = (CFG.stateFlags||[]).map(f=>
+    `<button class="chip tog${(d.flags||[]).includes(f)?" on":""}" data-flag="${esc(f)}">${esc(f)}</button>`).join("");
+  const dueVal = d.reviewDue ? new Date(d.reviewDue).toISOString().slice(0,10) : "";
+
+  showSheet(`
+    <h2>${isNew?"New decision":"Edit decision"}</h2>
+    <p class="sd">Record the call <em>before</em> you know the outcome. That ordering is what makes the calibration score meaningful.</p>
+
+    <label class="f">What did you decide?</label>
+    <input type="text" id="eTitle" value="${esc(d.title)}" placeholder="Took the contract instead of the salaried role" autocomplete="off">
+
+    <label class="f">Verdict</label>
+    <div class="chips" id="eVerdict">
+      ${["pending","good","bad","void"].map(v=>
+        `<button class="chip${d.verdict===v?" on":""}" data-v="${v}">${
+          v==="pending"?"◷ Pending":v==="good"?"✓ Good":v==="bad"?"✗ Bad":"– Void"}</button>`).join("")}
+    </div>
+
+    <label class="f">Domain</label>
+    <select id="eDomain"><option value="">—</option>${domOpts}</select>
+
+    <label class="f">Door type</label>
+    <div class="chips" id="eRev">
+      <button class="chip${d.reversibility==="two"?" on":""}" data-r="two">↔ Two-way (reversible)</button>
+      <button class="chip${d.reversibility==="one"?" on":""}" data-r="one">→ One-way (irreversible)</button>
+    </div>
+
+    <label class="f">Stakes · <span id="eStakesV">${d.stakes}</span>/5</label>
+    <input type="range" id="eStakes" min="1" max="5" step="1" value="${d.stakes}">
+
+    <label class="f">Confidence this turns out well · <span id="eConfV">${d.confidence==null?"—":d.confidence+"%"}</span></label>
+    <input type="range" id="eConf" min="0" max="100" step="5" value="${d.confidence==null?CFG.settings.defaultConfidence:d.confidence}">
+    <div class="hint">Your forecast, logged now. Resolving it later is what builds the Brier score — the only honest measure of whether you actually know what you're doing.</div>
+
+    <label class="f">State at time of deciding</label>
+    <div class="chips" id="eFlags">${flagChips}</div>
+
+    <label class="f">Review date (optional)</label>
+    <input type="date" id="eDue" value="${dueVal}">
+
+    <label class="f">Reasoning / context</label>
+    <textarea id="eNote" placeholder="Why this, why now, what I expected, what would have changed my mind">${esc(d.note)}</textarea>
+
+    <label class="f">Lesson (fill in on resolution)</label>
+    <textarea id="eLesson" placeholder="What I'd tell myself before making this call again">${esc(d.lesson)}</textarea>
+
+    <div style="height:16px"></div>
+    <button class="btn pri" id="eSave">${isNew?"Log decision":"Save changes"}</button>
+    ${isNew?"":'<button class="btn dan" id="eDel">Delete</button>'}
+    <button class="btn" id="eCancel">Cancel</button>
+  `);
+
+  let V=d.verdict, RV=d.reversibility, FL=(d.flags||[]).slice();
+  $$("#eVerdict .chip").forEach(b=>b.onclick=()=>{ V=b.dataset.v;
+    $$("#eVerdict .chip").forEach(x=>x.classList.toggle("on",x.dataset.v===V)); });
+  $$("#eRev .chip").forEach(b=>b.onclick=()=>{ RV = RV===b.dataset.r ? null : b.dataset.r;
+    $$("#eRev .chip").forEach(x=>x.classList.toggle("on",x.dataset.r===RV)); });
+  $$("#eFlags .chip").forEach(b=>b.onclick=()=>{ const f=b.dataset.flag;
+    if(FL.includes(f)) FL=FL.filter(x=>x!==f); else FL.push(f);
+    b.classList.toggle("on", FL.includes(f)); });
+  $("#eStakes").oninput=e=>$("#eStakesV").textContent=e.target.value;
+  $("#eConf").oninput=e=>$("#eConfV").textContent=e.target.value+"%";
+
+  $("#eSave").onclick = async () => {
+    const wasPending = d.verdict==="pending";
+    d.title=$("#eTitle").value.trim();
+    d.verdict=V; d.domain=$("#eDomain").value||null; d.reversibility=RV;
+    d.stakes=+$("#eStakes").value; d.confidence=+$("#eConf").value;
+    d.flags=FL; d.note=$("#eNote").value.trim(); d.lesson=$("#eLesson").value.trim();
+    const due=$("#eDue").value; d.reviewDue = due ? new Date(due+"T09:00").getTime() : null;
+    if((V==="good"||V==="bad") && (wasPending || !d.resolvedTs)) d.resolvedTs=now();
+    if(V==="pending"||V==="void") d.resolvedTs=null;
+    await saveDecision(d);
+    closeModal(); haptic(18); render();
+    toast(isNew?"Logged":"Saved", V==="good"?"g":V==="bad"?"b":undefined);
+  };
+  const del=$("#eDel"); if(del) del.onclick=async()=>{
+    if(!confirm("Delete this decision permanently?")) return;
+    await delDecision(d.id); closeModal(); render(); toast("Deleted");
+  };
+  $("#eCancel").onclick=closeModal;
+}
+
+/* ---- quick log ---- */
+async function quickLog(verdict, extra){
+  const bs=backupState();
+  if(bs.hard){ showBackupGate(true); return null; }
+  const d = await addDecision(Object.assign({
+    verdict, title:"", domain:quickState.domain, flags:quickState.flags.slice(),
+    resolvedTs: (verdict==="good"||verdict==="bad") ? now() : null
+  }, extra||{}));
+  haptic(verdict==="bad"?[10,40,10]:22);
+  flash(verdict==="good"?"#2fbf71":verdict==="bad"?"#e5484d":"#f5a524");
+  const st=computeStats(DECS);
+  toast(verdict==="good"?`Good · K/D ${st.kd.toFixed(2)}`
+      : verdict==="bad"?`Bad · K/D ${st.kd.toFixed(2)}`
+      : "Pending logged", verdict==="good"?"g":verdict==="bad"?"b":undefined);
+  render();
+  return d;
+}
+
+/* ------------------------------ URL params ------------------------------ */
+async function handleParams(){
+  const p=new URLSearchParams(location.search);
+  const log=(p.get("log")||p.get("d")||"").toLowerCase();
+  if(!log) return false;
+  const map={g:"good",good:"good",w:"good",win:"good",
+             b:"bad",bad:"bad",l:"bad",loss:"bad",
+             p:"pending",pending:"pending",q:"pending"};
+  const v=map[log]; if(!v) return false;
+
+  const extra={};
+  const t=p.get("t")||p.get("title")||p.get("note");
+  if(t) extra.title=t.slice(0,300);
+  const dom=p.get("tag")||p.get("domain");
+  if(dom){ const match=(CFG.domains||[]).find(x=>x.toLowerCase()===dom.toLowerCase()); extra.domain=match||dom; }
+  const s=p.get("s")||p.get("stakes"); if(s) extra.stakes=clamp(+s,1,5);
+  const c=p.get("c")||p.get("conf"); if(c) extra.confidence=clamp(+c,0,100);
+  const r=(p.get("r")||p.get("rev")||"").toLowerCase();
+  if(r==="one"||r==="1"||r==="oneway") extra.reversibility="one";
+  if(r==="two"||r==="2"||r==="twoway") extra.reversibility="two";
+  const due=p.get("due"); if(due && /^\d{4}-\d{2}-\d{2}$/.test(due)) extra.reviewDue=new Date(due+"T09:00").getTime();
+  const fl=p.get("f")||p.get("flags"); if(fl) extra.flags=fl.split(/[|,]/).map(x=>x.trim()).filter(Boolean);
+
+  const d = await quickLog(v, extra);
+  history.replaceState({}, "", location.pathname);
+  if(d && p.get("edit")==="1") openEntry(d);
+  return true;
+}
+
+/* ------------------------------- views ---------------------------------- */
+function viewLog(){
+  const st=computeStats(DECS);
+  const l30=computeStats(windowed(30)), l365=computeStats(windowed(365));
+  const domChips=(CFG.domains||[]).map(x=>
+    `<button class="chip${quickState.domain===x?" on":""}" data-qd="${esc(x)}">${esc(x)}</button>`).join("");
+  const flagChips=(CFG.stateFlags||[]).map(f=>
+    `<button class="chip tog${quickState.flags.includes(f)?" on":""}" data-qf="${esc(f)}">${esc(f)}</button>`).join("");
+  const recent=DECS.slice().sort((a,b)=>b.ts-a.ts).slice(0,6);
+
+  return `
+  <div class="bigrow">
+    <button class="big good" id="qGood"><span class="em">✓</span>GOOD<span class="sub">${st.good} lifetime</span></button>
+    <button class="big bad"  id="qBad"><span class="em">✗</span>BAD<span class="sub">${st.bad} lifetime</span></button>
+  </div>
+  <div class="midrow">
+    <button class="mid pend" id="qPend">◷ Log pending call</button>
+    <button class="mid" id="qDetail">✎ Detailed entry</button>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="bar"><i style="width:${(st.wr*100).toFixed(1)}%"></i></div>
+    <div class="brow"><span>${st.good} good</span><span>${pct(st.wr)} win rate</span><span>${st.bad} bad</span></div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="stat a"><div class="v">${st.resolvedN?st.kd.toFixed(2):"–"}</div><div class="l">Lifetime K/D</div></div>
+      <div class="stat ${l30.resolvedN?(l30.wr>=st.wr?"g":"b"):""}"><div class="v">${l30.resolvedN?pct(l30.wr):"–"}</div><div class="l">30-day</div></div>
+      <div class="stat ${st.curKind==="good"?"g":st.curKind==="bad"?"b":""}"><div class="v">${st.cur||0}</div><div class="l">${st.curKind==="bad"?"Loss streak":"Win streak"}</div></div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h3>Tag next entry · domain</h3>
+    <div class="chips" id="qDoms">
+      <button class="chip${quickState.domain===null?" on":""}" data-qd="">None</button>${domChips}
+    </div>
+  </div>
+  <div class="sect">
+    <h3>Tag next entry · state</h3>
+    <div class="chips" id="qFlags">${flagChips}</div>
+    <div class="hint">Sticky until you clear them. These are what later prove whether tiredness or time pressure is quietly costing you decisions.</div>
+  </div>
+
+  <div class="sect">
+    <h3>Recent</h3>
+    <div class="card">${recent.length?recent.map(rowHTML).join(""):'<div class="empty"><div class="e">⚡</div>Nothing logged yet. Hit a button above.</div>'}</div>
+  </div>
+
+  <div class="sect">
+    <h3>Lifetime</h3>
+    <div class="grid3">
+      <div class="stat"><div class="v">${DECS.length}</div><div class="l">Logged</div></div>
+      <div class="stat ${st.cap>=0?"g":"b"}"><div class="v">${st.cap>0?"+":""}${st.cap}</div><div class="l">Capital</div></div>
+      <div class="stat p"><div class="v">${st.pending}</div><div class="l">Pending</div></div>
+    </div>
+    <div class="hint" style="margin-top:10px">Capital is stakes-weighted: a 5/5 win is worth five 1/5 wins. It is the number that actually tracks whether your decisions are compounding.</div>
+  </div>`;
+}
+
+function rowHTML(d){
+  const overdue = d.verdict==="pending" && d.reviewDue && d.reviewDue<now();
+  const meta=[];
+  meta.push(ago(d.ts));
+  if(d.domain) meta.push(`<span class="tag">${esc(d.domain)}</span>`);
+  if(d.reversibility) meta.push(d.reversibility==="one"?"→ one-way":"↔ two-way");
+  if(d.stakes) meta.push("◆".repeat(d.stakes));
+  if(d.confidence!=null) meta.push(d.confidence+"%");
+  (d.flags||[]).forEach(f=>meta.push(`<span class="tag">${esc(f)}</span>`));
+  if(d.reviewDue && d.verdict==="pending")
+    meta.push(`<span class="${overdue?"overdue":""}">review ${fmtDate(d.reviewDue)}</span>`);
+  return `<div class="row" data-open="${d.id}">
+    <span class="dot ${d.verdict}"></span>
+    <div class="rmain">
+      <div class="rtitle">${d.title?esc(d.title):'<span style="color:var(--tx3)">Untitled — tap to add context</span>'}</div>
+      <div class="rmeta">${meta.join(" ")}</div>
+    </div>
+    ${d.verdict==="pending"?`<div class="rbtns">
+      <button class="sm g" data-res="${d.id}|good">✓</button>
+      <button class="sm b" data-res="${d.id}|bad">✗</button></div>`:""}
+  </div>`;
+}
+
+function viewQueue(){
+  const pend=DECS.filter(d=>d.verdict==="pending").sort((a,b)=>{
+    const ad=a.reviewDue||a.ts+90*DAY, bd=b.reviewDue||b.ts+90*DAY; return ad-bd; });
+  const due=pend.filter(d=>d.reviewDue&&d.reviewDue<=now());
+  const rest=pend.filter(d=>!due.includes(d));
+  return `
+  <div class="sect">
+    <h3>Open calls awaiting a verdict</h3>
+    <div class="card">
+      <div class="grid3">
+        <div class="stat p"><div class="v">${pend.length}</div><div class="l">Pending</div></div>
+        <div class="stat b"><div class="v">${due.length}</div><div class="l">Due now</div></div>
+        <div class="stat"><div class="v">${pend.filter(d=>now()-d.ts>45*DAY).length}</div><div class="l">Over 45d</div></div>
+      </div>
+      <div class="hint" style="margin-top:10px">Unresolved entries are where self-flattery hides. People adjudicate their wins and quietly leave losses pending forever — which inflates the ratio while destroying its usefulness.</div>
+    </div>
+  </div>
+  ${due.length?`<div class="sect"><h3>Due for review</h3><div class="card">${due.map(rowHTML).join("")}</div></div>`:""}
+  <div class="sect"><h3>${due.length?"Everything else":"All pending"}</h3>
+    <div class="card">${rest.length?rest.map(rowHTML).join(""):'<div class="empty"><div class="e">◷</div>No open calls. Log a prediction and come back to score it.</div>'}</div>
+  </div>
+  <button class="btn" id="qNewPending">+ Log a new pending call</button>`;
+}
+
+function viewStats(){
+  const st=computeStats(DECS);
+  if(st.resolvedN===0) return `<div class="empty"><div class="e">◈</div><p>No resolved decisions yet.<br>Statistics appear once you have verdicts to work with.</p></div>`;
+  const w30=computeStats(windowed(30)), w90=computeStats(windowed(90)), w365=computeStats(windowed(365));
+  const doms=groupStats(d=>d.domain), hrs=groupStats(hourBucket),
+        revs=groupStats(d=>d.reversibility==="one"?"One-way":d.reversibility==="two"?"Two-way":null),
+        flg=(CFG.stateFlags||[]).map(f=>{
+          const a=resolved(DECS).filter(d=>(d.flags||[]).includes(f));
+          return { key:f, n:a.length, good:a.filter(d=>d.verdict==="good").length,
+                   wr:a.length?a.filter(d=>d.verdict==="good").length/a.length:0 };
+        }).filter(g=>g.n>0).sort((a,b)=>b.n-a.n);
+
+  const tbl = (rows, label) => rows.length ? `<table><thead><tr>
+      <th>${label}</th><th style="text-align:right">N</th><th style="text-align:right">Win</th><th></th></tr></thead><tbody>
+      ${rows.map(g=>`<tr><td>${esc(g.key)}</td><td class="n">${g.n}</td>
+        <td class="n">${pct(g.wr)}</td>
+        <td class="n"><span class="mini"><i style="width:${(g.wr*100).toFixed(0)}%"></i></span></td></tr>`).join("")}
+    </tbody></table>` : '<div class="hint">Not enough tagged data yet.</div>';
+
+  // 12-month sparkline
+  const spark=[];
+  for(let i=11;i>=0;i--){
+    const s=new Date(); s.setMonth(s.getMonth()-i); s.setDate(1); s.setHours(0,0,0,0);
+    const e=new Date(s); e.setMonth(e.getMonth()+1);
+    const m=resolved(DECS).filter(d=>{ const t=d.resolvedTs||d.ts; return t>=s.getTime()&&t<e.getTime(); });
+    spark.push({ n:m.length, wr:m.length?m.filter(d=>d.verdict==="good").length/m.length:null });
+  }
+  const maxN=Math.max(1,...spark.map(s=>s.n));
+
+  const ins=insights();
+
+  return `
+  <div class="card">
+    <h4>Lifetime</h4>
+    <div class="bar"><i style="width:${(st.wr*100).toFixed(1)}%"></i></div>
+    <div class="brow"><span>${st.good} good</span><span>${pct(st.wr)}</span><span>${st.bad} bad</span></div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="stat a"><div class="v">${st.kd.toFixed(2)}</div><div class="l">K/D</div></div>
+      <div class="stat ${st.cap>=0?"g":"b"}"><div class="v">${st.cap>0?"+":""}${st.cap}</div><div class="l">Capital</div></div>
+      <div class="stat"><div class="v">${pct(st.weightedWR)}</div><div class="l">Wtd win</div></div>
+      <div class="stat g"><div class="v">${st.best}</div><div class="l">Best run</div></div>
+      <div class="stat b"><div class="v">${st.worst}</div><div class="l">Worst run</div></div>
+      <div class="stat p"><div class="v">${st.pending}</div><div class="l">Open</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Trailing windows</h4>
+    <table><thead><tr><th>Window</th><th style="text-align:right">N</th><th style="text-align:right">K/D</th><th style="text-align:right">Win</th></tr></thead><tbody>
+      ${[["30 days",w30],["90 days",w90],["365 days",w365],["Lifetime",st]].map(([l,s])=>
+        `<tr><td>${l}</td><td class="n">${s.resolvedN}</td>
+         <td class="n">${s.resolvedN?s.kd.toFixed(2):"–"}</td>
+         <td class="n">${s.resolvedN?pct(s.wr):"–"}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="spark">${spark.map(s=>{
+      const h=s.n?Math.max(6,(s.n/maxN)*40):2;
+      const cls=s.wr==null?"":(s.wr>=0.5?"g":"b");
+      return `<i class="${cls}" style="height:${h}px" title="${s.n} decisions"></i>`;}).join("")}</div>
+    <div class="hint">Last 12 months · bar height = volume, colour = whether that month cleared 50%.</div>
+  </div>
+
+  <div class="card">
+    <h4>Calibration${st.calN?` · ${st.calN} scored`:""}</h4>
+    ${st.calN>=5?`
+      <div class="grid2" style="margin-bottom:12px">
+        <div class="stat ${st.brier<0.2?"g":st.brier<0.25?"a":"b"}"><div class="v">${st.brier.toFixed(3)}</div><div class="l">Brier score</div></div>
+        <div class="stat"><div class="v">${st.meanConf!=null?pct(st.meanConf):"–"} / ${pct(st.wr)}</div><div class="l">Said / did</div></div>
+      </div>
+      ${st.buckets.filter(b=>b.n>0).map(b=>`
+        <div class="calrow">
+          <span class="lbl">${b.lo}–${b.hi}%</span>
+          <span class="caltrack"><i style="width:${(b.actual*100).toFixed(0)}%"></i><u style="left:${((b.lo+5))}%"></u></span>
+          <span class="nn">${b.n}</span>
+        </div>`).join("")}
+      <div class="hint">Bar = how often those calls actually landed. Tick = what you claimed. Bar shorter than tick means overconfidence in that band. Brier below 0.25 beats a coin; below 0.15 is genuinely strong.</div>
+    `:'<div class="hint">Set a confidence value on entries to unlock calibration scoring. This is the single most transferable skill the ledger can teach you — being right is domain-specific, but knowing how sure to be is not.</div>'}
+  </div>
+
+  <div class="card"><h4>By domain</h4>${tbl(doms,"Domain")}</div>
+  <div class="card"><h4>By door type</h4>${tbl(revs,"Type")}
+    <div class="hint">If one-way doors underperform two-way doors, you are allocating care by vividness rather than by stakes.</div></div>
+  <div class="card"><h4>By time of day</h4>${tbl(hrs,"Hours")}</div>
+  ${flg.length?`<div class="card"><h4>By state at decision time</h4>${tbl(flg,"State")}</div>`:""}
+
+  <div class="card">
+    <h4>Insights</h4>
+    ${ins.map(i=>`<div class="ins ${i.k==="neg"?"neg":i.k==="pos"?"pos":i.k==="warn2"?"warn2":""}">${i.t}${i.tip?`<span class="tip">${i.tip}</span>`:""}</div>`).join("")}
+  </div>
+
+  <button class="btn" id="stAll">Browse full history (${DECS.length})</button>`;
+}
+
+function viewData(){
+  const bs=backupState();
+  const url=META.configEditUrl||CFG.configEditUrl||"";
+  const base=location.origin+location.pathname;
+  const links=[
+    ["Good","?log=good"],["Bad","?log=bad"],["Pending","?log=pending"],
+    ["Good · Work","?log=good&tag=Work"],["Bad · Work","?log=bad&tag=Work"],
+    ["Bad · tired","?log=bad&f=Tired"],["Good, then edit","?log=good&edit=1"]
+  ];
+  return `
+  <div class="card">
+    <h4>Backup status</h4>
+    <div class="grid3">
+      <div class="stat ${bs.hard?"b":bs.soft?"p":"g"}"><div class="v">${bs.unb}</div><div class="l">Unsaved</div></div>
+      <div class="stat"><div class="v">${bs.last?Math.floor(bs.days):"—"}</div><div class="l">Days since</div></div>
+      <div class="stat a"><div class="v">${DECS.length}</div><div class="l">Records</div></div>
+    </div>
+    <div class="hint" style="margin:10px 0 12px">${bs.last?`Last backup ${ago(bs.last)}.`:"Never backed up."} Thresholds: nag at ${CFG.backupPolicy.softDecisions} entries or ${CFG.backupPolicy.softDays} days; hard block at ${CFG.backupPolicy.hardDecisions} or ${CFG.backupPolicy.hardDays}.</div>
+    <button class="btn pri" id="dBackup">Run backup now</button>
+    <div class="btn2">
+      <button class="btn" id="dDl">Download config.json</button>
+      <button class="btn" id="dCsv">Export CSV</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Backup destination</h4>
+    ${url?`<div class="hint" style="margin-bottom:10px"><code>${esc(url)}</code></div>
+        <a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Open editor ↗</a>`
+       :'<div class="hint" style="margin-bottom:10px">Not set. Backups will still download, but you will not be pushed anywhere to store them.</div>'}
+    <button class="btn" id="dSetUrl">${url?"Change":"Set"} config edit page</button>
+    <div class="hint">Stored locally <em>and</em> written into every exported config.json, so a restored device already knows where its own backups live.</div>
+  </div>
+
+  <div class="card">
+    <h4>One-tap logging</h4>
+    <div class="hint" style="margin-bottom:10px">Add these to your home screen (iOS: Share → Add to Home Screen · Android: ⋮ → Add to Home screen) or wire them into Shortcuts, Tasker, a widget, or an NFC tag. Each one records instantly and returns to the app.</div>
+    ${links.map(([l,q])=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <code style="flex:1">${esc(q)}</code>
+      <button class="sm" data-cp="${esc(base+q)}">Copy</button></div>`).join("")}
+    <div class="hint">Full parameter set: <code>log</code>=good|bad|pending · <code>t</code>=title · <code>tag</code>=domain · <code>s</code>=stakes 1–5 · <code>c</code>=confidence 0–100 · <code>r</code>=one|two · <code>f</code>=flags (pipe-separated) · <code>due</code>=YYYY-MM-DD · <code>edit</code>=1 to open the full form after logging.</div>
+  </div>
+
+  <div class="card">
+    <h4>Restore</h4>
+    <button class="btn" id="dImport">Import config.json or backup file</button>
+    <button class="btn" id="dPaste">Paste JSON instead</button>
+    <div class="hint">Merges by record ID — importing the same backup twice is safe and will not duplicate anything.</div>
+  </div>
+
+  <div class="card">
+    <h4>Danger zone</h4>
+    <button class="btn dan" id="dWipe">Erase all local data</button>
+    <div class="hint">Clears IndexedDB on this device only. Your committed config.json is untouched.</div>
+  </div>
+
+  <div class="card">
+    <h4>About</h4>
+    <div class="hint">Decision K/D v${APP_VERSION} · ${DECS.length} records · schema <code>decision-kd/1</code><br><br>
+    Everything runs client-side. No network calls except fetching <code>config.json</code> from this same repo. Your decision history never leaves your device unless you commit it yourself.</div>
+  </div>`;
+}
+
+function viewAll(){
+  const list=DECS.slice().sort((a,b)=>b.ts-a.ts);
+  return `<div class="sect"><h3>Full history · ${list.length}</h3>
+    <div class="card">${list.length?list.map(rowHTML).join(""):'<div class="empty"><div class="e">⛁</div>Empty.</div>'}</div>
+    <button class="btn" id="backStats">← Back to stats</button></div>`;
+}
+
+/* ------------------------------- render --------------------------------- */
+function render(){
+  const st=computeStats(DECS);
+  $("#hKD").textContent = st.resolvedN ? st.kd.toFixed(2) : "–";
+  const pend=DECS.filter(d=>d.verdict==="pending").length;
+  const badge=$("#qBadge");
+  const dueN=DECS.filter(d=>d.verdict==="pending"&&d.reviewDue&&d.reviewDue<=now()).length;
+  if(dueN>0){ badge.textContent=dueN; badge.classList.remove("hide"); } else badge.classList.add("hide");
+
+  // banners
+  const bs=backupState(); let b="";
+  if(bs.soft) b+=`<div class="banner warn"><div class="bx"><b>Backup due.</b> ${bs.unb} unsaved decision${bs.unb===1?"":"s"}${bs.last?`, last saved ${ago(bs.last)}`:""}.</div><button id="bnBackup">Back up</button></div>`;
+  if(dueN>0 && TAB!=="queue") b+=`<div class="banner info"><div class="bx"><b>${dueN} call${dueN===1?"":"s"} due for review.</b> Resolve them while the context is still fresh.</div><button id="bnQueue">Open</button></div>`;
+  $("#banners").innerHTML=b;
+
+  $("#view").innerHTML =
+    TAB==="log"?viewLog(): TAB==="queue"?viewQueue():
+    TAB==="stats"?viewStats(): TAB==="all"?viewAll(): viewData();
+
+  $$(".nb").forEach(n=>n.classList.toggle("on", n.dataset.tab===TAB || (TAB==="all"&&n.dataset.tab==="stats")));
+  bind();
+}
+
+function bind(){
+  const on=(sel,fn)=>{ const e=$(sel); if(e) e.onclick=fn; };
+  on("#bnBackup",()=>showBackupGate(false));
+  on("#bnQueue",()=>{ TAB="queue"; render(); });
+
+  on("#qGood",()=>quickLog("good"));
+  on("#qBad",()=>quickLog("bad"));
+  on("#qPend",()=>openEntry(null,"pending"));
+  on("#qDetail",()=>openEntry(null,"pending"));
+  on("#qNewPending",()=>openEntry(null,"pending"));
+  on("#stAll",()=>{ TAB="all"; render(); });
+  on("#backStats",()=>{ TAB="stats"; render(); });
+
+  $$("[data-qd]").forEach(b=>b.onclick=()=>{
+    quickState.domain = b.dataset.qd || null; render(); });
+  $$("[data-qf]").forEach(b=>b.onclick=()=>{
+    const f=b.dataset.qf;
+    quickState.flags = quickState.flags.includes(f) ? quickState.flags.filter(x=>x!==f) : quickState.flags.concat([f]);
+    render(); });
+
+  $$("[data-res]").forEach(b=>b.onclick=async e=>{
+    e.stopPropagation();
+    const [id,v]=b.dataset.res.split("|");
+    const d=DECS.find(x=>x.id===id); if(!d) return;
+    d.verdict=v; d.resolvedTs=now();
+    await saveDecision(d); haptic(20);
+    flash(v==="good"?"#2fbf71":"#e5484d");
+    toast(v==="good"?"Resolved: good":"Resolved: bad", v==="good"?"g":"b");
+    render(); });
+
+  $$("[data-open]").forEach(r=>r.onclick=e=>{
+    if(e.target.closest("[data-res]")) return;
+    const d=DECS.find(x=>x.id===r.dataset.open); if(d) openEntry(d); });
+
+  $$("[data-cp]").forEach(b=>b.onclick=async()=>{
+    const ok=await copyText(b.dataset.cp); toast(ok?"Link copied":"Copy failed", ok?"g":"b"); });
+
+  // data tab
+  on("#dBackup",()=>showBackupGate(false));
+  on("#dDl",()=>{ downloadJSON(buildConfigExport(),"config.json"); toast("Downloaded","g"); });
+  on("#dCsv",()=>{ csvExport(); toast("CSV exported","g"); });
+  on("#dSetUrl",()=>askConfigUrl(false));
+  on("#dImport",()=>{
+    const i=document.createElement("input"); i.type="file"; i.accept=".json,application/json";
+    i.onchange=async()=>{ const f=i.files[0]; if(!f) return;
+      try{ await importObj(JSON.parse(await f.text())); }catch(err){ toast("Invalid JSON file","b"); } };
+    i.click(); });
+  on("#dPaste",()=>{
+    showSheet(`<h2>Paste backup JSON</h2>
+      <p class="sd">Paste the contents of a config.json or any exported backup.</p>
+      <textarea id="pJson" style="min-height:180px" placeholder="{ ... }"></textarea>
+      <div style="height:12px"></div>
+      <button class="btn pri" id="pGo">Import</button>
+      <button class="btn" id="pCancel">Cancel</button>`);
+    $("#pGo").onclick=async()=>{
+      try{ await importObj(JSON.parse($("#pJson").value)); closeModal(); }
+      catch(e){ toast("Could not parse that","b"); } };
+    $("#pCancel").onclick=closeModal; });
+  on("#dWipe",()=>{
+    showSheet(`<h2>Erase everything?</h2>
+      <p class="sd">This deletes all ${DECS.length} local records permanently. If you have not committed a backup, they are gone.</p>
+      <button class="btn" id="wDl">Download a backup first</button>
+      <button class="btn dan" id="wGo">Yes, erase everything</button>
+      <button class="btn" id="wNo">Cancel</button>`,{center:true});
+    $("#wDl").onclick=()=>downloadJSON(buildConfigExport(),"config-before-wipe.json");
+    $("#wGo").onclick=async()=>{ await idbClear(S_DEC); DECS=[];
+      await setMeta("unbacked",0); closeModal(); render(); toast("All local data erased"); };
+    $("#wNo").onclick=closeModal; });
+}
+
+async function importObj(obj){
+  let incoming=[];
+  if(Array.isArray(obj)) incoming=obj;
+  else if(obj && obj.backup && Array.isArray(obj.backup.decisions)) incoming=obj.backup.decisions;
+  else if(obj && Array.isArray(obj.decisions)) incoming=obj.decisions;
+  else { toast("No decisions found in that file","b"); return; }
+
+  const have=new Set(DECS.map(d=>d.id));
+  let added=0, updated=0;
+  for(const raw of incoming){
+    const d=newDecision(raw);
+    if(have.has(d.id)){
+      const cur=DECS.find(x=>x.id===d.id);
+      if(JSON.stringify(cur)!==JSON.stringify(d)){ await saveDecision(d); updated++; }
+    } else { await idbPut(S_DEC,d); DECS.push(d); added++; }
+  }
+  if(obj && obj.configEditUrl && !META.configEditUrl) await setMeta("configEditUrl", obj.configEditUrl);
+  if(obj && obj.settings) CFG=deepMerge(CFG,obj);
+  await setMeta("unbacked",0);
+  await setMeta("lastBackup", now());
+  render();
+  toast(`Imported · ${added} new, ${updated} updated`,"g");
+}
+
+/* ------------------------------ manifest -------------------------------- */
+function injectManifest(){
+  try{
+    const icon="data:image/svg+xml;base64,"+btoa(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" rx="112" fill="#0b0d10"/><text x="256" y="330" font-size="240" font-family="system-ui,sans-serif" font-weight="800" text-anchor="middle" fill="#2fbf71">K/D</text></svg>`);
+    const m={ name:"Decision K/D", short_name:"K/D", start_url:".", scope:".",
+      display:"standalone", background_color:"#0b0d10", theme_color:"#0b0d10",
+      icons:[{src:icon,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}],
+      shortcuts:[
+        {name:"Log GOOD",url:"?log=good"},
+        {name:"Log BAD",url:"?log=bad"},
+        {name:"Log PENDING",url:"?log=pending"}]};
+    const l=document.createElement("link"); l.rel="manifest";
+    l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/json"}));
+    document.head.appendChild(l);
+  }catch(e){}
+}
+
+/* -------------------------------- boot ---------------------------------- */
+async function boot(){
+  injectManifest();
+  try{ db = await openDB(); }
+  catch(e){
+    document.body.innerHTML='<div class="wrap" style="padding-top:60px"><div class="empty"><div class="e">⚠</div><b>IndexedDB unavailable.</b><br>This app needs local storage. Private/incognito mode or a locked-down browser will block it.</div></div>';
+    return;
+  }
+  await loadConfig();
+  (await idbAll(S_META)).forEach(r=>META[r.k]=r.v);
+  DECS = await idbAll(S_DEC);
+
+  // cold-start restore from committed config backup
+  if(DECS.length===0 && CFG.backup && Array.isArray(CFG.backup.decisions) && CFG.backup.decisions.length){
+    for(const raw of CFG.backup.decisions){ const d=newDecision(raw); await idbPut(S_DEC,d); DECS.push(d); }
+    await setMeta("unbacked",0);
+    await setMeta("lastBackup", CFG.backup.exportedAt ? new Date(CFG.backup.exportedAt).getTime() : now());
+    toast(`Restored ${DECS.length} decisions from config.json`,"g");
+  }
+  if(!META.configEditUrl && CFG.configEditUrl) await setMeta("configEditUrl", CFG.configEditUrl);
+
+  $$(".nb").forEach(n=>n.onclick=()=>{ TAB=n.dataset.tab; haptic(8); window.scrollTo(0,0); render(); });
+  $("#btnQuick").onclick=()=>openEntry(null,"pending");
+
+  const didParam = await handleParams();
+  render();
+
+  if(!META.onboarded && !META.configEditUrl) askConfigUrl(true);
+  else { const bs=backupState(); if(bs.hard && !didParam) showBackupGate(true); }
+
+  // keyboard shortcuts for desktop review sessions
+  document.addEventListener("keydown", e=>{
+    if(e.target.matches("input,textarea,select")) return;
+    if(e.key==="g") quickLog("good");
+    if(e.key==="b") quickLog("bad");
+    if(e.key==="n") openEntry(null,"pending");
+  });
+}
+boot();
+</script>
+</body>
+</html>
