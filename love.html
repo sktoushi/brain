@@ -1,150 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Randomizer</title>
-
-<style>
-    body {
-        margin: 0;
-        background: #111;
-        color: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-
-    img {
-        display: block;
-        margin: 20px auto;
-        max-width: 95vw;
-        max-height: 80vh;
-        object-fit: contain;
-    }
-
-    button {
-        font-size: 20px;
-        padding: 12px 24px;
-        cursor: pointer;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Randomizer</title>
 </head>
 
 <body>
 
-<img id="image" alt="Random image">
-
-<button onclick="randomize()">🎲 Randomize</button>
+<button onclick="randomize()">Randomize</button>
 
 <script>
 
+const base =
+"https://github.com/needacounto/stash8/blob/main/cheeny-jane/";
+
 const images = [
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_175903_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180139_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180148_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180159_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180211_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180235_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180255_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180300_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180326_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180402_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180422_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180450_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180513_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180553_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180607_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180628_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180635_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180641_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180649_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180726_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180748_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180803_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180833_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180846_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180856_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180912_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180946_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_180957_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181012_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181055_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181100_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181103_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181108_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181113_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181117_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181147_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181206_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181239_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181408_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181414_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181507_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181514_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181526_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181532_Firefox%20Nightly.jpg",
-
-"https://raw.githubusercontent.com/needacounto/stash8/main/cheeny-jane/Screenshot_20260808_181544_Firefox%20Nightly.jpg"
-
+    "Screenshot_20260808_175903_Firefox Nightly.jpg",
+    "Screenshot_20260808_180139_Firefox Nightly.jpg",
+    "Screenshot_20260808_180148_Firefox Nightly.jpg",
+    "Screenshot_20260808_180159_Firefox Nightly.jpg",
+    "Screenshot_20260808_180211_Firefox Nightly.jpg",
+    "Screenshot_20260808_180235_Firefox Nightly.jpg",
+    "Screenshot_20260808_180255_Firefox Nightly.jpg",
+    "Screenshot_20260808_180300_Firefox Nightly.jpg",
+    "Screenshot_20260808_180326_Firefox Nightly.jpg",
+    "Screenshot_20260808_180402_Firefox Nightly.jpg",
+    "Screenshot_20260808_180422_Firefox Nightly.jpg",
+    "Screenshot_20260808_180450_Firefox Nightly.jpg",
+    "Screenshot_20260808_180513_Firefox Nightly.jpg",
+    "Screenshot_20260808_180553_Firefox Nightly.jpg",
+    "Screenshot_20260808_180607_Firefox Nightly.jpg",
+    "Screenshot_20260808_180628_Firefox Nightly.jpg",
+    "Screenshot_20260808_180635_Firefox Nightly.jpg",
+    "Screenshot_20260808_180641_Firefox Nightly.jpg",
+    "Screenshot_20260808_180649_Firefox Nightly.jpg",
+    "Screenshot_20260808_180726_Firefox Nightly.jpg",
+    "Screenshot_20260808_180748_Firefox Nightly.jpg",
+    "Screenshot_20260808_180803_Firefox Nightly.jpg",
+    "Screenshot_20260808_180833_Firefox Nightly.jpg",
+    "Screenshot_20260808_180846_Firefox Nightly.jpg",
+    "Screenshot_20260808_180856_Firefox Nightly.jpg",
+    "Screenshot_20260808_180912_Firefox Nightly.jpg",
+    "Screenshot_20260808_180946_Firefox Nightly.jpg",
+    "Screenshot_20260808_180957_Firefox Nightly.jpg",
+    "Screenshot_20260808_181012_Firefox Nightly.jpg",
+    "Screenshot_20260808_181055_Firefox Nightly.jpg",
+    "Screenshot_20260808_181100_Firefox Nightly.jpg",
+    "Screenshot_20260808_181103_Firefox Nightly.jpg",
+    "Screenshot_20260808_181108_Firefox Nightly.jpg",
+    "Screenshot_20260808_181113_Firefox Nightly.jpg",
+    "Screenshot_20260808_181117_Firefox Nightly.jpg",
+    "Screenshot_20260808_181147_Firefox Nightly.jpg",
+    "Screenshot_20260808_181206_Firefox Nightly.jpg",
+    "Screenshot_20260808_181239_Firefox Nightly.jpg",
+    "Screenshot_20260808_181408_Firefox Nightly.jpg",
+    "Screenshot_20260808_181414_Firefox Nightly.jpg",
+    "Screenshot_20260808_181507_Firefox Nightly.jpg",
+    "Screenshot_20260808_181514_Firefox Nightly.jpg",
+    "Screenshot_20260808_181526_Firefox Nightly.jpg",
+    "Screenshot_20260808_181532_Firefox Nightly.jpg",
+    "Screenshot_20260808_181544_Firefox Nightly.jpg"
 ];
 
 function randomize() {
+    const random =
+        images[Math.floor(Math.random() * images.length)];
 
-    const randomIndex =
-        Math.floor(Math.random() * images.length);
-
-    document.getElementById("image").src =
-        images[randomIndex];
-
+    window.location.href =
+        base + encodeURIComponent(random);
 }
-
-// Show a random image immediately
-randomize();
 
 </script>
 
