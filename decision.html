@@ -728,7 +728,7 @@ function deepMerge(base,over){
 const out=Array.isArray(base)?base.slice():Object.assign({},base);
 if(!over||typeof over!=="object") return out;
 for(const k of Object.keys(over)){
-const bv=base?baseundefined, ov=over[k];
+const bv=(base||{})[k], ov=over[k];
 if(ov&&typeof ov==="object"&&!Array.isArray(ov)&&bv&&typeof bv==="object"&&!Array.isArray(bv)) out[k]=deepMerge(bv,ov);
 else if(ov!==undefined&&ov!==null) out[k]=ov;
 }
