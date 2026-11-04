@@ -1,7 +1,7 @@
 {
   "schema": "decision-kd/2",
   "appVersion": "2.0.0",
-  "configEditUrl": "https://github.com/openai/brain/edit/main/config.json",
+  "configEditUrl": "https://github.com/sktoushi/brain/edit/main/config.json",
   "app": {"title":"Decision K/D","owner":""},
   "settings": {"hapticFeedback":true,"defaultConfidence":70,"minSample":10,"retainMonths":36},
   "domains": ["Work","Money","Health","Relationships","Learning","Time","Risk","Other"],
