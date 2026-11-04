@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
+<meta name="theme-color" content="#0b0d10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DKDR">
+<title>Decision KD</title>
+<style>
+:root{
+--bg:#0b0d10; --bg2:#12161c; --bg3:#1a2029; --line:#242c37;
+--tx:#e8edf4; --tx2:#95a3b6; --tx3:#61708a;
+--good:#2fbf71; --good2:#1c7a48; --bad:#e5484d; --bad2:#8f2226;
+--pend:#f5a524; --acc:#5b8def; --void:#6b7684;
+--r:14px;
+--safeb:env(safe-area-inset-bottom,0px);
+--safet:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--tx);
+font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+overscroll-behavior-y:none;-webkit-text-size-adjust:100%}
+body{padding-top:var(--safet)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+.hide{display:none!important}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px calc(96px + var(--safeb))}
+header{position:sticky;top:0;z-index:40;background:rgba(11,13,16,.92);
+backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hbar{max-width:640px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.brand{font-weight:800;letter-spacing:-.02em;font-size:16px}
+.brand span{color:var(--tx3);font-weight:600}
+.hspace{flex:1}
+.kdchip{display:flex;align-items:baseline;gap:6px;background:var(--bg3);border:1px solid var(--line);
+padding:6px 11px;border-radius:999px}
+.kdchip b{font-size:16px;font-variant-numeric:tabular-nums}
+.kdchip i{font-style:normal;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+.iconbtn{width:38px;height:38px;border-radius:10px;background:var(--bg3);border:1px solid var(--line);
+display:grid;place-items:center;font-size:16px}
+.banner{margin:12px 0;padding:12px 14px;border-radius:var(--r);font-size:13.5px;
+display:flex;gap:10px;align-items:flex-start;border:1px solid}
+.banner.warn{background:#3a2a08;border-color:#6b4c0d;color:#ffd88a}
+.banner.info{background:#0f2436;border-color:#1d4a6e;color:#b6dcff}
+.banner .bx{flex:1}
+.banner button{background:rgba(255,255,255,.12);padding:7px 12px;border-radius:9px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.bigrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.big{height:132px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+gap:4px;font-weight:800;font-size:19px;letter-spacing:-.01em;position:relative;overflow:hidden;
+border:1px solid transparent;transition:transform .09s ease;
+-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.big:active{transform:scale(.96)}
+.big .em{font-size:30px;line-height:1}
+.big .sub{font-size:11px;font-weight:600;opacity:.75;letter-spacing:.04em;text-transform:uppercase}
+.big.good{background:linear-gradient(160deg,#175c38,#0e2f1e);border-color:#1f7a4a;color:#8ff0bb}
+.big.bad{background:linear-gradient(160deg,#5c1a1c,#2f0f11);border-color:#8f2226;color:#ffb3b5}
+.big.bsm{height:64px;border-radius:14px;font-size:15px;flex-direction:row;gap:8px}
+.big.bsm .em{font-size:20px}
+.big .charge{position:absolute;left:0;bottom:0;top:0;width:0;background:rgba(255,255,255,.16);pointer-events:none}
+.big .lpv{position:absolute;top:6px;right:9px;font-size:11px;font-weight:800;letter-spacing:.03em;
+background:rgba(0,0,0,.35);padding:2px 7px;border-radius:99px;pointer-events:none}
+.big.charging{transform:scale(.97)}
+.midrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.mid{height:60px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);
+display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;color:var(--tx2)}
+.mid:active{background:var(--bg3)}
+.mid.pend{color:#ffcd6e;border-color:#5a4210}
+.bd{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px}
+.bdh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px}
+.bdh b{font-size:15px}
+.bdh span{font-size:11px;color:var(--tx3);font-weight:700;font-variant-numeric:tabular-nums}
+.bdrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bdhist{margin-top:8px;font-size:11.5px;color:var(--tx3);line-height:1.6}
+.bdhist .pg{color:var(--good);font-weight:800} .bdhist .pb{color:var(--bad);font-weight:800}
+.cfgrow{display:grid;grid-template-columns:1fr 58px 58px 38px;gap:6px;margin-bottom:6px;align-items:center}
+.cfgrow input{padding:10px}
+.cfghd{display:grid;grid-template-columns:1fr 58px 58px 38px;gap:6px;font-size:10px;color:var(--tx3);
+text-transform:uppercase;letter-spacing:.07em;font-weight:800;margin-bottom:6px}
+.sect{margin-top:22px}
+.sect h3{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--tx3);margin:0 0 9px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:8px 13px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);
+font-size:13px;color:var(--tx2);font-weight:600}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chip.tog.on{background:#3a2a08;border-color:#8a6410;color:#ffd88a}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card h4{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);font-weight:800}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--bg3);border:1px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center}
+.stat .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat .l{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;font-weight:700}
+.stat.g .v{color:var(--good)} .stat.b .v{color:var(--bad)} .stat.a .v{color:var(--acc)} .stat.p .v{color:var(--pend)}
+.delta{font-size:11px;font-weight:800;margin-left:4px}
+.delta.up{color:var(--good)} .delta.dn{color:var(--bad)}
+.bar{height:9px;border-radius:99px;background:var(--bad2);overflow:hidden;display:flex;margin:6px 0 2px}
+.bar i{display:block;background:var(--good);height:100%}
+.brow{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);
+padding:0 0 7px;font-weight:800;border-bottom:1px solid var(--line)}
+td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx2)}
+.mini{height:6px;border-radius:99px;background:var(--bg3);overflow:hidden;width:52px;display:inline-block;vertical-align:middle}
+.mini i{display:block;height:100%;background:var(--good)}
+.ins{border-left:3px solid var(--acc);background:var(--bg3);padding:11px 12px;border-radius:0 10px 10px 0;
+margin-bottom:9px;font-size:13.5px;line-height:1.5}
+.ins b{color:#fff}
+.ins.neg{border-color:var(--bad)} .ins.pos{border-color:var(--good)} .ins.warn2{border-color:var(--pend)}
+.ins .tip{display:block;margin-top:5px;color:var(--tx3);font-size:12.5px}
+.row{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.row:last-child{border-bottom:0}
+.dot{width:9px;height:9px;border-radius:99px;margin-top:6px;flex:none}
+.dot.good{background:var(--good)} .dot.bad{background:var(--bad)}
+.dot.pending{background:var(--pend)} .dot.void{background:var(--void)}
+.rmain{flex:1;min-width:0}
+.rtitle{font-size:14px;font-weight:600;word-break:break-word}
+.rmeta{font-size:11.5px;color:var(--tx3);margin-top:3px;display:flex;flex-wrap:wrap;gap:8px}
+.tag{background:var(--bg3);padding:2px 7px;border-radius:6px;font-size:10.5px;color:var(--tx2);font-weight:700}
+.rbtns{display:flex;gap:6px;flex:none}
+.sm{padding:7px 10px;border-radius:9px;font-size:12px;font-weight:800;background:var(--bg3);border:1px solid var(--line);color:var(--tx2)}
+.sm.g{background:#12331f;border-color:#1f7a4a;color:#7ee2ac}
+.sm.b{background:#3a1214;border-color:#8f2226;color:#ffa5a8}
+.overdue{color:var(--bad)!important}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;background:var(--bg3);border:1px solid var(--line);
+font-weight:700;font-size:14.5px;text-align:center;margin-bottom:9px;color:var(--tx);text-decoration:none}
+.btn:active{opacity:.75}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.dan{background:#3a1214;border-color:#8f2226;color:#ffa5a8}
+.btn.gd{background:#12331f;border-color:#1f7a4a;color:#7ee2ac}
+.btn2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.btn2 .btn{margin-bottom:0}
+label.f{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);
+margin:14px 0 6px;font-weight:800}
+input[type=text],input[type=url],input[type=number],input[type=date],textarea,select{
+width:100%;padding:13px;border-radius:11px;background:var(--bg3);border:1px solid var(--line);outline:0}
+input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+textarea{min-height:78px;resize:vertical;font-family:inherit}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.hint{font-size:12px;color:var(--tx3);margin-top:6px;line-height:1.45}
+code{background:var(--bg3);padding:2px 6px;border-radius:5px;font-size:12px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;color:#b6dcff}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:90;
+display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.sheet{background:var(--bg2);width:100%;max-width:640px;max-height:92vh;overflow-y:auto;
+border-radius:22px 22px 0 0;border:1px solid var(--line);border-bottom:0;
+padding:8px 16px calc(24px + var(--safeb));animation:up .22s cubic-bezier(.2,.8,.3,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.grab{width:38px;height:4px;background:var(--line);border-radius:99px;margin:6px auto 12px}
+.sheet h2{margin:0 0 4px;font-size:19px;letter-spacing:-.02em}
+.sheet .sd{color:var(--tx2);font-size:13.5px;margin:0 0 12px;line-height:1.5}
+.scrim.center{align-items:center;padding:16px}
+.scrim.center .sheet{border-radius:20px;border-bottom:1px solid var(--line);animation:pop .2s ease}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.95);
+backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+padding-bottom:var(--safeb)}
+.nin{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.nb{padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tx3);font-size:10px;font-weight:700}
+.nb .ni{font-size:19px;line-height:1}
+.nb.on{color:var(--acc)}
+.nb .bdg{position:absolute;transform:translate(14px,-4px);background:var(--bad);color:#fff;
+font-size:9px;padding:1px 5px;border-radius:99px;font-weight:800}
+#toast{position:fixed;left:50%;bottom:calc(80px + var(--safeb));transform:translateX(-50%) translateY(20px);
+background:#fff;color:#0b0d10;padding:11px 18px;border-radius:99px;font-weight:800;font-size:13.5px;
+z-index:200;opacity:0;transition:.22s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.g{background:var(--good);color:#04140a} #toast.b{background:var(--bad);color:#fff}
+.flash{position:fixed;inset:0;z-index:150;pointer-events:none;opacity:0;transition:opacity .35s}
+.flash.on{opacity:.22}
+.empty{text-align:center;padding:44px 16px;color:var(--tx3)}
+.empty .e{font-size:40px;margin-bottom:10px;opacity:.5}
+.spark{display:flex;align-items:flex-end;gap:2px;height:44px;margin-top:8px}
+.spark i{flex:1;background:var(--bg3);border-radius:2px 2px 0 0;min-height:2px;display:block}
+.spark i.g{background:var(--good2)} .spark i.b{background:var(--bad2)} .spark i.n{background:var(--acc);opacity:.55}
+.sparkx{display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:4px;font-weight:700}
+.calrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.calrow .lbl{width:52px;color:var(--tx3);font-variant-numeric:tabular-nums;font-weight:700}
+.caltrack{flex:1;height:16px;background:var(--bg3);border-radius:5px;position:relative;overflow:hidden}
+.caltrack i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);opacity:.85}
+.caltrack u{position:absolute;top:0;bottom:0;width:2px;background:#fff;opacity:.6}
+.calrow .nn{width:30px;text-align:right;color:var(--tx3);font-variant-numeric:tabular-nums}
+.undo{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);
+border-radius:12px;padding:10px 12px;margin-top:12px;font-size:12.5px;color:var(--tx3)}
+.undo .ux{flex:1}
+.undo button{background:var(--bg3);border:1px solid var(--line);padding:6px 12px;border-radius:9px;
+font-size:12px;font-weight:800;color:var(--tx2)}
+.gauge{height:26px;border-radius:8px;background:var(--bg3);position:relative;overflow:hidden;margin:6px 0}
+.gauge i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#1c7a48,#2fbf71)}
+.gauge b{position:absolute;right:8px;top:0;line-height:26px;font-size:12px;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header>
+<div class="hbar">
+<div class="brand">Decision <span>KD</span></div>
+<div class="hspace"></div>
+<div class="kdchip"><b id="hKD">–</b><i>ratio</i></div>
+<button class="iconbtn" id="btnQuick" title="Detailed entry">✎</button>
+</div>
+</header>
+<div class="wrap">
+<div id="banners"></div>
+<div id="view"></div>
+</div>
+<nav><div class="nin">
+<button class="nb on" data-tab="log"><span class="ni">⚡</span>Log</button>
+<button class="nb" data-tab="queue"><span class="ni">◷</span>Open<span class="bdg hide" id="qBadge">0</span></button>
+<button class="nb" data-tab="trends"><span class="ni">◈</span>Trends</button>
+<button class="nb" data-tab="data"><span class="ni">⛁</span>Data</button>
+</div></nav>
+<div id="toast"></div>
+<div class="flash" id="flash"></div>
+<div id="modal"></div>
+<script>
+"use strict";
+const APP_VERSION = "2.2.0";
+const SCHEMA = "decision-kd2";
+const LS_KEY = "dkd.v2";
+const RETAIN_MONTHS = 36;          // months kept at full resolution
+const HB = ["00–06","06–10","10–14","14–18","18–22","22–24"];
+const WD = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAY = 86400000;
+const DEFAULT_BASE = ["coffee","oil","salt","sugar","sloth","alcohol","gambling"]
+.map(k=>({ k, n:k[0].toUpperCase()+k.slice(1), g:2, b:3 }));
+const DEFAULTS = {
+schema: SCHEMA,
+configEditUrl: "",
+app: { title: "Decision KD", owner: "" },
+settings: {
+hapticFeedback: true,
+defaultConfidence: 70,
+minSample: 10,
+retainMonths: RETAIN_MONTHS,
+histPerBase: 3,
+copyOnLog: true,
+longPress: { holdMs: 450, fullMs: 2500, maxMult: 3, dailyBonus: 12, decayMin: 10 }
+},
+domains: ["Work","Money","Health","Relationships","Learning","Time","Risk","Other"],
+stateFlags: ["Tired","Rushed","Angry","Hungry","Pressured","Unclear"],
+base: DEFAULT_BASE,
+backupPolicy: { softEntries: 25, softDays: 14, hardEntries: 80, hardDays: 45 }
+};
+let CFG = JSON.parse(JSON.stringify(DEFAULTS));
+let ST  = null;
+let TAB = "log";
+let quickState = { domain: null, flags: [] };
+const $  = (s,r)=>(r||document).querySelector(s);
+const $$ = (s,r)=>Array.from((r||document).querySelectorAll(s));
+const now = ()=>Date.now();
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid = ()=> "o"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc = s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r4  = n=>Math.round(n*10000)/10000;
+function pct(n){ return n==null?"–":(n*100).toFixed(0)+"%"; }
+function mk(ts){ const d=new Date(ts); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+function dk(ts){ const d=new Date(ts); return mk(ts)+"-"+String(d.getDate()).padStart(2,"0"); }
+function mkShift(key,n){ const [y,m]=key.split("-").map(Number); const d=new Date(y,m-1+n,1); return mk(d.getTime()); }
+function mkLabel(key){ const [y,m]=key.split("-").map(Number);
+return new Date(y,m-1,1).toLocaleDateString(undefined,{month:"short"})+(m===1?" "+String(y).slice(2):""); }
+function fmtDate(ts){ if(!ts) return "–"; return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"2-digit"}); }
+function ago(ts){ if(!ts) return "never"; const s=(now()-ts)/1000;
+if(s<60) return "just now"; if(s<3600) return Math.floor(s/60)+"m ago";
+if(s<86400) return Math.floor(s/3600)+"h ago"; const d=Math.floor(s/86400);
+if(d<30) return d+"d ago"; if(d<365) return Math.floor(d/30)+"mo ago"; return (d/365).toFixed(1)+"y ago"; }
+function agoLong(ts){
+const s=Math.max(0,(now()-ts)/1000);
+if(s<60) return "just now";
+const u=[["year",31536000],["month",2592000],["week",604800],["day",86400],["hour",3600],["minute",60]];
+for(const [n,sec] of u){ const v=Math.floor(s/sec); if(v>=1) return v+" "+n+(v===1?"":"s")+" ago"; }
+return "just now";
+}
+function bytes(n){ return n<1024 ? n+" B" : n<1048576 ? (n/1024).toFixed(1)+" KB" : (n/1048576).toFixed(2)+" MB"; }
+function haptic(m){ try{ if(CFG.settings.hapticFeedback && navigator.vibrate) navigator.vibrate(m||12);}catch(e){} }
+function toast(msg,kind){ const t=$("#toast"); if(!t) return; t.textContent=msg;
+t.className="on"+(kind?" "+kind:""); clearTimeout(t._t); t._t=setTimeout(()=>{t.className="";},2100); }
+function flash(c){ const f=$("#flash"); if(!f) return; f.style.background=c; f.classList.add("on");
+setTimeout(()=>f.classList.remove("on"),340); }
+function blankState(){
+return {
+schema: SCHEMA, version: APP_VERSION,
+start: mk(now()),
+m: {},              // "YYYY-MM" -> bucket   (last RETAIN_MONTHS)
+y: {},              // "YYYY"    -> bucket   (compacted, core + domain)
+dim: {},            // permanent lifetime cross-sections
+open: [],           // unresolved calls (the only per-item records kept)
+hist: {},           // base key -> [[epochMinute, signedPts], ...] fixed-size ring
+base: null,         // local override of the base list (null = use config)
+meta: { lastBackup:null, unbacked:0, configEditUrl:"", onboarded:false, undo:null,
+lp:{ day:"", used:0, recent:[] } },
+rec: []             // local-only display ring, never exported
+};
+}
+const CORE = ["g","b","x","cap","cn","cs","bs"];
+function bump(o,k,n){ if(!n) return; const v=r4((o[k]||0)+n); if(v) o[k]=v; else delete o[k]; }
+function pair(o,grp,key,g,b){
+if(!g&&!b) return;
+const t=o[grp]||(o[grp]={}); const a=t[key]||(t[key]=[0,0]);
+a[0]=Math.max(0,a[0]+g); a[1]=Math.max(0,a[1]+b);
+if(!a[0]&&!a[1]) delete t[key];
+if(!Object.keys(t).length) delete o[grp];
+}
+function ensure(map,key){ return map[key]||(map[key]={}); }
+function applyEvent(ev, sign){
+sign = sign||1;
+const M = ensure(ST.m, mk(ev.ts)), D = ST.dim;
+if(ev.verdict==="void"){ bump(M,"x",sign); cleanup(M,mk(ev.ts)); return; }
+const isG = ev.verdict==="good";
+const w = Math.max(1, Math.round(+ev.w||1));
+const g = isG?sign*w:0, b = isG?0:sign*w;
+bump(M,"g",g); bump(M,"b",b);
+const s = clamp(+ev.stakes||2,1,5);
+const capUnit = ev.k ? w : s*w;
+bump(M,"cap", sign*(isG?capUnit:-capUnit));
+if(ev.confidence!=null){
+const p=clamp(+ev.confidence,0,100), o=isG?1:0;
+bump(M,"cn",sign); bump(M,"cs",sign*p); bump(M,"bs", r4(sign*Math.pow(p/100-o,2)));
+const dec=String(Math.min(9,Math.floor(p/10)));
+pair(M,"cb",dec,g,b); pair(D,"cb",dec,g,b);
+}
+if(ev.domain){ pair(M,"d",ev.domain,g,b); pair(D,"d",ev.domain,g,b); }
+(ev.flags||[]).forEach(f=>{ pair(M,"f",f,g,b); pair(D,"f",f,g,b); });
+const hi=String(hourIdx(ev.ts)), wi=String(new Date(ev.ts).getDay());
+pair(M,"h",hi,g,b); pair(D,"h",hi,g,b);
+pair(M,"w",wi,g,b); pair(D,"w",wi,g,b);
+if(ev.k) pair(D,"k",ev.k,g,b);
+else { pair(M,"s",String(s),g,b); pair(D,"s",String(s),g,b); }
+if(ev.rev){ const rk=ev.rev==="one"?"1":"2"; pair(M,"r",rk,g,b); pair(D,"r",rk,g,b); }
+cleanup(M, mk(ev.ts));
+}
+function cleanup(M,key){ if(!Object.keys(M).length) delete ST.m[key]; }
+function hourIdx(ts){ const h=new Date(ts).getHours();
+return h<6?0:h<10?1:h<14?2:h<18?3:h<22?4:5; }
+function compact(){
+const keep = CFG.settings.retainMonths || RETAIN_MONTHS;
+const cut  = mkShift(mk(now()), -(keep-1));
+let moved=0;
+Object.keys(ST.m).forEach(k=>{
+if(k >= cut) return;                       // "YYYY-MM" sorts lexically
+const Y = ensure(ST.y, k.slice(0,4)), M = ST.m[k];
+CORE.forEach(c=>{ if(M[c]) bump(Y,c,M[c]); });
+if(M.d) Object.entries(M.d).forEach(([key,v])=>pair(Y,"d",key,v[0],v[1]));
+delete ST.m[k]; moved++;
+});
+const N = CFG.settings.histPerBase || 3, keys = new Set(baseList().map(x=>x.k));
+Object.keys(ST.hist||{}).forEach(k=>{
+if(!keys.has(k)) delete ST.hist[k]; else ST.hist[k]=ST.hist[k].slice(0,N);
+});
+return moved;
+}
+function baseList(){ return (ST&&ST.base) || CFG.base || DEFAULTS.base; }
+function baseItem(k){ return baseList().find(x=>x.k===k)||null; }
+function lastPress(k){ const h=ST.hist[k]; return h&&h.length ? h[0][0]*60000 : 0; }
+let baseFreezeUntil=0, baseOrderCache=null, reorderTimer=null;
+function orderedBase(){
+const list=baseList();
+if(now()<baseFreezeUntil && baseOrderCache){
+const pos=new Map(baseOrderCache.map((k,i)=>[k,i]));
+return list.slice().sort((a,b)=>(pos.has(a.k)?pos.get(a.k):999)-(pos.has(b.k)?pos.get(b.k):999));
+}
+const idx=new Map(list.map((x,i)=>[x.k,i]));
+const out=list.slice().sort((a,b)=>(lastPress(b.k)-lastPress(a.k))||(idx.get(a.k)-idx.get(b.k)));
+baseOrderCache=out.map(x=>x.k);
+return out;
+}
+function scheduleReorder(){
+baseFreezeUntil=now()+1500;
+clearTimeout(reorderTimer);
+reorderTimer=setTimeout(function again(){
+if(LPX){ reorderTimer=setTimeout(again,400); return; }   // never re-render mid-press
+if(TAB==="log" && !$("#modal").innerHTML) render();
+},1600);
+}
+function slug(s){ return String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,24)||"item"; }
+function lpCfg(){ return Object.assign({}, DEFAULTS.settings.longPress, CFG.settings.longPress||{}); }
+function lpState(){
+const t=dk(now()); let s=ST.meta.lp;
+if(!s||typeof s!=="object") s=ST.meta.lp={day:t,used:0,recent:[]};
+if(s.day!==t){ s.day=t; s.used=0; }
+s.recent=(s.recent||[]).filter(x=>now()-x<DAY);
+return s;
+}
+function lpCompute(baseW, ms, p){
+const C=lpCfg(), st=lpState();
+const t=clamp((ms-C.holdMs)/Math.max(1,C.fullMs-C.holdMs),0,1);
+const inten=0.75+0.5*clamp(p==null?0.5:p,0,1);
+const mult=Math.min(C.maxMult, 1+t*(C.maxMult-1)*inten);
+let bonus=Math.round(baseW*mult)-baseW;
+const reps=st.recent.filter(x=>now()-x<C.decayMin*60000).length;
+bonus=Math.floor(bonus*Math.pow(0.5,reps));
+const left=Math.max(0,C.dailyBonus-st.used);
+const capped=bonus>left;
+bonus=Math.max(0,Math.min(bonus,left));
+return { w:baseW+bonus, bonus, mult, reps, capped, left };
+}
+function lpCommit(bonus){ const s=lpState(); s.used+=bonus; s.recent.push(now()); s.recent=s.recent.slice(-30); }
+function lpRefund(ev){ const s=lpState(); if(ev.lpDay===s.day) s.used=Math.max(0,s.used-(ev.lp||0)); s.recent.pop(); }
+let LPX=null;
+function readP(e){
+if(e.pointerType==="mouse") return 0.5;
+const p=+e.pressure; return (!p||p===0.5) ? 0.5 : p;   // 0.5 = "no pressure data"
+}
+function pressBaseW(verdict,key){
+const it=key?baseItem(key):null;
+return it ? Math.max(1,+(verdict==="good"?it.g:it.b)||1) : 1;
+}
+function bindPress(btn){
+const verdict=btn.dataset.lp, key=btn.dataset.k||null;
+btn.addEventListener("contextmenu",e=>e.preventDefault());
+btn.onpointerdown=e=>{
+if(e.button>0) return;
+if(LPX) endLP(false);
+try{ btn.setPointerCapture(e.pointerId); }catch(_){}
+LPX={ btn, verdict, key, t0:performance.now(), p:readP(e), x:e.clientX, y:e.clientY,
+on:false, lastW:0, raf:0, baseW:pressBaseW(verdict,key) };
+LPX.raf=requestAnimationFrame(tickLP);
+};
+btn.onpointermove=e=>{
+if(!LPX||LPX.btn!==btn) return;
+LPX.p=Math.max(LPX.p,readP(e));
+if(!LPX.on && Math.hypot(e.clientX-LPX.x,e.clientY-LPX.y)>12) endLP(false);   // it's a scroll
+};
+btn.onpointerup=()=>{ if(LPX&&LPX.btn===btn) endLP(true); };
+btn.onpointercancel=()=>{ if(LPX&&LPX.btn===btn) endLP(false); };
+btn.onclick=e=>{ if(e.detail===0) firePress(verdict,key,null); };   // keyboard activation
+}
+function tickLP(){
+if(!LPX) return;
+const C=lpCfg(), ms=performance.now()-LPX.t0, b=LPX.btn;
+if(ms>=C.holdMs){
+if(!LPX.on){
+LPX.on=true; haptic(15); b.classList.add("charging");
+b.insertAdjacentHTML("beforeend",'<span class="charge"></span><span class="lpv"></span>');
+}
+const r=lpCompute(LPX.baseW, ms, LPX.p);
+const fill=clamp((ms-C.holdMs)/Math.max(1,C.fullMs-C.holdMs),0,1);
+$(".charge",b).style.width=(fill*100).toFixed(0)+"%";
+$(".lpv",b).textContent=(LPX.verdict==="good"?"+":"−")+r.w+(r.capped?" · cap":r.reps?" · decay":"");
+if(r.w!==LPX.lastW){ if(LPX.lastW) haptic(8); LPX.lastW=r.w; }
+}
+LPX.raf=requestAnimationFrame(tickLP);
+}
+function endLP(commit){
+const X=LPX; if(!X) return; LPX=null;
+cancelAnimationFrame(X.raf);
+X.btn.classList.remove("charging");
+$$(".charge,.lpv",X.btn).forEach(n=>n.remove());
+if(!commit) return;
+const ms=performance.now()-X.t0;
+firePress(X.verdict, X.key, X.on ? lpCompute(X.baseW, ms, X.p) : null);
+}
+function firePress(verdict,key,lp){
+if(backupState().hard){ showBackupGate(true); return; }
+const it=key?baseItem(key):null;
+const extra={ w: lp ? lp.w : pressBaseW(verdict,key) };
+if(it){ extra.k=it.k; extra.label=it.n; extra.domain=it.d||null; }
+if(lp){ lpCommit(lp.bonus); extra.lp=lp.bonus; extra.lpDay=lpState().day; }
+quickLog(verdict, extra, lp);
+if(key) scheduleReorder();
+}
+function sumBuckets(list){
+const t={g:0,b:0,x:0,cap:0,cn:0,cs:0,bs:0};
+list.forEach(B=>CORE.forEach(c=>{ if(B[c]) t[c]=r4(t[c]+B[c]); }));
+t.n = t.g+t.b;
+t.wr = t.n ? t.g/t.n : null;
+t.kd = t.b ? t.g/t.b : (t.g||null);
+t.brier = t.cn ? r4(t.bs/t.cn) : null;
+t.conf  = t.cn ? t.cs/t.cn/100 : null;
+return t;
+}
+function lifetime(){ return sumBuckets(Object.values(ST.m).concat(Object.values(ST.y))); }
+function monthKeysBack(n){ const out=[]; let k=mk(now()); for(let i=0;i<n;i++){ out.unshift(k); k=mkShift(k,-1); } return out; }
+function windowTotals(nMonths){ return sumBuckets(monthKeysBack(nMonths).map(k=>ST.m[k]).filter(Boolean)); }
+function prevWindowTotals(nMonths){
+const keys=[]; let k=mkShift(mk(now()),-nMonths);
+for(let i=0;i<nMonths;i++){ keys.push(k); k=mkShift(k,-1); }
+return sumBuckets(keys.map(x=>ST.m[x]).filter(Boolean));
+}
+function yearRows(){
+const years=new Set(Object.keys(ST.y));
+Object.keys(ST.m).forEach(k=>years.add(k.slice(0,4)));
+return Array.from(years).sort().reverse().map(y=>{
+const list=[]; if(ST.y[y]) list.push(ST.y[y]);
+Object.keys(ST.m).forEach(k=>{ if(k.slice(0,4)===y) list.push(ST.m[k]); });
+const t=sumBuckets(list); t.key=y; return t;
+});
+}
+function dimRows(grp, labeler){
+const src = ST.dim[grp]||{};
+return Object.entries(src).map(([k,v])=>({
+key: labeler?labeler(k):k, raw:k, good:v[0], bad:v[1], n:v[0]+v[1],
+wr: (v[0]+v[1]) ? v[0]/(v[0]+v[1]) : null
+})).filter(r=>r.n>0).sort((a,b)=>b.n-a.n);
+}
+function monthSeries(n){
+return monthKeysBack(n).map(k=>{
+const B=ST.m[k]||{}; const g=B.g||0, b=B.b||0;
+return { key:k, g, b, n:g+b, wr:(g+b)?g/(g+b):null, cap:B.cap||0 };
+});
+}
+function openDue(){ return ST.open.filter(o=>o.due && o.due<=now()).length; }
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(ST)); }
+catch(e){ toast("Storage write failed","b"); } }
+function record(ev){
+ev.ts = ev.ts||now();
+applyEvent(ev,1);
+const w=Math.max(1,Math.round(+ev.w||1));
+if(ev.k){
+const N=CFG.settings.histPerBase||3, h=ST.hist[ev.k]||(ST.hist[ev.k]=[]);
+h.unshift([Math.round(ev.ts/60000), ev.verdict==="good"?w:-w]);
+ST.hist[ev.k]=h.slice(0,N);
+}
+ST.meta.undo = ev;
+ST.rec.unshift({ ts:ev.ts, v:ev.verdict, d:ev.domain||null, s:ev.k?null:(ev.stakes||null),
+c:ev.confidence==null?null:ev.confidence, f:(ev.flags||[]).slice(0,3), t:ev.label||"",
+p:w, lp:ev.lp||0 });
+ST.rec = ST.rec.slice(0,25);
+ST.meta.unbacked = (ST.meta.unbacked||0)+1;
+compact();
+save();
+if(ev.verdict==="good"||ev.verdict==="bad") copyMeta(ev);
+}
+function decisionMeta(ev){
+const w=Math.max(1,Math.round(+ev.w||1)), L=lifetime();
+const o={ verdict:ev.verdict, points:ev.verdict==="good"?w:-w };
+if(ev.k) o.base=ev.k;
+if(ev.label) o.label=ev.label;
+if(ev.domain) o.domain=ev.domain;
+if(ev.flags&&ev.flags.length) o.flags=ev.flags.slice();
+if(!ev.k&&ev.stakes) o.stakes=+ev.stakes;
+if(ev.confidence!=null) o.confidence=+ev.confidence;
+if(ev.rev) o.door=ev.rev==="one"?"one-way":"two-way";
+if(ev.lp) o.boost=ev.lp;
+o.at=new Date(ev.ts).toISOString();
+o.kd=L.kd==null?null:+L.kd.toFixed(3);
+o.winRate=L.wr==null?null:+L.wr.toFixed(4);
+return o;
+}
+function copyMeta(ev){
+if(CFG.settings.copyOnLog===false) return;
+let txt; try{ txt=JSON.stringify(decisionMeta(ev)); }catch(e){ return; }
+const done=ok=>{ if(typeof document==="undefined") return;
+const t=document.querySelector&&document.querySelector("#toast");
+if(ok && t && t.className.indexOf("on")===0 && t.textContent.indexOf("copied")<0) t.textContent+=" · copied";
+else if(!ok) toast("Logged — clipboard blocked by browser","b"); };
+try{
+if(navigator.clipboard && navigator.clipboard.writeText){
+navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(legacyCopy(txt)));
+} else done(legacyCopy(txt));
+}catch(e){ done(legacyCopy(txt)); }
+}
+function legacyCopy(t){
+try{
+const ta=document.createElement("textarea"); ta.value=t; ta.readOnly=true;   // readOnly: no iOS keyboard
+ta.style.cssText="position:fixed;top:0;left:0;opacity:0;pointer-events:none";
+document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,t.length);
+const ok=document.execCommand("copy"); ta.remove(); return ok;
+}catch(e){ return false; }
+}
+function undoLast(){
+const ev=ST.meta.undo; if(!ev) return false;
+applyEvent(ev,-1);
+if(ev.k && ST.hist[ev.k] && ST.hist[ev.k].length && ST.hist[ev.k][0][0]===Math.round(ev.ts/60000)){
+ST.hist[ev.k].shift(); if(!ST.hist[ev.k].length) delete ST.hist[ev.k];
+}
+if(ev.lp!=null) lpRefund(ev);
+ST.meta.undo=null; ST.rec.shift();
+ST.meta.unbacked=Math.max(0,(ST.meta.unbacked||0)-1);
+save(); return true;
+}
+function addOpen(o){
+o.id=o.id||uid(); o.ts=o.ts||now();
+ST.open.unshift(o); ST.open=ST.open.slice(0,200);
+ST.meta.unbacked=(ST.meta.unbacked||0)+1; save(); return o;
+}
+function resolveOpen(id, verdict){
+const i=ST.open.findIndex(o=>o.id===id); if(i<0) return;
+const o=ST.open[i]; ST.open.splice(i,1);
+record({ ts:o.ts, verdict, domain:o.domain, flags:o.flags, stakes:o.stakes,
+confidence:o.confidence, rev:o.rev, label:o.label });
+}
+function dropOpen(id){ ST.open=ST.open.filter(o=>o.id!==id); save(); }
+function backupState(){
+const p=CFG.backupPolicy||DEFAULTS.backupPolicy;
+const unb=ST.meta.unbacked||0, last=ST.meta.lastBackup||0;
+const L=lifetime(), any=L.n+L.x+ST.open.length>0;
+const days=last?(now()-last)/DAY:(any?999:0);
+const hard = unb>=p.hardEntries || (any && days>=p.hardDays);
+const soft = unb>=p.softEntries || (any && days>=p.softDays);
+return { unb, last, days, hard, soft: soft&&!hard };
+}
+function buildExport(){
+const L=lifetime();
+return {
+schema: SCHEMA,
+appVersion: APP_VERSION,
+configEditUrl: ST.meta.configEditUrl || CFG.configEditUrl || "",
+app: CFG.app,
+settings: CFG.settings,
+domains: CFG.domains,
+stateFlags: CFG.stateFlags,
+base: baseList(),
+backupPolicy: CFG.backupPolicy,
+legend: {
+note: "Aggregate ledger. Individual decisions are never stored — only counts.",
+bucket: { g:"good points", b:"bad points", x:"void", cap:"stakes-weighted capital",
+cn:"count with confidence", cs:"sum of confidence 0-100", bs:"sum of Brier terms" },
+maps: { d:"domain", f:"state flag", h:"hour bucket 0-5", w:"weekday 0=Sun",
+s:"stakes 1-5", r:"door 1=one-way 2=two-way", cb:"confidence decile 0-9",
+k:"base decision (lifetime only)", value:"[good, bad]" },
+base: "k key · n label · g points per GOOD · b points per BAD · d optional domain",
+hist: `base key -> last ${CFG.settings.histPerBase||3} presses as [epoch minute, signed points]; fixed size`,
+retention: `m = last ${CFG.settings.retainMonths||RETAIN_MONTHS} months at full detail; older months collapse into y (core counts + domain); dim = permanent lifetime cross-sections.`
+},
+summary: {
+since: ST.start, good:L.g, bad:L.b, void:L.x, resolved:L.n,
+winRate: L.wr==null?null:+(L.wr).toFixed(4),
+kd: L.kd==null?null:+(L.kd).toFixed(3),
+capital: L.cap, brier: L.brier, meanConfidence: L.conf==null?null:+(L.conf).toFixed(4),
+openCalls: ST.open.length
+},
+ledger: {
+start: ST.start, m: ST.m, y: ST.y, dim: ST.dim, open: ST.open, hist: ST.hist,
+backup: { at: new Date().toISOString(), months:Object.keys(ST.m).length,
+years:Object.keys(ST.y).length, resolved:L.n }
+}
+};
+}
+function jpretty(v, lvl){
+lvl = lvl||0;
+const flat = JSON.stringify(v);
+if(flat===undefined) return "null";
+if(flat.length<=110 || v===null || typeof v!=="object") return flat;
+const pad="  ".repeat(lvl+1), end="  ".repeat(lvl);
+if(Array.isArray(v)) return "[\n"+v.map(x=>pad+jpretty(x,lvl+1)).join(",\n")+"\n"+end+"]";
+return "{\n"+Object.keys(v).map(k=>pad+JSON.stringify(k)+": "+jpretty(v[k],lvl+1)).join(",\n")+"\n"+end+"}";
+}
+function exportText(){ return jpretty(buildExport()); }
+function exportBytes(){ const t=exportText();
+try{ return new Blob([t]).size; }catch(e){ return t.length; } }
+function yearRowBytes(){
+const ys=Object.values(ST.y);
+if(ys.length) return Math.round(ys.reduce((a,b)=>a+jpretty(b).length+14,0)/ys.length);
+const nd=Object.keys(ST.dim.d||{}).length || (CFG.domains||[]).length;
+return 90 + nd*18;                       // core counts + one [g,b] pair per domain
+}
+function projectBytes(years){
+const cur=exportBytes();
+const retain=CFG.settings.retainMonths||RETAIN_MONTHS;
+const ms=Object.values(ST.m);
+const mAvg=ms.length?Math.round(ms.reduce((a,b)=>a+jpretty(b).length+14,0)/ms.length):420;
+const fill=Math.max(0,Math.min(retain-ms.length, years*12));   // window still filling
+const histFull=baseList().length*(CFG.settings.histPerBase||3)*16;
+const histNow=JSON.stringify(ST.hist||{}).length;
+return cur + fill*mAvg + yearRowBytes()*years + Math.max(0,histFull-histNow);   // hist is a fixed ceiling
+}
+function downloadJSON(obj,name){
+const blob=new Blob([jpretty(obj)],{type:"application/json"});
+const u=URL.createObjectURL(blob), a=document.createElement("a");
+a.href=u; a.download=name; document.body.appendChild(a); a.click();
+setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},400);
+}
+function exportCSV(){
+const rows=[["period","good","bad","void","resolved","win_rate","kd","capital","conf_n","conf_sum","brier_sum"].join(",")];
+const add=(k,t)=>rows.push([k,t.g,t.b,t.x,t.n,t.wr==null?"":t.wr.toFixed(4),
+t.kd==null?"":t.kd.toFixed(3),t.cap,t.cn,t.cs,t.bs].join(","));
+yearRows().slice().reverse().forEach(y=>add(y.key,y));
+Object.keys(ST.m).sort().forEach(k=>add(k,sumBuckets([ST.m[k]])));
+const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+const u=URL.createObjectURL(blob), a=document.createElement("a");
+a.href=u; a.download="decision-kd-trends-"+new Date().toISOString().slice(0,10)+".csv";
+document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},400);
+}
+async function copyText(t){
+try{ await navigator.clipboard.writeText(t); return true; }
+catch(e){
+const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+document.body.appendChild(ta); ta.select(); let ok=false;
+try{ ok=document.execCommand("copy"); }catch(_){}
+ta.remove(); return ok;
+}
+}
+function markBackedUp(){ ST.meta.lastBackup=now(); ST.meta.unbacked=0; save(); render(); }
+function importObj(obj){
+if(!obj||typeof obj!=="object") { toast("Not a valid file","b"); return; }
+if(obj.ledger && (obj.ledger.m||obj.ledger.y||obj.ledger.dim)){
+const L=obj.ledger;
+ST.m = L.m||{}; ST.y = L.y||{}; ST.dim = L.dim||{};
+ST.open = Array.isArray(L.open)?L.open:[];
+ST.hist = (L.hist&&typeof L.hist==="object")?L.hist:{};
+ST.start = L.start||ST.start;
+if(Array.isArray(obj.base)) ST.base = obj.base;
+if(obj.configEditUrl && !ST.meta.configEditUrl) ST.meta.configEditUrl=obj.configEditUrl;
+CFG = deepMerge(CFG, obj);
+ST.meta.unbacked=0; ST.meta.lastBackup=now(); ST.meta.undo=null;
+compact(); save(); render();
+const t=lifetime(); toast(`Restored · ${t.n} resolved points`,"g"); return;
+}
+let evs=null;
+if(Array.isArray(obj)) evs=obj;
+else if(obj.backup && Array.isArray(obj.backup.decisions)) evs=obj.backup.decisions;
+else if(Array.isArray(obj.decisions)) evs=obj.decisions;
+if(!evs){ toast("No ledger found in that file","b"); return; }
+let folded=0, opened=0;
+evs.forEach(d=>{
+const ts = d.ts || Date.parse(d.iso||"") || now();
+if(d.verdict==="good"||d.verdict==="bad"||d.verdict==="void"){
+applyEvent({ ts, verdict:d.verdict, domain:d.domain||null, flags:d.flags||[],
+stakes:d.stakes, confidence:d.confidence==null?null:d.confidence,
+rev:d.reversibility||d.rev||null },1); folded++;
+} else {
+ST.open.push({ id:d.id||uid(), ts, label:(d.title||"").slice(0,80), domain:d.domain||null,
+flags:d.flags||[], stakes:d.stakes||2, confidence:d.confidence==null?null:d.confidence,
+rev:d.reversibility||null, due:d.reviewDue||null }); opened++;
+}
+});
+if(obj.domains) CFG.domains=obj.domains;
+if(obj.stateFlags) CFG.stateFlags=obj.stateFlags;
+if(obj.configEditUrl && !ST.meta.configEditUrl) ST.meta.configEditUrl=obj.configEditUrl;
+const firstTs = evs.map(d=>d.ts).filter(Boolean).sort()[0];
+if(firstTs) ST.start = mk(firstTs);
+compact(); ST.meta.unbacked+=folded+opened; save(); render();
+toast(`Migrated · ${folded} folded into counts, ${opened} still open`,"g");
+}
+function deepMerge(base,over){
+const out=Array.isArray(base)?base.slice():Object.assign({},base);
+if(!over||typeof over!=="object") return out;
+for(const k of Object.keys(over)){
+const bv=base?baseundefined, ov=over[k];
+if(ov&&typeof ov==="object"&&!Array.isArray(ov)&&bv&&typeof bv==="object"&&!Array.isArray(bv)) out[k]=deepMerge(bv,ov);
+else if(ov!==undefined&&ov!==null) out[k]=ov;
+}
+return out;
+}
+function insights(){
+const out=[], MIN=CFG.settings.minSample||10, L=lifetime();
+if(L.n < MIN){
+out.push({k:"info",t:`<b>Building baseline.</b> ${L.n} resolved point${L.n===1?"":"s"} so far; patterns unlock around ${MIN}. Counts are cheap to collect and only become meaningful in bulk.`});
+return out;
+}
+const a=windowTotals(12), p=prevWindowTotals(12);
+if(a.n>=MIN && p.n>=MIN){
+const d=a.wr-p.wr;
+if(Math.abs(d)>=0.07) out.push({k:d>0?"pos":"neg",
+t:`<b>${d>0?"Improving":"Sliding"}.</b> Last 12 months ${pct(a.wr)} over ${a.n} points vs ${pct(p.wr)} over ${p.n} in the 12 before — a ${Math.abs(d*100).toFixed(0)}-point ${d>0?"gain":"drop"}.`,
+tip:d>0?"Whatever changed, it is working. Note what you started doing about a year ago."
+:"Check volume first: a falling win rate with rising volume usually means you loosened your filter, not that you got worse."});
+}
+if(L.cn>=MIN*2 && L.conf!=null){
+const gap=L.conf-L.wr;
+if(gap>=0.08) out.push({k:"neg",
+t:`<b>Overconfident by ${(gap*100).toFixed(0)} points.</b> You claim ${pct(L.conf)} and deliver ${pct(L.wr)} across ${L.cn} scored calls. Brier ${L.brier.toFixed(3)} (0.25 = coin flip).`,
+tip:"Subtract the gap from every estimate for 30 days, then re-measure. Calibration is trainable and it transfers across domains."});
+else if(gap<=-0.08) out.push({k:"warn2",
+t:`<b>Underconfident by ${Math.abs(gap*100).toFixed(0)} points.</b> You predict ${pct(L.conf)}, you deliver ${pct(L.wr)}.`,
+tip:"Underconfidence costs you the decisions you never made — and those leave no evidence in the ledger, which is exactly why nobody counts them."});
+else out.push({k:"pos",
+t:`<b>Well calibrated.</b> Stated ${pct(L.conf)} vs actual ${pct(L.wr)}, Brier ${L.brier.toFixed(3)}.`,
+tip:"Protect this by always recording the forecast before the outcome is known."});
+}
+const doms=dimRows("d").filter(r=>r.n>=MIN);
+if(doms.length>=2){
+const s=doms.slice().sort((x,y)=>y.wr-x.wr), top=s[0], bot=s[s.length-1];
+if(top.wr-bot.wr>=0.15){
+out.push({k:"pos",t:`<b>Strongest: ${esc(top.key)}</b> — ${pct(top.wr)} across ${top.n}.`,
+tip:"Where you are reliably good, decide faster and stop shopping for second opinions."});
+out.push({k:"neg",t:`<b>Weakest: ${esc(bot.key)}</b> — ${pct(bot.wr)} across ${bot.n}.`,
+tip:"Highest-yield place to install a rule: mandatory waiting period, second opinion, or bought expertise."});
+}
+}
+const bks=dimRows("k",k=>(baseItem(k)||{n:k}).n).filter(r=>r.n>=MIN);
+if(bks.length>=2){
+const s=bks.slice().sort((x,y)=>x.wr-y.wr);
+if(s[s.length-1].wr-s[0].wr>=0.15) out.push({k:"neg",
+t:`<b>Weakest base decision: ${esc(s[0].key)}</b> — ${pct(s[0].wr)} of ${s[0].n} points vs ${esc(s[s.length-1].key)} at ${pct(s[s.length-1].wr)}.`,
+tip:"Habits respond to environment more than willpower. Change what is within reach before you change your resolve."});
+}
+dimRows("f").forEach(r=>{
+if(r.n<MIN) return;
+const og=L.g-r.good, ob=L.b-r.bad, on=og+ob; if(on<MIN) return;
+const diff=(og/on)-r.wr;
+if(diff>=0.15) out.push({k:"neg",
+t:`<b>"${esc(r.key)}" is costing you.</b> ${pct(r.wr)} when flagged (n=${r.n}) vs ${pct(og/on)} otherwise.`,
+tip:"A state-validity signal. The cheap intervention is deferral, not trying harder to think straight."});
+});
+const hrs=dimRows("h",k=>HB[+k]).filter(r=>r.n>=MIN);
+if(hrs.length>=3){
+const s=hrs.slice().sort((x,y)=>x.wr-y.wr);
+if(s[s.length-1].wr-s[0].wr>=0.18) out.push({k:"warn2",
+t:`<b>Time-of-day effect.</b> Worst window ${esc(s[0].key)} at ${pct(s[0].wr)} (n=${s[0].n}); best ${esc(s[s.length-1].key)} at ${pct(s[s.length-1].wr)} (n=${s[s.length-1].n}).`,
+tip:"A scheduling policy is cheaper than winning the argument with yourself in the moment."});
+}
+const wds=dimRows("w",k=>WD[+k]).filter(r=>r.n>=MIN);
+if(wds.length>=4){
+const s=wds.slice().sort((x,y)=>x.wr-y.wr);
+if(s[s.length-1].wr-s[0].wr>=0.2) out.push({k:"warn2",
+t:`<b>Weekday effect.</b> ${esc(s[0].key)} ${pct(s[0].wr)} (n=${s[0].n}) vs ${esc(s[s.length-1].key)} ${pct(s[s.length-1].wr)} (n=${s[s.length-1].n}).`,
+tip:"Usually a proxy for load or sleep rather than the day. Look at what your worst day actually contains."});
+}
+const stk=ST.dim.s||{};
+const hi=[4,5].reduce((a,k)=>{const v=stk[k]||[0,0];return[a[0]+v[0],a[1]+v[1]];},[0,0]);
+const lo=[1,2].reduce((a,k)=>{const v=stk[k]||[0,0];return[a[0]+v[0],a[1]+v[1]];},[0,0]);
+if(hi[0]+hi[1]>=MIN && lo[0]+lo[1]>=MIN){
+const hw=hi[0]/(hi[0]+hi[1]), lw=lo[0]/(lo[0]+lo[1]);
+if(lw-hw>=0.15) out.push({k:"neg",
+t:`<b>You degrade under stakes.</b> High-stakes ${pct(hw)} (n=${hi[0]+hi[1]}) vs low-stakes ${pct(lw)} (n=${lo[0]+lo[1]}).`,
+tip:"Pre-commit a checklist for anything rated 4–5 so the process does not depend on your state at the moment of choosing."});
+}
+const rr=ST.dim.r||{}, one=rr["1"]||[0,0], two=rr["2"]||[0,0];
+if(one[0]+one[1]>=MIN && two[0]+two[1]>=MIN){
+const ow=one[0]/(one[0]+one[1]), tw=two[0]/(two[0]+two[1]);
+out.push({k:ow<tw?"neg":"pos",
+t:`<b>Door analysis.</b> One-way ${pct(ow)} (n=${one[0]+one[1]}) · two-way ${pct(tw)} (n=${two[0]+two[1]}).`,
+tip:ow<tw?"Your irreversible calls underperform. Slow those down and speed the reversible ones up — most people do the exact opposite."
+:"Healthy: you are allocating care by reversibility rather than by vividness."});
+}
+const stale=ST.open.filter(o=>now()-o.ts>45*DAY).length;
+if(stale>=3) out.push({k:"warn2",
+t:`<b>${stale} calls open for over 45 days.</b> Unresolved entries silently inflate your win rate, because losses are the ones people avoid adjudicating.`,
+tip:"Resolve or void them. An honest ledger requires closing losses."});
+const v3=windowTotals(3), v3p=prevWindowTotals(3);
+if(v3p.n>=6 && v3.n < v3p.n*0.5) out.push({k:"warn2",
+t:`<b>Logging is dropping off.</b> ${v3.n} in the last 3 months vs ${v3p.n} in the 3 before.`,
+tip:"A ledger with gaps produces survivorship bias, not insight. Use the one-tap URLs on your home screen."});
+if(!out.length) out.push({k:"info",t:"<b>No strong patterns yet.</b> That is itself informative — performance is currently uniform across every dimension tracked. Tag domain, stakes and confidence to sharpen resolution."});
+return out;
+}
+function trendChip(cur,prev){
+if(cur==null||prev==null) return "";
+const d=(cur-prev)*100; if(Math.abs(d)<1) return "";
+return `<span class="delta ${d>0?"up":"dn"}">${d>0?"▲":"▼"}${Math.abs(d).toFixed(0)}</span>`;
+}
+function baseCard(it){
+const life=(ST.dim.k||{})[it.k]||[0,0];
+const h=ST.hist[it.k]||[];
+const hist=h.length
+? h.map(([m,p])=>`<span class="${p>0?"pg":"pb"}">${p>0?"+":"−"}${Math.abs(p)} point${Math.abs(p)===1?"":"s"}</span> · ${agoLong(m*60000)}`).join("<br>")
+: "No presses yet";
+return `<div class="bd">
+<div class="bdh"><b>${esc(it.n)}</b><span>+${it.g} / −${it.b} · ${life[0]}g ${life[1]}b lifetime</span></div>
+<div class="bdrow">
+<button class="big good bsm" data-lp="good" data-k="${esc(it.k)}"><span class="em">✓</span>+${it.g}</button>
+<button class="big bad bsm" data-lp="bad" data-k="${esc(it.k)}"><span class="em">✗</span>−${it.b}</button>
+</div>
+<div class="bdhist">${hist}</div>
+</div>`;
+}
+function baseConfigCard(){
+const list=baseList();
+return `<div class="sect">
+<h3>Configure base decisions</h3>
+<div class="card">
+<div class="cfghd"><span>Name</span><span>+Good</span><span>−Bad</span><span></span></div>
+<div id="cfgRows">${list.map((it,i)=>cfgRow(it,i)).join("")}</div>
+<button class="btn" id="cfgAdd" style="margin-top:8px">+ Add base decision</button>
+<div class="btn2"><button class="btn pri" id="cfgSaveBase">Save list</button>
+<button class="btn" id="cfgReset">Reset defaults</button></div>
+<div class="hint">Points per press, 1–10. Renaming keeps a decision's history; removing one keeps its lifetime points in the totals but drops its mini-history. The list is written into config.json on your next backup.</div>
+</div>
+</div>`;
+}
+function cfgRow(it,i){
+return `<div class="cfgrow" data-ck="${esc(it.k||"")}">
+<input type="text" maxlength="24" value="${esc(it.n||"")}" placeholder="Name" data-cf="n">
+<input type="number" min="1" max="10" value="${it.g==null?2:it.g}" data-cf="g">
+<input type="number" min="1" max="10" value="${it.b==null?3:it.b}" data-cf="b">
+<button class="sm" data-cdel="${i}" title="Remove">✕</button></div>`;
+}
+function viewLog(){
+const L=lifetime(), M=windowTotals(1), Y=windowTotals(12), Yp=prevWindowTotals(12);
+const domChips=(CFG.domains||[]).map(x=>
+`<button class="chip${quickState.domain===x?" on":""}" data-qd="${esc(x)}">${esc(x)}</button>`).join("");
+const flagChips=(CFG.stateFlags||[]).map(f=>
+`<button class="chip tog${quickState.flags.includes(f)?" on":""}" data-qf="${esc(f)}">${esc(f)}</button>`).join("");
+const series=monthSeries(12), maxN=Math.max(1,...series.map(s=>s.n));
+const u=ST.meta.undo;
+const uPts=u&&u.verdict!=="void"?` ${u.verdict==="good"?"+":"−"}${Math.max(1,Math.round(+u.w||1))}`:"";
+const bl=orderedBase();
+return `
+<div class="bigrow">
+<button class="big good" id="qGood" data-lp="good"><span class="em">✓</span>GOOD<span class="sub">${L.g} lifetime</span></button>
+<button class="big bad"  id="qBad" data-lp="bad"><span class="em">✗</span>BAD<span class="sub">${L.b} lifetime</span></button>
+</div>
+<div class="midrow">
+<button class="mid pend" id="qPend">◷ Open call</button>
+<button class="mid" id="qDetail">✎ Tagged entry</button>
+</div>
+${u?`<div class="undo"><span class="ux">Last: <b style="color:${u.verdict==="good"?"var(--good)":u.verdict==="bad"?"var(--bad)":"var(--void)"}">${esc(u.verdict)}${uPts}</b>${u.k?" · "+esc(u.label||u.k):u.domain?" · "+esc(u.domain):""} · ${ago(u.ts)}</span><button id="qUndo">Undo</button></div>`:""}
+<div class="hint">Tap = 1×. Hold any GOOD/BAD button to boost (up to ${lpCfg().maxMult}×) — ${Math.max(0,lpCfg().dailyBonus-lpState().used)} bonus points left today.</div>
+${bl.length?`<div class="sect">
+<h3>Base decisions · most recent first</h3>
+${bl.map(baseCard).join("")}
+</div>`:""}
+<div class="card" style="margin-top:16px">
+<div class="bar"><i style="width:${L.wr!=null?(L.wr*100).toFixed(1):0}%"></i></div>
+<div class="brow"><span>${L.g} good</span><span>${pct(L.wr)} lifetime</span><span>${L.b} bad</span></div>
+<div class="grid3" style="margin-top:12px">
+<div class="stat a"><div class="v">${L.kd!=null?L.kd.toFixed(2):"–"}</div><div class="l">Lifetime KD</div></div>
+<div class="stat ${Y.wr!=null&&Yp.wr!=null?(Y.wr>=Yp.wr?"g":"b"):""}"><div class="v">${pct(Y.wr)}${trendChip(Y.wr,Yp.wr)}</div><div class="l">12-month</div></div>
+<div class="stat p"><div class="v">${M.n}</div><div class="l">This month</div></div>
+</div>
+<div class="spark">${series.map(s=>{
+const h=s.n?Math.max(6,(s.n/maxN)*44):2;
+const cls=s.wr==null?"":(s.wr>=0.5?"g":"b");
+return `<i class="${cls}" style="height:${h}px"></i>`;}).join("")}</div>
+<div class="sparkx"><span>${mkLabel(series[0].key)}</span><span>12-month volume · green = cleared 50%</span><span>now</span></div>
+</div>
+<div class="sect">
+<h3>Tag next entry · domain</h3>
+<div class="chips" id="qDoms">
+<button class="chip${quickState.domain===null?" on":""}" data-qd="">None</button>${domChips}
+</div>
+</div>
+<div class="sect">
+<h3>Tag next entry · state</h3>
+<div class="chips" id="qFlags">${flagChips}</div>
+<div class="hint">Sticky until cleared, and applied to base decisions too. These tags are the only thing that can later prove whether tiredness or time pressure is quietly costing you decisions.</div>
+</div>
+<div class="sect">
+<h3>Recent activity <span style="color:var(--tx3);font-weight:600;text-transform:none;letter-spacing:0">· device only, not backed up</span></h3>
+<div class="card">${ST.rec.length?ST.rec.map(recRow).join(""):'<div class="empty"><div class="e">⚡</div>Nothing logged yet. Hit a button above.</div>'}</div>
+</div>
+<div class="sect">
+<h3>Lifetime</h3>
+<div class="grid3">
+<div class="stat"><div class="v">${L.n+L.x}</div><div class="l">Points</div></div>
+<div class="stat ${L.cap>=0?"g":"b"}"><div class="v">${L.cap>0?"+":""}${L.cap}</div><div class="l">Capital</div></div>
+<div class="stat p"><div class="v">${ST.open.length}</div><div class="l">Open</div></div>
+</div>
+<div class="hint" style="margin-top:10px">Capital is stakes-weighted: a 5/5 win is worth five 1/5 wins. Base decisions move it by their own points. It is the number that actually tracks whether decisions are compounding.</div>
+</div>
+${baseConfigCard()}`;
+}
+function recRow(r){
+const meta=[ago(r.ts)];
+if(r.d) meta.push(`<span class="tag">${esc(r.d)}</span>`);
+if(r.p && r.p>1) meta.push(`<span class="tag">${r.v==="good"?"+":"−"}${r.p} pts${r.lp?" · boosted":""}</span>`);
+if(r.s) meta.push("◆".repeat(r.s));
+if(r.c!=null) meta.push(r.c+"%");
+(r.f||[]).forEach(f=>meta.push(`<span class="tag">${esc(f)}</span>`));
+return `<div class="row"><span class="dot ${r.v}"></span><div class="rmain">
+<div class="rtitle">${r.t?esc(r.t):(r.v==="good"?"Good call":r.v==="bad"?"Bad call":"Void")}</div>
+<div class="rmeta">${meta.join(" ")}</div></div></div>`;
+}
+function viewQueue(){
+const list=ST.open.slice().sort((a,b)=>(a.due||a.ts+90*DAY)-(b.due||b.ts+90*DAY));
+const due=list.filter(o=>o.due&&o.due<=now());
+const rest=list.filter(o=>!due.includes(o));
+const row=o=>{
+const over=o.due&&o.due<now();
+const meta=[ago(o.ts)];
+if(o.domain) meta.push(`<span class="tag">${esc(o.domain)}</span>`);
+if(o.rev) meta.push(o.rev==="one"?"→ one-way":"↔ two-way");
+if(o.stakes) meta.push("◆".repeat(o.stakes));
+if(o.confidence!=null) meta.push(o.confidence+"%");
+(o.flags||[]).forEach(f=>meta.push(`<span class="tag">${esc(f)}</span>`));
+if(o.due) meta.push(`<span class="${over?"overdue":""}">review ${fmtDate(o.due)}</span>`);
+return `<div class="row" data-edit="${o.id}">
+<span class="dot pending"></span>
+<div class="rmain"><div class="rtitle">${o.label?esc(o.label):'<span style="color:var(--tx3)">Untitled call — tap to edit</span>'}</div>
+<div class="rmeta">${meta.join(" ")}</div></div>
+<div class="rbtns"><button class="sm g" data-res="${o.id}|good">✓</button>
+<button class="sm b" data-res="${o.id}|bad">✗</button></div></div>`;
+};
+return `
+<div class="sect"><h3>Open calls awaiting a verdict</h3>
+<div class="card">
+<div class="grid3">
+<div class="stat p"><div class="v">${list.length}</div><div class="l">Open</div></div>
+<div class="stat b"><div class="v">${due.length}</div><div class="l">Due now</div></div>
+<div class="stat"><div class="v">${list.filter(o=>now()-o.ts>45*DAY).length}</div><div class="l">Over 45d</div></div>
+</div>
+<div class="hint" style="margin-top:10px">Open calls are the only per-item records this app keeps — everything else has already been folded into counts. Resolving one adds it to the totals and deletes the record.</div>
+</div>
+</div>
+${due.length?`<div class="sect"><h3>Due for review</h3><div class="card">${due.map(row).join("")}</div></div>`:""}
+<div class="sect"><h3>${due.length?"Everything else":"All open"}</h3>
+<div class="card">${rest.length?rest.map(row).join(""):'<div class="empty"><div class="e">◷</div>No open calls. Log a prediction and come back to score it.</div>'}</div></div>
+<button class="btn" id="qNewPending">+ Log a new open call</button>`;
+}
+function viewTrends(){
+const L=lifetime();
+if(!L.n) return `<div class="empty"><div class="e">◈</div><p>No resolved decisions yet.<br>Trends appear once you have verdicts to count.</p></div>`;
+const w1=windowTotals(1), w3=windowTotals(3), w12=windowTotals(12), w36=windowTotals(36);
+const series=monthSeries(24), maxN=Math.max(1,...series.map(s=>s.n));
+const years=yearRows();
+const tbl=(rows,label)=>rows.length?`<table><thead><tr><th>${label}</th>
+<th style="text-align:right">N</th><th style="text-align:right">Win</th><th></th></tr></thead><tbody>
+${rows.map(r=>`<tr><td>${esc(r.key)}</td><td class="n">${r.n}</td><td class="n">${pct(r.wr)}</td>
+<td class="n"><span class="mini"><i style="width:${r.wr!=null?(r.wr*100).toFixed(0):0}%"></i></span></td></tr>`).join("")}
+</tbody></table>`:'<div class="hint">Not enough tagged data yet.</div>';
+const cb=ST.dim.cb||{};
+const calRows=Object.keys(cb).sort((a,b)=>a-b).map(k=>{
+const v=cb[k], n=v[0]+v[1], act=n?v[0]/n:0;
+return `<div class="calrow"><span class="lbl">${k*10}–${+k*10+10}%</span>
+<span class="caltrack"><i style="width:${(act*100).toFixed(0)}%"></i><u style="left:${+k*10+5}%"></u></span>
+<span class="nn">${n}</span></div>`;
+}).join("");
+return `
+<div class="card">
+<h4>Lifetime · since ${esc(ST.start)}</h4>
+<div class="bar"><i style="width:${(L.wr*100).toFixed(1)}%"></i></div>
+<div class="brow"><span>${L.g} good</span><span>${pct(L.wr)}</span><span>${L.b} bad</span></div>
+<div class="grid3" style="margin-top:12px">
+<div class="stat a"><div class="v">${L.kd.toFixed(2)}</div><div class="l">KD</div></div>
+<div class="stat ${L.cap>=0?"g":"b"}"><div class="v">${L.cap>0?"+":""}${L.cap}</div><div class="l">Capital</div></div>
+<div class="stat"><div class="v">${L.n}</div><div class="l">Resolved pts</div></div>
+</div>
+</div>
+<div class="card">
+<h4>Trailing windows</h4>
+<table><thead><tr><th>Window</th><th style="text-align:right">N</th>
+<th style="text-align:right">KD</th><th style="text-align:right">Win</th></tr></thead><tbody>
+${[["This month",w1],["3 months",w3],["12 months",w12],["36 months",w36],["Lifetime",L]].map(([l,t])=>
+`<tr><td>${l}</td><td class="n">${t.n}</td><td class="n">${t.kd!=null?t.kd.toFixed(2):"–"}</td>
+<td class="n">${pct(t.wr)}</td></tr>`).join("")}
+</tbody></table>
+<div class="hint">Windows are whole calendar months — raw timestamps are discarded on logging, which is what keeps this file small.</div>
+</div>
+<div class="card">
+<h4>24-month trend</h4>
+<div class="spark">${series.map(s=>{const h=s.n?Math.max(6,(s.n/maxN)*44):2;
+return `<i class="${s.wr==null?"":(s.wr>=0.5?"g":"b")}" style="height:${h}px" title="${s.key}: ${s.g}/${s.n}"></i>`;}).join("")}</div>
+<div class="sparkx"><span>${mkLabel(series[0].key)}</span><span>volume</span><span>${mkLabel(series[series.length-1].key)}</span></div>
+<div class="spark" style="height:34px">${series.map(s=>{const h=s.wr==null?2:Math.max(3,s.wr*34);
+return `<i class="${s.wr==null?"":"n"}" style="height:${h}px" title="${s.key}: ${pct(s.wr)}"></i>`;}).join("")}</div>
+<div class="sparkx"><span>0%</span><span>win rate</span><span>100%</span></div>
+</div>
+<div class="card"><h4>By year</h4>
+<table><thead><tr><th>Year</th><th style="text-align:right">N</th><th style="text-align:right">Win</th>
+<th style="text-align:right">KD</th><th style="text-align:right">Cap</th></tr></thead><tbody>
+${years.map(y=>`<tr><td>${y.key}</td><td class="n">${y.n}</td><td class="n">${pct(y.wr)}</td>
+<td class="n">${y.kd!=null?y.kd.toFixed(2):"–"}</td>
+<td class="n" style="color:${y.cap>=0?"var(--good)":"var(--bad)"}">${y.cap>0?"+":""}${y.cap}</td></tr>`).join("")}
+</tbody></table>
+<div class="hint">Years older than ${CFG.settings.retainMonths||RETAIN_MONTHS} months keep counts, capital, calibration sums and domain splits — the rest is intentionally forgotten.</div>
+</div>
+<div class="card">
+<h4>Calibration${L.cn?` · ${L.cn} scored`:""}</h4>
+${L.cn>=5?`<div class="grid2" style="margin-bottom:12px">
+<div class="stat ${L.brier<0.2?"g":L.brier<0.25?"a":"b"}"><div class="v">${L.brier.toFixed(3)}</div><div class="l">Brier</div></div>
+<div class="stat"><div class="v">${pct(L.conf)} / ${pct(L.wr)}</div><div class="l">Said / did</div></div>
+</div>${calRows}
+<div class="hint">Bar = how often those calls actually landed. Tick = what you claimed. Bar short of the tick means overconfidence in that band. Brier under 0.25 beats a coin; under 0.15 is genuinely strong.</div>`
+:'<div class="hint">Set a confidence value on tagged entries to unlock calibration scoring — the most transferable skill this ledger can teach. Being right is domain-specific; knowing how sure to be is not.</div>'}
+</div>
+<div class="card"><h4>By base decision · lifetime points</h4>${tbl(dimRows("k",k=>(baseItem(k)||{n:k+" (removed)"}).n),"Decision")}</div>
+<div class="card"><h4>By domain · lifetime</h4>${tbl(dimRows("d"),"Domain")}</div>
+<div class="card"><h4>By door type</h4>${tbl(dimRows("r",k=>k==="1"?"One-way":"Two-way"),"Type")}
+<div class="hint">If one-way doors underperform two-way doors, you are allocating care by vividness rather than by stakes.</div></div>
+<div class="card"><h4>By stakes</h4>${tbl(dimRows("s",k=>"◆".repeat(+k)+" ("+k+"/5)"),"Stakes")}</div>
+<div class="card"><h4>By time of day</h4>${tbl(dimRows("h",k=>HB[+k]),"Hours")}</div>
+<div class="card"><h4>By weekday</h4>${tbl(dimRows("w",k=>WD[+k]),"Day")}</div>
+${(ST.dim.f&&Object.keys(ST.dim.f).length)?`<div class="card"><h4>By state at decision time</h4>${tbl(dimRows("f"),"State")}</div>`:""}
+<div class="card"><h4>Insights</h4>
+${insights().map(i=>`<div class="ins ${i.k==="neg"?"neg":i.k==="pos"?"pos":i.k==="warn2"?"warn2":""}">${i.t}${i.tip?`<span class="tip">${i.tip}</span>`:""}</div>`).join("")}
+</div>`;
+}
+function viewData(){
+const bs=backupState(), L=lifetime();
+const url=ST.meta.configEditUrl||CFG.configEditUrl||"";
+const base=location.origin+location.pathname;
+const size=exportBytes();
+const fb=baseList()[0];
+const links=[["Good","?log=good"],["Bad","?log=bad"],["Open call","?log=open"],
+["Good · Work","?log=good&tag=Work"],["Bad · Work","?log=bad&tag=Work"],
+["Bad · tired","?log=bad&f=Tired"],["Good, then tag","?log=good&edit=1"]]
+.concat(fb?[[fb.n+" · bad","?log=bad&k="+encodeURIComponent(fb.k)]]:[]);
+const nHist=baseList().length*(CFG.settings.histPerBase||3);
+return `
+<div class="card">
+<h4>Backup status</h4>
+<div class="grid3">
+<div class="stat ${bs.hard?"b":bs.soft?"p":"g"}"><div class="v">${bs.unb}</div><div class="l">Unsaved</div></div>
+<div class="stat"><div class="v">${bs.last?Math.floor(bs.days):"—"}</div><div class="l">Days since</div></div>
+<div class="stat a"><div class="v">${bytes(size)}</div><div class="l">File size</div></div>
+</div>
+<div class="hint" style="margin:10px 0 12px">${bs.last?`Last backup ${ago(bs.last)}.`:"Never backed up."} Nag at ${CFG.backupPolicy.softEntries} entries or ${CFG.backupPolicy.softDays} days; hard block at ${CFG.backupPolicy.hardEntries} or ${CFG.backupPolicy.hardDays}.</div>
+<button class="btn pri" id="dBackup">Run backup now</button>
+<div class="btn2">
+<button class="btn" id="dDl">Download config.json</button>
+<button class="btn" id="dCsv">Export CSV</button>
+</div>
+</div>
+<div class="card">
+<h4>Storage footprint</h4>
+<div class="grid3">
+<div class="stat"><div class="v">${Object.keys(ST.m).length}</div><div class="l">Month rows</div></div>
+<div class="stat"><div class="v">${Object.keys(ST.y).length}</div><div class="l">Year rows</div></div>
+<div class="stat p"><div class="v">${ST.open.length}</div><div class="l">Open items</div></div>
+</div>
+<div class="hint" style="margin:10px 0 8px">${L.n+L.x} points are represented by ${Object.keys(ST.m).length+Object.keys(ST.y).length} rows. Raw entries are discarded at the moment of logging; month rows older than ${CFG.settings.retainMonths||RETAIN_MONTHS} months collapse into a single row per year. Base mini-history is a fixed ring of at most ${nHist} entries.</div>
+<table><thead><tr><th>Horizon</th><th style="text-align:right">Projected file</th></tr></thead><tbody>
+${[1,10,25,50].map(y=>`<tr><td>+${y} year${y===1?"":"s"}</td><td class="n">${bytes(projectBytes(y))}</td></tr>`).join("")}
+</tbody></table>
+<div class="hint">Once the 36-month window is full, the file grows about <b>0.6 KB per year</b> and nothing else — the cost is per <em>year</em>, not per decision. Base decisions and long presses add no per-month fields, so they do not change that rate.</div>
+</div>
+<div class="card">
+<h4>Clipboard</h4>
+<button class="btn ${CFG.settings.copyOnLog===false?"":"gd"}" id="dCopyTog">Copy decision metadata on GOOD/BAD: ${CFG.settings.copyOnLog===false?"off":"on"}</button>
+<div class="hint">Each verdict is copied as one line of JSON (verdict, points, base decision, tags, time, KD after the press). The app keeps no copy of it.</div>
+</div>
+<div class="card">
+<h4>Backup destination</h4>
+${url?`<div class="hint" style="margin-bottom:10px"><code>${esc(url)}</code></div>
+<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Open editor ↗</a>`
+:'<div class="hint" style="margin-bottom:10px">Not set. Backups still download, but nothing pushes you to store them anywhere permanent.</div>'}
+<button class="btn" id="dSetUrl">${url?"Change":"Set"} config edit page</button>
+<div class="hint">Stored locally <em>and</em> written into every exported config.json, so a restored device already knows where its own backups live.</div>
+</div>
+<div class="card">
+<h4>One-tap logging</h4>
+<div class="hint" style="margin-bottom:10px">Add to your home screen (iOS: Share → Add to Home Screen · Android: ⋮ → Add to Home screen), or wire into Shortcuts, Tasker, a widget, or an NFC tag.</div>
+${links.map(([l,q])=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+<code style="flex:1">${esc(q)}</code><button class="sm" data-cp="${esc(base+q)}">Copy</button></div>`).join("")}
+<div class="hint">Parameters: <code>log</code>=good|bad|void|open · <code>k</code>=base decision key · <code>tag</code>=domain · <code>s</code>=stakes 1–5 · <code>c</code>=confidence 0–100 · <code>r</code>=one|two · <code>f</code>=flags (pipe-separated) · <code>t</code>=label (open calls only) · <code>due</code>=YYYY-MM-DD · <code>edit</code>=1 to open the form after logging.</div>
+</div>
+<div class="card">
+<h4>Restore &amp; migrate</h4>
+<button class="btn" id="dImport">Import config.json or old backup</button>
+<button class="btn" id="dPaste">Paste JSON instead</button>
+<div class="hint">A v2 file <b>replaces</b> local counts — aggregates cannot be de-duplicated, so merging would double-count. A v1 file (the old per-decision format) is <b>folded</b> into these counts instead, preserving every statistic that survives aggregation.</div>
+</div>
+<div class="card">
+<h4>Danger zone</h4>
+<button class="btn dan" id="dWipe">Erase all local data</button>
+<div class="hint">Clears this device only. A committed config.json is untouched.</div>
+</div>
+<div class="card"><h4>About</h4>
+<div class="hint">Decision KD v${APP_VERSION} · schema <code>${SCHEMA}</code> · ${bytes(size)}<br><br>
+Counts and trends only. No per-decision text. The only timestamps kept are the last ${CFG.settings.histPerBase||3} presses per base decision (minute precision) for the mini-history. Everything runs client-side; the only network call is fetching <code>config.json</code> from this same repo.</div>
+</div>`;
+}
+function closeModal(){ const m=$("#modal"); if(m) m.innerHTML=""; }
+function showSheet(html,opts){
+opts=opts||{};
+$("#modal").innerHTML=`<div class="scrim${opts.center?" center":""}" id="scrim">
+<div class="sheet">${opts.center?"":'<div class="grab"></div>'}${html}</div></div>`;
+if(!opts.persistent) $("#scrim").addEventListener("click",e=>{ if(e.target.id==="scrim") closeModal(); });
+}
+function normalizeEditUrl(v){
+v=(v||"").trim(); if(!v) return "";
+if(/\/edit\//.test(v)) return v;
+let m=v.match(/github\.com\/([^\/]+)\/([^\/\s]+)/i);
+if(m) return `https://github.com/${m[1]}/${m[2].replace(/\.git$/,"")}/edit/main/config.json`;
+m=v.match(/^([\w.-]+)\/([\w.-]+)$/);
+if(m) return `https://github.com/${m[1]}/${m[2]}/edit/main/config.json`;
+m=v.match(/^https?:\/\/([\w-]+)\.github\.io\/([^\/\s]+)/i);
+if(m) return `https://github.com/${m[1]}/${m[2]}/edit/main/config.json`;
+m=v.match(/^https?:\/\/([\w-]+)\.github\.io\/?$/i);
+if(m) return `https://github.com/${m[1]}/${m[1]}.github.io/edit/main/config.json`;
+return v;
+}
+function askConfigUrl(force){
+const cur=ST.meta.configEditUrl||CFG.configEditUrl||"";
+showSheet(`<h2>Where do backups go?</h2>
+<p class="sd">This ledger keeps counts, not entries — the whole file is a few kilobytes and stays that way for decades. It still needs a permanent home, because browsers do evict local storage.</p>
+<p class="sd">Paste your repo's <b>config.json edit page</b>. When a backup is due the app hands you the file and sends you straight there to paste and commit.</p>
+<label class="f">GitHub repo or edit URL</label>
+<input type="url" id="cfgUrl" placeholder="https://github.com/you/repo" value="${esc(cur)}" autocomplete="off" spellcheck="false">
+<div class="hint">Accepts <code>you/repo</code> · <code>github.com/you/repo</code> · <code>you.github.io/repo</code> · a full <code>/edit/main/config.json</code> link.</div>
+<div style="height:16px"></div>
+<button class="btn pri" id="cfgSave">Save &amp; continue</button>
+${force?"":'<button class="btn" id="cfgSkip">Skip for now</button>'}`,{persistent:!!force});
+$("#cfgSave").onclick=()=>{
+const raw=$("#cfgUrl").value.trim(), url=normalizeEditUrl(raw);
+if(raw && !/^https?:\/\//.test(url)){ toast("That doesn't look like a URL","b"); return; }
+ST.meta.configEditUrl=url; ST.meta.onboarded=true; CFG.configEditUrl=url; save();
+closeModal(); render(); if(url) toast("Backup destination saved","g");
+};
+const s=$("#cfgSkip"); if(s) s.onclick=()=>{ ST.meta.onboarded=true; save(); closeModal(); render(); };
+}
+function showBackupGate(hard){
+const bs=backupState(), url=ST.meta.configEditUrl||CFG.configEditUrl||"";
+showSheet(`<h2>${hard?"Backup required":"Backup due"}</h2>
+<p class="sd">${bs.unb} entr${bs.unb===1?"y":"ies"} since your last backup${bs.last?` (${ago(bs.last)})`:""}. The whole file is ${bytes(exportBytes())} — this takes two taps.${hard?" Logging is paused until it is done." :""}</p>
+<button class="btn pri" id="bkDl">1 · Download config.json</button>
+<button class="btn" id="bkCopy">1b · Copy to clipboard instead</button>
+${url?`<a class="btn" href="${esc(url)}" target="_blank" rel="noopener">2 · Open config.json editor ↗</a>`
+:`<button class="btn" id="bkSet">2 · Set your config edit page first</button>`}
+<div class="hint" style="margin:2px 0 14px">In the GitHub editor: select all (<code>Ctrl/Cmd+A</code>) → paste → <b>Commit changes</b>. Every backup becomes a diff you can read.</div>
+<button class="btn gd" id="bkDone">3 · Done — I committed it</button>
+${hard?"":'<button class="btn" id="bkLater">Remind me later</button>'}`,{persistent:!!hard});
+$("#bkDl").onclick=()=>{ downloadJSON(buildExport(),"config.json"); toast("Downloaded config.json","g"); };
+$("#bkCopy").onclick=async()=>{ const ok=await copyText(exportText());
+toast(ok?"Copied — now paste into GitHub":"Copy failed, use download",ok?"g":"b"); };
+const st=$("#bkSet"); if(st) st.onclick=()=>askConfigUrl(false);
+$("#bkDone").onclick=()=>{ markBackedUp(); closeModal(); toast("Backup recorded ✓","g"); };
+const lt=$("#bkLater"); if(lt) lt.onclick=closeModal;
+}
+function openEntry(mode, existing){
+const o = existing || { verdict:mode||"pending", domain:quickState.domain, flags:quickState.flags.slice(),
+stakes:2, confidence:CFG.settings.defaultConfidence, rev:null, label:"", due:null, ts:now() };
+const isOpen = !!existing || mode==="pending";
+const domOpts=(CFG.domains||[]).map(x=>`<option value="${esc(x)}"${o.domain===x?" selected":""}>${esc(x)}</option>`).join("");
+const flagChips=(CFG.stateFlags||[]).map(f=>
+`<button class="chip tog${(o.flags||[]).includes(f)?" on":""}" data-flag="${esc(f)}">${esc(f)}</button>`).join("");
+const dueVal=o.due?new Date(o.due).toISOString().slice(0,10):"";
+let V = existing ? "pending" : (mode||"pending");
+showSheet(`<h2>${existing?"Edit open call":isOpen?"New open call":"Tagged entry"}</h2>
+<p class="sd">${isOpen
+? "An open call is stored as a record until you resolve it. On resolution it is folded into the counts and the record is deleted."
+: "Only these tags are kept — as counters. No text, no timestamp beyond the month."}</p>
+${existing?"":`<label class="f">Verdict</label>
+<div class="chips" id="eVerdict">${["good","bad","void","pending"].map(v=>
+`<button class="chip${V===v?" on":""}" data-v="${v}">${v==="pending"?"◷ Open call":v==="good"?"✓ Good":v==="bad"?"✗ Bad":"– Void"}</button>`).join("")}</div>`}
+<div id="labelWrap" class="${isOpen?"":"hide"}">
+<label class="f">Short label (open calls only)</label>
+<input type="text" id="eLabel" maxlength="80" value="${esc(o.label||"")}" placeholder="Took the contract over the salaried role" autocomplete="off">
+<label class="f">Review date</label>
+<input type="date" id="eDue" value="${dueVal}">
+</div>
+<label class="f">Domain</label>
+<select id="eDomain"><option value="">—</option>${domOpts}</select>
+<label class="f">Door type</label>
+<div class="chips" id="eRev">
+<button class="chip${o.rev==="two"?" on":""}" data-r="two">↔ Two-way (reversible)</button>
+<button class="chip${o.rev==="one"?" on":""}" data-r="one">→ One-way (irreversible)</button>
+</div>
+<label class="f">Stakes · <span id="eStakesV">${o.stakes||2}</span>/5</label>
+<input type="range" id="eStakes" min="1" max="5" step="1" value="${o.stakes||2}">
+<label class="f">Confidence this turns out well · <span id="eConfV">${o.confidence==null?CFG.settings.defaultConfidence:o.confidence}%</span></label>
+<input type="range" id="eConf" min="0" max="100" step="5" value="${o.confidence==null?CFG.settings.defaultConfidence:o.confidence}">
+<div class="hint">Logged now, scored later. This is what builds the Brier score — the only honest measure of whether you know what you are doing.</div>
+<label class="f">State at time of deciding</label>
+<div class="chips" id="eFlags">${flagChips}</div>
+<div style="height:16px"></div>
+<button class="btn pri" id="eSave">${existing?"Save changes":"Log it"}</button>
+${existing?'<div class="btn2"><button class="btn gd" id="eG">Resolve good</button><button class="btn dan" id="eB">Resolve bad</button></div><div style="height:9px"></div><button class="btn" id="eDel">Delete without counting</button>':""}
+<button class="btn" id="eCancel">Cancel</button>`);
+let RV=o.rev, FL=(o.flags||[]).slice();
+$$("#eVerdict .chip").forEach(b=>b.onclick=()=>{ V=b.dataset.v;
+$$("#eVerdict .chip").forEach(x=>x.classList.toggle("on",x.dataset.v===V));
+$("#labelWrap").classList.toggle("hide",V!=="pending"); });
+$$("#eRev .chip").forEach(b=>b.onclick=()=>{ RV=RV===b.dataset.r?null:b.dataset.r;
+$$("#eRev .chip").forEach(x=>x.classList.toggle("on",x.dataset.r===RV)); });
+$$("#eFlags .chip").forEach(b=>b.onclick=()=>{ const f=b.dataset.flag;
+FL=FL.includes(f)?FL.filter(x=>x!==f):FL.concat([f]); b.classList.toggle("on",FL.includes(f)); });
+$("#eStakes").oninput=e=>$("#eStakesV").textContent=e.target.value;
+$("#eConf").oninput=e=>$("#eConfV").textContent=e.target.value+"%";
+const collect=()=>({
+domain:$("#eDomain").value||null, rev:RV, flags:FL,
+stakes:+$("#eStakes").value, confidence:+$("#eConf").value,
+label:$("#eLabel")?$("#eLabel").value.trim().slice(0,80):"",
+due:($("#eDue")&&$("#eDue").value)?new Date($("#eDue").value+"T09:00").getTime():null
+});
+$("#eSave").onclick=()=>{
+const c=collect();
+if(existing){ Object.assign(existing,c); save(); }
+else if(V==="pending"){ addOpen(Object.assign({ts:now()},c)); }
+else { if(backupState().hard){ showBackupGate(true); return; }
+record(Object.assign({verdict:V},c)); flash(V==="good"?"#2fbf71":V==="bad"?"#e5484d":"#6b7684"); }
+closeModal(); haptic(18); render(); toast(existing?"Saved":"Logged",V==="good"?"g":V==="bad"?"b":undefined);
+};
+if(existing){
+$("#eG").onclick=()=>{ Object.assign(existing,collect()); resolveOpen(existing.id,"good");
+closeModal(); flash("#2fbf71"); haptic(20); render(); toast("Resolved: good","g"); };
+$("#eB").onclick=()=>{ Object.assign(existing,collect()); resolveOpen(existing.id,"bad");
+closeModal(); flash("#e5484d"); haptic(20); render(); toast("Resolved: bad","b"); };
+$("#eDel").onclick=()=>{ dropOpen(existing.id); closeModal(); render(); toast("Deleted"); };
+}
+$("#eCancel").onclick=closeModal;
+}
+function quickLog(verdict,extra,lp){
+if(backupState().hard){ showBackupGate(true); return null; }
+const ev=Object.assign({ verdict, domain:quickState.domain, flags:quickState.flags.slice(),
+stakes:2, confidence:null, rev:null }, extra||{});
+record(ev);
+haptic(verdict==="bad"?[10,40,10]:22);
+flash(verdict==="good"?"#2fbf71":verdict==="bad"?"#e5484d":"#6b7684");
+const L=lifetime(), w=Math.max(1,Math.round(+ev.w||1));
+const what=(ev.k?(ev.label||ev.k)+" ":"")+(verdict==="good"?"Good":verdict==="bad"?"Bad":"Void");
+const pts=verdict==="void"?"":` ${verdict==="good"?"+":"−"}${w}`;
+const note=lp?(lp.capped?" · daily cap":lp.reps?" · decayed":" · boosted"):"";
+toast(`${what}${pts}${note} · KD ${L.kd!=null?L.kd.toFixed(2):"–"}`,
+verdict==="good"?"g":verdict==="bad"?"b":undefined);
+render(); return ev;
+}
+function handleParams(){
+const p=new URLSearchParams(location.search);
+const raw=(p.get("log")||p.get("d")||"").toLowerCase(); if(!raw) return false;
+const map={g:"good",good:"good",w:"good",win:"good",b:"bad",bad:"bad",l:"bad",loss:"bad",
+v:"void",void:"void",p:"pending",pending:"pending",open:"pending",q:"pending"};
+const v=map[raw]; if(!v) return false;
+const extra={};
+const dom=p.get("tag")||p.get("domain");
+if(dom){ const m=(CFG.domains||[]).find(x=>x.toLowerCase()===dom.toLowerCase()); extra.domain=m||dom; }
+const s=p.get("s")||p.get("stakes"); if(s) extra.stakes=clamp(+s,1,5);
+const c=p.get("c")||p.get("conf"); if(c) extra.confidence=clamp(+c,0,100);
+const r=(p.get("r")||p.get("rev")||"").toLowerCase();
+if(["one","1","oneway"].includes(r)) extra.rev="one";
+if(["two","2","twoway"].includes(r)) extra.rev="two";
+const fl=p.get("f")||p.get("flags"); if(fl) extra.flags=fl.split(/[|,]/).map(x=>x.trim()).filter(Boolean);
+const t=p.get("t")||p.get("title"); if(t) extra.label=t.slice(0,80);
+const due=p.get("due"); if(due&&/^\d{4}-\d{2}-\d{2}$/.test(due)) extra.due=new Date(due+"T09:00").getTime();
+const bk=(p.get("k")||p.get("base")||"").toLowerCase();
+const it=bk?baseList().find(x=>x.k===bk||x.n.toLowerCase()===bk):null;
+let opened=null;
+if(v==="pending"){ opened=addOpen(Object.assign({ts:now(),flags:quickState.flags.slice()},extra));
+haptic(18); toast("Open call logged"); }
+else if(it && v!=="void"){ Object.assign(extra,{ k:it.k, label:it.n, domain:it.d||extra.domain||null,
+w:pressBaseW(v,it.k) }); quickLog(v,extra); }
+else quickLog(v,extra);
+history.replaceState({},"",location.pathname);
+if(p.get("edit")==="1"){ if(opened) openEntry(null,opened); else openEntry("good"); }
+return true;
+}
+function render(){
+const L=lifetime();
+$("#hKD").textContent = L.kd!=null ? L.kd.toFixed(2) : "–";
+const dueN=openDue(), badge=$("#qBadge");
+if(dueN>0){ badge.textContent=dueN; badge.classList.remove("hide"); } else badge.classList.add("hide");
+const bs=backupState(); let b="";
+if(bs.soft) b+=`<div class="banner warn"><div class="bx"><b>Backup due.</b> ${bs.unb} unsaved entr${bs.unb===1?"y":"ies"}${bs.last?`, last saved ${ago(bs.last)}`:""}. File is ${bytes(exportBytes())}.</div><button id="bnBackup">Back up</button></div>`;
+if(dueN>0 && TAB!=="queue") b+=`<div class="banner info"><div class="bx"><b>${dueN} call${dueN===1?"":"s"} due for review.</b> Resolve them while the context is fresh.</div><button id="bnQueue">Open</button></div>`;
+$("#banners").innerHTML=b;
+$("#view").innerHTML = TAB==="log"?viewLog(): TAB==="queue"?viewQueue():
+TAB==="trends"?viewTrends(): viewData();
+$$(".nb").forEach(n=>n.classList.toggle("on",n.dataset.tab===TAB));
+bind();
+}
+function readCfgRows(){
+return $$("#cfgRows .cfgrow").map(r=>({
+k:r.dataset.ck||"",
+n:$('[data-cf="n"]',r).value.trim().slice(0,24),
+g:clamp(Math.round(+$('[data-cf="g"]',r).value||2),1,10),
+b:clamp(Math.round(+$('[data-cf="b"]',r).value||3),1,10)
+}));
+}
+function saveBaseList(rows){
+const used=new Set(), out=[], old=new Map(baseList().map(x=>[x.k,x]));
+rows.filter(r=>r.n).forEach(r=>{
+let k=r.k||slug(r.n), i=2; const root=k;
+while(used.has(k)) k=root+"-"+(i++);
+used.add(k);
+const it={ k, n:r.n, g:r.g, b:r.b };
+const prev=old.get(k); if(prev&&prev.d) it.d=prev.d;
+out.push(it);
+});
+ST.base=out; baseOrderCache=null;
+ST.meta.unbacked=(ST.meta.unbacked||0)+1;
+compact(); save(); render(); toast("Base decisions saved","g");
+}
+function bind(){
+const on=(sel,fn)=>{ const e=$(sel); if(e) e.onclick=fn; };
+on("#bnBackup",()=>showBackupGate(false));
+on("#bnQueue",()=>{ TAB="queue"; render(); });
+$$("[data-lp]").forEach(bindPress);          // GOOD/BAD + every base button: tap or hold
+on("#qPend",()=>openEntry("pending"));
+on("#qDetail",()=>openEntry("good"));
+on("#qNewPending",()=>openEntry("pending"));
+on("#qUndo",()=>{ if(undoLast()){ haptic(30); render(); toast("Reversed"); } });
+on("#cfgAdd",()=>{ $("#cfgRows").insertAdjacentHTML("beforeend",cfgRow({k:"",n:"",g:2,b:3},$$("#cfgRows .cfgrow").length));
+bindCfgDel(); const ins=$$('#cfgRows [data-cf="n"]'); ins[ins.length-1].focus(); });
+on("#cfgSaveBase",()=>saveBaseList(readCfgRows()));
+on("#cfgReset",()=>{ showSheet(`<h2>Reset base decisions?</h2>
+<p class="sd">Restores coffee, oil, salt, sugar, sloth, alcohol and gambling at +2 / −3. Lifetime points are kept.</p>
+<button class="btn dan" id="rsGo">Reset list</button><button class="btn" id="rsNo">Cancel</button>`,{center:true});
+$("#rsGo").onclick=()=>{ closeModal(); saveBaseList(DEFAULT_BASE.map(x=>Object.assign({},x))); };
+$("#rsNo").onclick=closeModal; });
+bindCfgDel();
+$$("[data-qd]").forEach(b=>b.onclick=()=>{ quickState.domain=b.dataset.qd||null; render(); });
+$$("[data-qf]").forEach(b=>b.onclick=()=>{ const f=b.dataset.qf;
+quickState.flags=quickState.flags.includes(f)?quickState.flags.filter(x=>x!==f):quickState.flags.concat([f]);
+render(); });
+$$("[data-res]").forEach(b=>b.onclick=e=>{ e.stopPropagation();
+const [id,v]=b.dataset.res.split("|"); resolveOpen(id,v); haptic(20);
+flash(v==="good"?"#2fbf71":"#e5484d"); render(); toast("Resolved: "+v,v==="good"?"g":"b"); });
+$$("[data-edit]").forEach(r=>r.onclick=e=>{ if(e.target.closest("[data-res]")) return;
+const o=ST.open.find(x=>x.id===r.dataset.edit); if(o) openEntry(null,o); });
+$$("[data-cp]").forEach(b=>b.onclick=async()=>{ const ok=await copyText(b.dataset.cp);
+toast(ok?"Link copied":"Copy failed",ok?"g":"b"); });
+on("#dBackup",()=>showBackupGate(false));
+on("#dDl",()=>{ downloadJSON(buildExport(),"config.json"); toast("Downloaded","g"); });
+on("#dCsv",()=>{ exportCSV(); toast("CSV exported","g"); });
+on("#dSetUrl",()=>askConfigUrl(false));
+on("#dCopyTog",()=>{ CFG.settings.copyOnLog=CFG.settings.copyOnLog===false; localStorage.setItem("dkd.copy",CFG.settings.copyOnLog?"1":"0");
+render(); toast("Clipboard copy "+(CFG.settings.copyOnLog?"on":"off")); });
+on("#dImport",()=>{ const i=document.createElement("input"); i.type="file"; i.accept=".json,application/json";
+i.onchange=async()=>{ const f=i.files[0]; if(!f) return;
+try{ importObj(JSON.parse(await f.text())); }catch(e){ toast("Invalid JSON file","b"); } };
+i.click(); });
+on("#dPaste",()=>{ showSheet(`<h2>Paste backup JSON</h2>
+<p class="sd">Accepts a v2 config.json or an old per-decision export.</p>
+<textarea id="pJson" style="min-height:180px" placeholder="{ ... }"></textarea>
+<div style="height:12px"></div><button class="btn pri" id="pGo">Import</button>
+<button class="btn" id="pCancel">Cancel</button>`);
+$("#pGo").onclick=()=>{ try{ importObj(JSON.parse($("#pJson").value)); closeModal(); }
+catch(e){ toast("Could not parse that","b"); } };
+$("#pCancel").onclick=closeModal; });
+on("#dWipe",()=>{ const L=lifetime();
+showSheet(`<h2>Erase everything?</h2>
+<p class="sd">Deletes all local counts (${L.n+L.x} points) and ${ST.open.length} open calls. If you have not committed a backup, they are gone.</p>
+<button class="btn" id="wDl">Download a backup first</button>
+<button class="btn dan" id="wGo">Yes, erase everything</button>
+<button class="btn" id="wNo">Cancel</button>`,{center:true});
+$("#wDl").onclick=()=>downloadJSON(buildExport(),"config-before-wipe.json");
+$("#wGo").onclick=()=>{ const url=ST.meta.configEditUrl; ST=blankState(); ST.meta.configEditUrl=url||"";
+ST.meta.onboarded=true; save(); closeModal(); render(); toast("All local data erased"); };
+$("#wNo").onclick=closeModal; });
+}
+function bindCfgDel(){
+$$("[data-cdel]").forEach(b=>b.onclick=()=>{ b.closest(".cfgrow").remove(); });
+}
+function injectManifest(){
+try{
+const icon="data:image/svg+xml;base64,"+btoa(
+`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" rx="112" fill="#0b0d10"/><text x="256" y="330" font-size="240" font-family="system-ui,sans-serif" font-weight="800" text-anchor="middle" fill="#2fbf71">KD</text></svg>`);
+const m={name:"Decision KD",short_name:"KD",start_url:".",scope:".",display:"standalone",
+background_color:"#0b0d10",theme_color:"#0b0d10",
+icons:[{src:icon,sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}],
+shortcuts:[{name:"Log GOOD",url:"?log=good"},{name:"Log BAD",url:"?log=bad"},{name:"Open call",url:"?log=open"}]};
+const l=document.createElement("link"); l.rel="manifest";
+l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:"application/json"}));
+document.head.appendChild(l);
+}catch(e){}
+}
+async function loadConfig(){
+try{
+const r=await fetch("config.json?ts="+now(),{cache:"no-store"});
+if(r.ok) return await r.json();
+}catch(e){}
+return null;
+}
+function loadLocal(){
+try{
+const raw=localStorage.getItem(LS_KEY); if(!raw) return null;
+const s=JSON.parse(raw);
+if(!s||typeof s!=="object") return null;
+s.m=s.m||{}; s.y=s.y||{}; s.dim=s.dim||{}; s.open=s.open||[]; s.rec=s.rec||[];
+s.hist=s.hist||{}; s.base=Array.isArray(s.base)?s.base:null;
+s.meta=Object.assign({lastBackup:null,unbacked:0,configEditUrl:"",onboarded:false,undo:null,
+lp:{day:"",used:0,recent:[]}},s.meta||{});
+s.start=s.start||mk(now());
+return s;
+}catch(e){ return null; }
+}
+async function boot(){
+injectManifest();
+let ok=true;
+try{ localStorage.setItem("dkd.probe","1"); localStorage.removeItem("dkd.probe"); }catch(e){ ok=false; }
+if(!ok){ document.body.innerHTML='<div class="wrap" style="padding-top:60px"><div class="empty"><div class="e">⚠</div><b>Local storage unavailable.</b><br>Private mode or a locked-down browser will block this app.</div></div>'; return; }
+const file=await loadConfig();
+if(file) CFG=deepMerge(DEFAULTS,file);
+const cp=localStorage.getItem("dkd.copy"); if(cp!=null) CFG.settings.copyOnLog=cp==="1";
+ST=loadLocal();
+if(!ST){
+ST=blankState();
+if(file&&file.ledger){                       // cold start: restore from the committed file
+ST.m=file.ledger.m||{}; ST.y=file.ledger.y||{}; ST.dim=file.ledger.dim||{};
+ST.open=file.ledger.open||[]; ST.start=file.ledger.start||ST.start;
+ST.hist=file.ledger.hist||{};
+ST.meta.lastBackup = file.ledger.backup&&file.ledger.backup.at ? Date.parse(file.ledger.backup.at) : now();
+const L=lifetime(); if(L.n) setTimeout(()=>toast(`Restored ${L.n} points from config.json`,"g"),400);
+}
+if(file&&file.configEditUrl) ST.meta.configEditUrl=file.configEditUrl;
+}
+if(!ST.meta.configEditUrl && CFG.configEditUrl) ST.meta.configEditUrl=CFG.configEditUrl;
+compact(); save();
+$$(".nb").forEach(n=>n.onclick=()=>{ TAB=n.dataset.tab; haptic(8); window.scrollTo(0,0); render(); });
+$("#btnQuick").onclick=()=>openEntry("good");
+const didParam=handleParams();
+render();
+if(!ST.meta.onboarded && !ST.meta.configEditUrl) askConfigUrl(true);
+else { const bs=backupState(); if(bs.hard && !didParam) showBackupGate(true); }
+document.addEventListener("keydown",e=>{
+if(e.target.matches("input,textarea,select")) return;
+if(e.key==="g") quickLog("good");
+if(e.key==="b") quickLog("bad");
+if(e.key==="n") openEntry("pending");
+if(e.key==="z") { if(undoLast()){ render(); toast("Reversed"); } }
+});
+}
+if(typeof globalThis!=="undefined" && globalThis.__DKD_TEST){
+Object.assign(globalThis,{blankState,applyEvent,compact,sumBuckets,lifetime,windowTotals,
+prevWindowTotals,yearRows,dimRows,monthSeries,buildExport,importObj,mk,mkShift,record,undoLast,
+lpCompute,lpCommit,orderedBase,deepMerge,decisionMeta,baseList,agoLong,jpretty,normalizeEditUrl,viewLog,viewTrends,viewData,
+setState:s=>{ST=s;},getState:()=>ST,setCFG:c=>{CFG=c;},getCFG:()=>CFG,DEFAULTS,monthKeysBack});
+} else boot();
+</script>
+</body>
+</html>
